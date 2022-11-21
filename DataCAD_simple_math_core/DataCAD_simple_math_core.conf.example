@@ -1,0 +1,9 @@
+[logging]
+level = INFO
+
+[db_conf]
+host = localhost
+port = 5432
+database = DataCAD_simple_math_core
+user = DataCAD_simple_math_core
+password = DataCAD_simple_math_core
