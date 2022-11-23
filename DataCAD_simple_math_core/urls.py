@@ -2,7 +2,7 @@ from rest.urls import path
 from cache import cache_page
 from .views.example import ExampleView
 from .views.hello import HelloView
-from .views.simple_math import SimpleMath
+from .views.source_wide_table_handler import SourceWideTableHandler
 
 # Use cache_page decorator for caching view
 
@@ -13,5 +13,5 @@ from .views.simple_math import SimpleMath
 urlpatterns = [
     path('example/', ExampleView.as_view()),
     path('hello/', HelloView.as_view()),
-    path('simple_math/', SimpleMath.as_view())
+    path('swt/', SourceWideTableHandler.as_view())
 ]
