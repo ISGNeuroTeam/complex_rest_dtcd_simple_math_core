@@ -1,7 +1,7 @@
 from ot_simple_connector.connector import Connector
-from translator.commands.reader import Reader
-from translator.commands.writer import Writer
-from translator.commands.eval import Eval
+from DataCAD_simple_math_core.translator.commands.reader import Reader
+from DataCAD_simple_math_core.translator.commands.writer import Writer
+from DataCAD_simple_math_core.translator.commands.eval import Eval
 
 
 class SourceWideTable:

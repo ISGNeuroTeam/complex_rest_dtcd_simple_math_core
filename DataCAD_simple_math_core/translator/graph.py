@@ -1,7 +1,7 @@
 import json
 import re
 
-from translator.swt import SourceWideTable
+from DataCAD_simple_math_core.translator.swt import SourceWideTable
 
 
 class Graph:

@@ -2,7 +2,7 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from translator.swt import SourceWideTable
+from DataCAD_simple_math_core.translator.swt import SourceWideTable
 
 
 class SourceWideTableHandler(APIView):

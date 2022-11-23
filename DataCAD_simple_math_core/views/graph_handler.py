@@ -2,8 +2,7 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from translator.swt import SourceWideTable
-from translator.graph import Graph
+from DataCAD_simple_math_core.translator.graph import Graph
 
 
 class GraphHandler(APIView):
