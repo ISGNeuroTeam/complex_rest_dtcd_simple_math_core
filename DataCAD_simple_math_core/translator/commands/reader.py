@@ -1,4 +1,4 @@
-class Read:
+class Reader:
     SWT_BASE_PATH = "SWT"
     FORMAT = "CSV"
 

@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from swt import SourceWideTable
+from translator.swt import SourceWideTable
 
 
 class TestSourceWideTable(unittest.TestCase):

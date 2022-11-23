@@ -1,6 +1,6 @@
 import unittest
 
-from translator.eval import Eval
+from translator.commands.eval import Eval
 
 
 class TestTranslatorEval(unittest.TestCase):
