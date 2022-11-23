@@ -9,7 +9,8 @@ class SourceWideTableHandler(APIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         swt_name = request.data['swt_name']
         graph = request.data['graph']
 
