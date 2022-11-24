@@ -1,3 +1,5 @@
+import json
+
 from ot_simple_connector.connector import Connector
 from DataCAD_simple_math_core.translator.commands.reader import Reader
 from DataCAD_simple_math_core.translator.commands.writer import Writer
@@ -28,10 +30,15 @@ class SourceWideTable:
         return swt
 
     def new_iteration(self, graph):
-        read_query = Reader.read_last_row(self.swt_name)
+        # read_query = Reader.read_last_row(self.swt_name)
+        read_query = Reader.read(self.swt_name)
         eval_query = Eval.from_graph(graph)
         write_query = Writer.rewrite(self.swt_name)
-        query = " | ".join((read_query, eval_query, write_query))
+
+        # TODO fix the problem with overwriting or switch to append mode
+        subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
+
+        query = " | ".join((subquery, write_query))
         swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
         return swt
 

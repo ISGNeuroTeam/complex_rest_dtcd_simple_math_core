@@ -43,7 +43,7 @@ class Eval:
 
     @classmethod
     def from_graph(cls, graph):
-        graph = json.loads(graph)
+        # graph = json.loads(graph)
         nodes = graph["graph"]["nodes"]
         cls.log.debug(f"Nodes: {nodes}")
         sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["value"]))

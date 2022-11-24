@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from translator.commands.eval import Eval
@@ -12,7 +13,7 @@ class TestTranslatorEval(unittest.TestCase):
                     "eval 'TargetRichLabelNode1_1.P' = " \
                     "'ControlledRichLabelNode01_207.V'*'ControlledRichLabelNode01_207.I'*'StepRichLabelNode11_1" \
                     ".Enabled'"
-            second = Eval.from_graph(fr.read())
+            second = Eval.from_graph(json.loads(fr.read()))
             self.assertEqual(first, second)
 
 
