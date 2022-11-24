@@ -6,11 +6,20 @@ from DataCAD_simple_math_core.translator.graph import Graph
 
 
 class GraphHandler(APIView):
+    """
+    Endpoint for graph.
+    It provides update SWT by new expressions in graph and a merged graph with a linked SWT last row.
+    """
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
     @staticmethod
     def post(request):
+        """
+        Updates a linked SWT and merges executed calculations with an incoming graph. Returns it.
+        :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
+        :return
+        """
         swt_name = request.data['swt_name']
         graph = request.data['graph']
 
@@ -25,6 +34,11 @@ class GraphHandler(APIView):
 
     @staticmethod
     def get(request):
+        """
+        Returns a saved graph fragment by its name.
+        :param request: Consists of a "swt_name" (a graph fragment name)
+        :return:
+        """
         swt_name = request.GET.get("swt_name", None)
         if swt_name is None:
             return ErrorResponse(

@@ -6,11 +6,21 @@ from DataCAD_simple_math_core.translator.swt import SourceWideTable
 
 
 class SourceWideTableHandler(APIView):
+    """
+    Endpoint for Source Wide Table.
+    It provides update by an incoming graph and reading a linked table.
+    """
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
     @staticmethod
     def post(request):
+        """
+        Updates a linked SWT by an incoming graph and returns it.
+
+        :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
+        :return:
+        """
         swt_name = request.data['swt_name']
         graph = request.data['graph']
 
@@ -22,12 +32,16 @@ class SourceWideTableHandler(APIView):
             {
                 'swt_name': swt_name,
                 'swt_body': swt,
-
             })
-    pass
 
     @staticmethod
     def get(request):
+        """
+        Reads an SWT table and returns it.
+
+        :param request: Consists of a "swt_name" (a graph fragment name)
+        :return:
+        """
         swt_name = request.GET.get("swt_name", None)
         if swt_name is None:
             return ErrorResponse(
