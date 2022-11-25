@@ -18,7 +18,7 @@ Deploy [complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop)
 ## Running the tests
 Run all tests:
 ```bash
-python ./complex_rest/manage.py test ./plugin_dev/DataCAD_simple_math_core/tests --settings=core.settings.test
+python ./complex_rest/manage.py test ./plugin_dev/dtcd_simple_math_core/tests --settings=core.settings.test
 ```
 
 ## Deployment

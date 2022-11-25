@@ -9,7 +9,7 @@ all:
  build - build project into build directory, with configuration file and environment\n\
  clean - clean all addition file, build directory and output archive file\n\
  test - run all tests\n\
- pack - make output archive, file name format \"DataCAD_simple_math_core_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
+ pack - make output archive, file name format \"dtcd_simple_math_core_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
 Addition section:\n\
  venv\n\
 "
@@ -22,22 +22,22 @@ SET_BRANCH = $(eval BRANCH=$(GENERATE_BRANCH))
 define clean_docker_containers
 	@echo "Stopping and removing docker containers"
 	docker-compose -f docker-compose-test.yml stop
-	if [[ $$(docker ps -aq -f name=DataCAD_simple_math_core) ]]; then docker rm $$(docker ps -aq -f name=DataCAD_simple_math_core);  fi;
+	if [[ $$(docker ps -aq -f name=dtcd_simple_math_core) ]]; then docker rm $$(docker ps -aq -f name=dtcd_simple_math_core);  fi;
 endef
 
 pack: make_build
 	$(SET_VERSION)
 	$(SET_BRANCH)
-	rm -f DataCAD_simple_math_core-*.tar.gz
-	echo Create archive \"DataCAD_simple_math_core-$(VERSION)-$(BRANCH).tar.gz\"
-	cd make_build; tar czf ../DataCAD_simple_math_core-$(VERSION)-$(BRANCH).tar.gz DataCAD_simple_math_core
+	rm -f dtcd_simple_math_core-*.tar.gz
+	echo Create archive \"dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz\"
+	cd make_build; tar czf ../dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz dtcd_simple_math_core
 
 clean_pack:
-	rm -f DataCAD_simple_math_core-*.tar.gz
+	rm -f dtcd_simple_math_core-*.tar.gz
 
 
-DataCAD_simple_math_core.tar.gz: build
-	cd make_build; tar czf ../DataCAD_simple_math_core.tar.gz DataCAD_simple_math_core && rm -rf ../make_build
+dtcd_simple_math_core.tar.gz: build
+	cd make_build; tar czf ../dtcd_simple_math_core.tar.gz dtcd_simple_math_core && rm -rf ../make_build
 
 build: make_build
 
@@ -46,14 +46,14 @@ make_build: venv venv.tar.gz
 	echo make_build
 	mkdir make_build
 
-	cp -R ./DataCAD_simple_math_core make_build
-	rm make_build/DataCAD_simple_math_core/DataCAD_simple_math_core.conf
-	mv make_build/DataCAD_simple_math_core/DataCAD_simple_math_core.conf.example make_build/DataCAD_simple_math_core/DataCAD_simple_math_core.conf
-	cp *.md make_build/DataCAD_simple_math_core/
-	cp *.py make_build/DataCAD_simple_math_core/
+	cp -R ./dtcd_simple_math_core make_build
+	rm make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
+	mv make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf.example make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
+	cp *.md make_build/dtcd_simple_math_core/
+	cp *.py make_build/dtcd_simple_math_core/
 	if [ -s requirements.txt ]; then \
-		mkdir make_build/DataCAD_simple_math_core/venv;\
-		tar -xzf ./venv.tar.gz -C make_build/DataCAD_simple_math_core/venv; \
+		mkdir make_build/dtcd_simple_math_core/venv;\
+		tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv; \
 	fi
 
 clean_build:

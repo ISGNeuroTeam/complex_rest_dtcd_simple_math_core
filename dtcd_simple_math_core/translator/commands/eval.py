@@ -5,7 +5,7 @@ import re
 
 class Eval:
     PROPERTY_TYPE = "expression"
-    PLUGIN_NAME = "DataCAD_simple_math_core"
+    PLUGIN_NAME = "dtcd_simple_math_core"
     OBJECT_ID_COLUMN = "primitiveID"
     RE_OBJECT_PROPERTY_NAME = r"[\.\w]+"
     OBJECT_ID = "__OBJECT_ID__"

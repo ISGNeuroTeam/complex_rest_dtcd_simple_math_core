@@ -1,14 +1,14 @@
 import json
 import re
 
-from DataCAD_simple_math_core.translator.swt import SourceWideTable
+from dtcd_simple_math_core.translator.swt import SourceWideTable
 
 
 class Graph:
 
     OBJECT_ID_COLUMN = "primitiveID"
     RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
-    PATH_TO_GRAPH = "./plugins/DataCAD_simple_math_core/graphs/{0}.json"
+    PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
 
     def __init__(self, swt_name, graph_string=None, graph_dict=None):
         self.swt_name = swt_name

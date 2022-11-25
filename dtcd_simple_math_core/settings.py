@@ -11,9 +11,9 @@ default_ini_config = {
     'db_conf': {
         'host': 'localhost',
         'port': '5432',
-        'database':  'DataCAD_simple_math_core',
-        'user': 'DataCAD_simple_math_core',
-        'password': 'DataCAD_simple_math_core'
+        'database':  'dtcd_simple_math_core',
+        'user': 'dtcd_simple_math_core',
+        'password': 'dtcd_simple_math_core'
     }
 }
 
@@ -22,7 +22,7 @@ default_ini_config = {
 conf_path_env = os.environ.get('DataCAD_simple_math_core_conf', None)
 base_dir = Path(__file__).resolve().parent
 if conf_path_env is None:
-    conf_path = base_dir / 'DataCAD_simple_math_core.conf'
+    conf_path = base_dir / 'dtcd_simple_math_core.conf'
 else:
     conf_path = Path(conf_path_env).resolve()
 

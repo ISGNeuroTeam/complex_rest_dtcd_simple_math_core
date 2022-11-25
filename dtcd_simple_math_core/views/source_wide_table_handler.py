@@ -2,7 +2,7 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from DataCAD_simple_math_core.translator.swt import SourceWideTable
+from dtcd_simple_math_core.translator.swt import SourceWideTable
 
 
 class SourceWideTableHandler(APIView):
@@ -27,7 +27,6 @@ class SourceWideTableHandler(APIView):
         swt = SourceWideTable(swt_name)
         swt = swt.new_iteration(graph)
 
-        # do some logic here
         return SuccessResponse(
             {
                 'swt_name': swt_name,
