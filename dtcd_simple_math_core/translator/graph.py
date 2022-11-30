@@ -1,11 +1,13 @@
 import json
 import re
+import logging
 
 from dtcd_simple_math_core.translator.swt import SourceWideTable
 
 
 class Graph:
-
+    PLUGIN_NAME = "dtcd_simple_math_core"
+    log = logging.getLogger(PLUGIN_NAME)
     OBJECT_ID_COLUMN = "primitiveID"
     RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
     PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
@@ -28,12 +30,15 @@ class Graph:
         return node
 
     def update(self, swt_line):
+        self.log.debug(f"swt_line: {swt_line}")
         filtered_columns = filter(lambda c: not c.startswith("_"), swt_line)
         for column in filtered_columns:
             object_id, object_property = re.match(self.RE_OBJECT_ID_AND_PROPERTY, column).groups()
             node = self.search_node_by_id(object_id)
             _property = node["properties"][object_property]
             _property["value"] = swt_line[column]
+            _property["status"] = "complete"
+            self.log.debug(f"_property: {_property}")
 
         self.graph_string = json.dumps(self.graph_dict)
         return self.graph_string
