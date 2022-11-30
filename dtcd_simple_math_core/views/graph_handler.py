@@ -24,12 +24,12 @@ class GraphHandler(APIView):
         graph = request.data['graph']
 
         _graph = Graph(swt_name, graph_dict=graph)
-        new_graph = _graph.new_iteration()
+        _graph.new_iteration()
 
         return SuccessResponse(
             {
                 'swt_name': swt_name,
-                'graph': new_graph,
+                'graph': _graph.graph_dict,
             })
 
     @staticmethod
