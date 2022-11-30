@@ -46,7 +46,7 @@ class Eval:
         # graph = json.loads(graph)
         nodes = graph["graph"]["nodes"]
         cls.log.debug(f"Nodes: {nodes}")
-        sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["value"]))
+        sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["expression"]))
         cls.log.debug(f"Sorted nodes: {sorted_nodes}")
         eval_expressions = []
         for node in sorted_nodes:
