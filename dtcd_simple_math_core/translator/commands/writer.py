@@ -1,6 +1,6 @@
 class Writer:
     SWT_BASE_PATH = "SWT"
-    FORMAT = "CSV"
+    FORMAT = "JSON"
 
     @classmethod
     def rewrite(cls, swt_name):

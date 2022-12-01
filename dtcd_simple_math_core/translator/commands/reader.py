@@ -1,6 +1,6 @@
 class Reader:
     SWT_BASE_PATH = "SWT"
-    FORMAT = "CSV"
+    FORMAT = "JSON"
 
     @classmethod
     def read(cls, swt_name):
