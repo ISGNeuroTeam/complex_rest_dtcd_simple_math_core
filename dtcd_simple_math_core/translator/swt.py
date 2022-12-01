@@ -13,7 +13,7 @@ class SourceWideTable:
                         "user": "admin",
                         "password": "12345678"}
 
-    CACHE_TTL = 60
+    CACHE_TTL = 5
 
     def __init__(self, swt_name):
         self.swt_name = swt_name
