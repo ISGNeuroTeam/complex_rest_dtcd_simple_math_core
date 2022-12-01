@@ -26,7 +26,10 @@ class Graph:
     def search_node_by_id(self, nid):
         nodes = self.graph_dict["graph"]["nodes"]
         node = filter(lambda n: n[self.OBJECT_ID_COLUMN] == nid, nodes)
-        node = list(node)[0]
+        try:
+            node = list(node)[0]
+        except IndexError:
+            node = None
         return node
 
     def update(self, swt_line):
@@ -34,11 +37,18 @@ class Graph:
         filtered_columns = filter(lambda c: not c.startswith("_"), swt_line)
         for column in filtered_columns:
             object_id, object_property = re.match(self.RE_OBJECT_ID_AND_PROPERTY, column).groups()
+
             node = self.search_node_by_id(object_id)
-            _property = node["properties"][object_property]
-            _property["value"] = swt_line[column]
-            _property["status"] = "complete"
-            self.log.debug(f"_property: {_property}")
+            if node is not None and object_property in node["properties"]:
+                _property = node["properties"][object_property]
+                _property["value"] = swt_line[column]
+                _property["status"] = "complete"
+                self.log.debug(f"_property: {_property}")
+                node["properties"]["_operations_order"]["value"] = node["properties"]["_operations_order"]["expression"]
+                node["properties"]["_operations_order"]["status"] = "complete"
+            else:
+                self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
+            # TODO move graph key names to external shared object between math core classes
 
         self.graph_string = json.dumps(self.graph_dict)
         return self.graph_string
