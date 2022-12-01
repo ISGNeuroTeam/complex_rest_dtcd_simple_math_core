@@ -8,7 +8,7 @@ class Eval:
     PLUGIN_NAME = "dtcd_simple_math_core"
     OBJECT_ID_COLUMN = "primitiveID"
     RE_OBJECT_PROPERTY_NAME = r"[\.\w]+"
-    OBJECT_ID = "__OBJECT_ID__"
+    RE_NUMBERS = r"^\d+\.?\d*$"
 
     log = logging.getLogger(PLUGIN_NAME)
 
@@ -18,11 +18,12 @@ class Eval:
         return flag
 
     @classmethod
-    def make_object_property_full_name(cls, re_group):
+    def make_object_property_full_name(cls, re_group, node_properties, node_id):
         name = re_group.group(0)
-        if "." not in name:
-            name = ".".join((cls.OBJECT_ID, name))
-        name = f"'{name}'"
+        if "." not in name and name in node_properties:
+            name = ".".join((node_id, name))
+        if re.fullmatch(cls.RE_NUMBERS, name) is None and '.' in name:
+            name = f"'{name}'"
         return name
 
     @staticmethod
@@ -30,12 +31,12 @@ class Eval:
         return expr[""]
 
     @classmethod
-    def make_expression(cls, cp_tuple):
+    def make_expression(cls, cp_tuple, node_properties):
         column, _property, node_id = cp_tuple
         if _property['expression']:
             _exp = _property["expression"].strip("\"")
-            _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, cls.make_object_property_full_name, _exp)
-            _exp = _exp.replace(cls.OBJECT_ID, node_id)
+            _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, lambda p: cls.make_object_property_full_name(p, node_properties,
+                                                                                                    node_id), _exp)
             expression = f'eval \'{node_id}.{column}\' = {_exp}'
         else:
             expression = ''
@@ -46,15 +47,19 @@ class Eval:
         # graph = json.loads(graph)
         nodes = graph["graph"]["nodes"]
         cls.log.debug(f"Nodes: {nodes}")
-        sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["expression"]))
-        cls.log.debug(f"Sorted nodes: {sorted_nodes}")
+        try:
+            sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["expression"]))
+            cls.log.debug(f"Sorted nodes: {sorted_nodes}")
+        except KeyError:
+            raise Exception("Not all nodes have _operations_order property")
         eval_expressions = []
         for node in sorted_nodes:
             object_id = node[cls.OBJECT_ID_COLUMN]
             node_properties = node["properties"]
             node_eval_properties = filter(cls.filter_eval_properties, node_properties.items())
             node_eval_properties = map(lambda x: x + (object_id,), node_eval_properties)
-            node_eval_expressions = list(filter(None, map(cls.make_expression, node_eval_properties)))
+            node_eval_expressions = list(filter(None, map(lambda p: cls.make_expression(p, node["properties"].keys()),
+                                                          node_eval_properties)))
             eval_expressions += node_eval_expressions
 
         otl = ' | '.join(eval_expressions)
