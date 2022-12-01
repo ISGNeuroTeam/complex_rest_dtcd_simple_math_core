@@ -1,3 +1,5 @@
+import logging
+
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
@@ -10,11 +12,13 @@ class GraphHandler(APIView):
     Endpoint for graph.
     It provides update SWT by new expressions in graph and a merged graph with a linked SWT last row.
     """
+    PLUGIN_NAME = "dtcd_simple_math_core"
+    log = logging.getLogger(PLUGIN_NAME)
+
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    @staticmethod
-    def post(request):
+    def post(self, request):
         """
         Updates a linked SWT and merges executed calculations with an incoming graph. Returns it.
         :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
@@ -23,8 +27,16 @@ class GraphHandler(APIView):
         swt_name = request.data['swt_name']
         graph = request.data['graph']
 
-        _graph = Graph(swt_name, graph_dict=graph)
-        _graph.new_iteration()
+        try:
+            _graph = Graph(swt_name, graph_dict=graph)
+            _graph.new_iteration()
+        except Exception as e:
+            # TODO Add logging of a caught  exception.
+            return ErrorResponse(
+                {
+                    'message': str(e)
+                }
+            )
 
         return SuccessResponse(
             {
