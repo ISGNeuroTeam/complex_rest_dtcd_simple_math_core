@@ -34,7 +34,7 @@ class Eval:
     def make_expression(cls, cp_tuple, node_properties):
         column, _property, node_id = cp_tuple
         if _property['expression']:
-            _exp = _property["expression"].strip("\"")
+            _exp = _property["expression"]
             _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, lambda p: cls.make_object_property_full_name(p, node_properties,
                                                                                                     node_id), _exp)
             expression = f'eval \'{node_id}.{column}\' = {_exp}'
