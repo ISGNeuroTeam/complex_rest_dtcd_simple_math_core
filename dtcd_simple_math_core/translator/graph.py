@@ -23,13 +23,18 @@ class Graph:
         else:
             raise Exception("Can`t load graph")
 
-    def search_node_by_id(self, nid):
-        nodes = self.graph_dict["graph"]["nodes"]
-        node = filter(lambda n: n[self.OBJECT_ID_COLUMN] == nid, nodes)
+    @classmethod
+    def search_node_by_id(cls, nid, nodes):
+        node = filter(lambda n: n[cls.OBJECT_ID_COLUMN] == nid, nodes)
         try:
             node = list(node)[0]
         except IndexError:
             node = None
+        return node
+
+    def _search_node_by_id(self, nid):
+        nodes = self.graph_dict["graph"]["nodes"]
+        node = self.search_node_by_id(nid, nodes)
         return node
 
     def update(self, swt_line):
@@ -38,7 +43,7 @@ class Graph:
         for column in filtered_columns:
             object_id, object_property = re.match(self.RE_OBJECT_ID_AND_PROPERTY, column).groups()
 
-            node = self.search_node_by_id(object_id)
+            node = self._search_node_by_id(object_id)
             if node is not None and object_property in node["properties"]:
                 _property = node["properties"][object_property]
                 _property["value"] = swt_line[column]
