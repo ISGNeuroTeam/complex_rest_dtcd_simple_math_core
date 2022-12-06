@@ -4,10 +4,10 @@ import unittest
 from translator.graph import Graph
 
 
-class TestGraph(unittest.TestCase):
+class TestGraphWithEdges(unittest.TestCase):
 
     def setUp(self) -> None:
-        with open("resources/example_of_graph.json") as fr:
+        with open("resources/example_of_graph_with_edges.json") as fr:
             self._graph = Graph("example_of_swt", fr.read())
         Graph.PATH_TO_GRAPH = "./resources/graphs/{0}.json"
 
