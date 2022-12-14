@@ -17,6 +17,9 @@ class Reader:
     @classmethod
     def read_tick(cls, swt_name, tick):
         base_read_line = cls.read(swt_name)
-        filter_line = f"search {cls.TICK_COLUMN}={tick}"
-        complete_line = " | ".join((base_read_line, filter_line))
+        if tick == -1:
+            complete_line = cls.read_last_row(swt_name)
+        else:
+            filter_line = f"search {cls.TICK_COLUMN}={tick}"
+            complete_line = " | ".join((base_read_line, filter_line))
         return complete_line
