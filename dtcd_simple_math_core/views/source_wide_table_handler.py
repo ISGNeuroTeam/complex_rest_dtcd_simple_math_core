@@ -37,23 +37,33 @@ class SourceWideTableHandler(APIView):
     def get(request):
         """
         Reads an SWT table and returns it.
-
-        :param request: Consists of a "swt_name" (a graph fragment name)
-        :return:
+        :param request: Keys of request JSON object
+            "swt_name" [STRING] a graph fragment name
+            "tick" [NUMBER] specified tick or
+                -1 last row
+                0 whole table
+                >0 tick from table
+        :return: an SWT table in a JSONL format
         """
         swt_name = request.GET.get("swt_name", None)
+        tick = request.GET.get("tick", 0)
         if swt_name is None:
-            return ErrorResponse(
-                {
-                    'message': 'A source wide table name is required'
-                }
-            )
+            return ErrorResponse({'message': 'A source wide table name is required'})
         else:
+
             swt = SourceWideTable(swt_name)
-            table = swt.read()
+
+            if tick == 0:
+                table = swt.read()
+            elif tick == -1:
+                table = swt.read_last_row()
+            elif tick > 0:
+                table = swt.read_tick(tick)
+            else:
+                return ErrorResponse({'message': 'A wrong tick is specified'})
+
             return SuccessResponse(
                 {
                     'table': table
                 })
 
-    pass

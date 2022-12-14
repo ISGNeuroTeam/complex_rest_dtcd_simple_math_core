@@ -19,14 +19,22 @@ class SourceWideTable:
         self.swt_name = swt_name
         self.connector = Connector(**self.CONNECTOR_CONFIG)
 
+    def _query(self, query):
+        return self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
+
     def read(self):
         query = Reader.read(self.swt_name)
-        swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
+        swt = self._query(query)
         return swt
 
     def read_last_row(self):
         query = Reader.read_last_row(self.swt_name)
-        swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
+        swt = self._query(query)
+        return swt
+
+    def read_tick(self, tick):
+        query = Reader.read_tick(self.swt_name, tick)
+        swt = self._query(query)
         return swt
 
     def new_iteration(self, graph):
