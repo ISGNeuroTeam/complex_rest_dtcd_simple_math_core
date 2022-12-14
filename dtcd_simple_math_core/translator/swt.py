@@ -33,8 +33,15 @@ class SourceWideTable:
         return swt
 
     def read_tick(self, tick):
-        query = Reader.read_tick(self.swt_name, tick)
-        swt = self._query(query)
+        if tick == 0:
+            swt = self.read()
+        elif tick == -1:
+            swt = self.read_last_row()
+        elif tick > 0:
+            query = Reader.read_tick(self.swt_name, tick)
+            swt = self._query(query)
+        else:
+            raise Exception(f"Wrong tick: {tick}")
         return swt
 
     def new_iteration(self, graph):

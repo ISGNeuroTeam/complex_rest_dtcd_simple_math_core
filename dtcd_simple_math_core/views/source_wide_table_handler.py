@@ -52,16 +52,7 @@ class SourceWideTableHandler(APIView):
         else:
 
             swt = SourceWideTable(swt_name)
-
-            if tick == 0:
-                table = swt.read()
-            elif tick == -1:
-                table = swt.read_last_row()
-            elif tick > 0:
-                table = swt.read_tick(tick)
-            else:
-                return ErrorResponse({'message': 'A wrong tick is specified'})
-
+            table = swt.read_tick(tick)
             return SuccessResponse(
                 {
                     'table': table
