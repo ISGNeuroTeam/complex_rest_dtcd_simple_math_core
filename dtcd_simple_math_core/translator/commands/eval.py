@@ -14,6 +14,8 @@ class Eval:
     RE_OBJECT_PROPERTY_NAME = r"""(?<=[^'\w\."]|^)([\w\.]+)(?=[^'\w\."]|$)+?"""
     RE_NUMBERS = r"^\d+\.?\d*$"
 
+    DEFAULT_OPERATIONS_ORDER = 100
+
     log = logging.getLogger(PLUGIN_NAME)
 
     @classmethod
@@ -150,12 +152,17 @@ class Eval:
         return node_eval_expressions
 
     @classmethod
-    def preprocess_nodes_and_edges(cls, nodes, edges):
+    def sort_operations_order(cls, node):
         try:
-            sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["expression"]))
-            cls.log.debug(f"Sorted nodes: {sorted_nodes}")
+            _operations_order = int(node["properties"]["_operations_order"]["expression"])
         except KeyError:
-            raise Exception("Not all nodes have _operations_order property")
+            _operations_order = cls.DEFAULT_OPERATIONS_ORDER
+        return _operations_order
+
+    @classmethod
+    def preprocess_nodes_and_edges(cls, nodes, edges):
+        sorted_nodes = sorted(nodes, key=cls.sort_operations_order)
+        cls.log.debug(f"Sorted nodes: {sorted_nodes}")
         eval_expressions = []
         for node in sorted_nodes:
             cls.log.info(f"Node: {node}")
