@@ -5,7 +5,6 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
 from dtcd_simple_math_core.translator.graph import Graph
-from dtcd_simple_math_core.settings import ini_config
 
 
 class GraphHandler(APIView):
@@ -15,7 +14,6 @@ class GraphHandler(APIView):
     """
     PLUGIN_NAME = "dtcd_simple_math_core"
     log = logging.getLogger(PLUGIN_NAME)
-    log.setLevel(ini_config['logging']['level'])
 
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)

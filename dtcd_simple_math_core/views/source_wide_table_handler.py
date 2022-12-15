@@ -5,8 +5,6 @@ from rest.response import SuccessResponse, ErrorResponse
 
 from dtcd_simple_math_core.translator.swt import SourceWideTable
 
-from dtcd_simple_math_core.settings import ini_config
-
 
 class SourceWideTableHandler(APIView):
     """
@@ -18,7 +16,6 @@ class SourceWideTableHandler(APIView):
 
     PLUGIN_NAME = "dtcd_simple_math_core"
     log = logging.getLogger(PLUGIN_NAME)
-    log.setLevel(ini_config['logging']['level'])
 
     def post(self, request):
         """
