@@ -20,7 +20,8 @@ class Eval:
 
     @classmethod
     def filter_eval_properties(cls, _property):
-        flag = _property[1]["type"] == cls.PROPERTY_TYPE and not _property[0].startswith("_")
+        cls.log.debug(f"_property: {_property}")
+        flag = not _property[0].startswith("_") and _property[1]["type"] == cls.PROPERTY_TYPE
         return flag
 
     @classmethod

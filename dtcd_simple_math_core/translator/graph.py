@@ -12,6 +12,8 @@ class Graph:
     RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
     PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
 
+    DEFAULT_OPERATIONS_ORDER = 100
+
     def __init__(self, swt_name, graph_string=None, graph_dict=None):
         self.swt_name = swt_name
         if graph_string is not None:
@@ -42,15 +44,27 @@ class Graph:
         filtered_columns = filter(lambda c: not c.startswith("_"), swt_line)
         for column in filtered_columns:
             object_id, object_property = re.match(self.RE_OBJECT_ID_AND_PROPERTY, column).groups()
-
+            self.log.debug(f"object_id: {object_id}, object_property: {object_property}")
             node = self._search_node_by_id(object_id)
             if node is not None and object_property in node["properties"]:
+                self.log.debug(f"node: {node}")
                 _property = node["properties"][object_property]
                 _property["value"] = swt_line[column]
                 _property["status"] = "complete"
                 self.log.debug(f"_property: {_property}")
-                node["properties"]["_operations_order"]["value"] = node["properties"]["_operations_order"]["expression"]
-                node["properties"]["_operations_order"]["status"] = "complete"
+                if "_operations_order" in node["properties"]:
+                    node["properties"]["_operations_order"]["value"] = node["properties"]["_operations_order"][
+                        "expression"]
+                    node["properties"]["_operations_order"]["status"] = "complete"
+                    self.log.error(f"Updated _operations_order: {node['properties']['_operations_order']}")
+                else:
+                    node["properties"]["_operations_order"] = {}
+                    node["properties"]["_operations_order"]["value"] = self.DEFAULT_OPERATIONS_ORDER
+                    node["properties"]["_operations_order"]["status"] = "complete"
+                    node["properties"]["_operations_order"]["type"] = "expression"
+                    node["properties"]["_operations_order"]["expression"] = self.DEFAULT_OPERATIONS_ORDER
+                    node["properties"]["_operations_order"]["input"] = {"component": "textarea"}
+                    self.log.error(f"Created _operations_order: {node['properties']['_operations_order']}")
             else:
                 self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
             # TODO move graph key names to external shared object between math core classes
