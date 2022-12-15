@@ -1,8 +1,11 @@
+import logging
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
 from dtcd_simple_math_core.translator.swt import SourceWideTable
+
+from dtcd_simple_math_core.settings import ini_config
 
 
 class SourceWideTableHandler(APIView):
@@ -13,8 +16,11 @@ class SourceWideTableHandler(APIView):
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
-    @staticmethod
-    def post(request):
+    PLUGIN_NAME = "dtcd_simple_math_core"
+    log = logging.getLogger(PLUGIN_NAME)
+    log.setLevel(ini_config['logging']['level'])
+
+    def post(self, request):
         """
         Updates a linked SWT by an incoming graph and returns it.
 
@@ -24,17 +30,19 @@ class SourceWideTableHandler(APIView):
         swt_name = request.data['swt_name']
         graph = request.data['graph']
 
+        self.log.info(f"swt_name: {swt_name}")
+        self.log.debug(f"graph: {graph}")
+
         swt = SourceWideTable(swt_name)
         swt = swt.new_iteration(graph)
-
+        self.log.debug(f"swt: {swt}")
         return SuccessResponse(
             {
                 'swt_name': swt_name,
                 'swt_body': swt,
             })
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         """
         Reads an SWT table and returns it.
         :param request: Keys of request JSON object
@@ -47,12 +55,17 @@ class SourceWideTableHandler(APIView):
         """
         swt_name = request.GET.get("swt_name", None)
         tick = request.GET.get("tick", 0)
+
+        self.log.info(f"swt_name: {swt_name}")
+        self.log.info(f"tick: {tick}")
+
         if swt_name is None:
             return ErrorResponse({'message': 'A source wide table name is required'})
         else:
 
             swt = SourceWideTable(swt_name)
             table = swt.read_tick(tick)
+            self.log.debug(f"table: {table}")
             return SuccessResponse(
                 {
                     'table': table

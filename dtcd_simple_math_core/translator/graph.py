@@ -56,7 +56,7 @@ class Graph:
                     node["properties"]["_operations_order"]["value"] = node["properties"]["_operations_order"][
                         "expression"]
                     node["properties"]["_operations_order"]["status"] = "complete"
-                    self.log.error(f"Updated _operations_order: {node['properties']['_operations_order']}")
+                    self.log.debug(f"Updated _operations_order: {node['properties']['_operations_order']}")
                 else:
                     node["properties"]["_operations_order"] = {}
                     node["properties"]["_operations_order"]["value"] = self.DEFAULT_OPERATIONS_ORDER
@@ -64,7 +64,7 @@ class Graph:
                     node["properties"]["_operations_order"]["type"] = "expression"
                     node["properties"]["_operations_order"]["expression"] = self.DEFAULT_OPERATIONS_ORDER
                     node["properties"]["_operations_order"]["input"] = {"component": "textarea"}
-                    self.log.error(f"Created _operations_order: {node['properties']['_operations_order']}")
+                    self.log.debug(f"Created _operations_order: {node['properties']['_operations_order']}")
             else:
                 self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
             # TODO move graph key names to external shared object between math core classes
@@ -76,6 +76,7 @@ class Graph:
         swt = SourceWideTable(self.swt_name)
         swt = swt.new_iteration(self.graph_dict)
         swt_last_line = swt[-1]
+        self.log.info(f"swt_last_line: {swt_last_line}")
         return self.update(swt_last_line)
 
     def save(self):

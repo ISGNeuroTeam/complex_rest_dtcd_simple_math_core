@@ -1,5 +1,6 @@
 import json
 
+import logging
 from ot_simple_connector.connector import Connector
 from dtcd_simple_math_core.translator.commands.reader import Reader
 from dtcd_simple_math_core.translator.commands.writer import Writer
@@ -7,13 +8,14 @@ from dtcd_simple_math_core.translator.commands.eval import Eval
 
 
 class SourceWideTable:
-
+    PLUGIN_NAME = "dtcd_simple_math_core"
     CONNECTOR_CONFIG = {"host": "s-dev-2.dev.isgneuro.com",
                         "port": "6080",
                         "user": "admin",
                         "password": "12345678"}
 
     CACHE_TTL = 5
+    log = logging.getLogger(PLUGIN_NAME)
 
     def __init__(self, swt_name):
         self.swt_name = swt_name
@@ -54,6 +56,7 @@ class SourceWideTable:
         subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
 
         query = " | ".join((subquery, write_query))
+        self.log.info(f"New iteration query: {query}")
         swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
         return swt
 

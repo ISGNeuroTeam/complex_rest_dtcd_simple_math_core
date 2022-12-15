@@ -124,7 +124,7 @@ class Eval:
 
     @classmethod
     def make_expression(cls, cp_tuple, node_properties, node_ports_in, edges, nodes):
-        cls.log.info(f"cp_tuple: {cp_tuple}")
+        cls.log.debug(f"cp_tuple: {cp_tuple}")
         column, _property, node_id = cp_tuple
         if _property['expression']:
             _exp = _property["expression"]
@@ -134,7 +134,7 @@ class Eval:
             expression = f'eval \'{node_id}.{column}\' = {_exp}'
         else:
             expression = ''
-        cls.log.info(f"expression: {expression}")
+        cls.log.debug(f"expression: {expression}")
         return expression
 
     @classmethod
@@ -146,7 +146,7 @@ class Eval:
         node_properties = node["properties"]
         node_eval_properties = list(filter(cls.filter_eval_properties, node_properties.items()))
         node_eval_properties = list(map(lambda x: x + (object_id,), node_eval_properties))
-        cls.log.info(f"node_eval_properties: {node_eval_properties}")
+        cls.log.debug(f"node_eval_properties: {node_eval_properties}")
         node_eval_expressions = list(filter(None, map(lambda p: cls.make_expression(p, node["properties"].keys(),
                                                                                     node_ports_in, edges, nodes),
                                                       node_eval_properties)))
@@ -166,7 +166,7 @@ class Eval:
         cls.log.debug(f"Sorted nodes: {sorted_nodes}")
         eval_expressions = []
         for node in sorted_nodes:
-            cls.log.info(f"Node: {node}")
+            cls.log.debug(f"Node: {node}")
             node_eval_expressions = cls.preprocess_one_node(node, nodes, edges)
             eval_expressions += node_eval_expressions
 
@@ -180,4 +180,5 @@ class Eval:
         edges = graph["graph"]["edges"]
         cls.log.debug(f"Edges: {edges}")
         otl = cls.preprocess_nodes_and_edges(nodes, edges)
+        cls.log.info(f"Eval otl: {otl}")
         return otl
