@@ -53,7 +53,7 @@ class SourceWideTable:
         write_query = Writer.rewrite(self.swt_name)
 
         # TODO fix the problem with overwriting or switch to append mode
-        subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
+        subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)), ensure_ascii=False)}"
 
         query = " | ".join((subquery, write_query))
         self.log.info(f"New iteration query: {query}")
