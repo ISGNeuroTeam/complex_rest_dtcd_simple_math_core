@@ -52,6 +52,7 @@ class SourceWideTableHandler(APIView):
         """
         swt_name = request.GET.get("swt_name", None)
         tick = request.GET.get("tick", 0)
+        tick = int(tick)
 
         self.log.info(f"swt_name: {swt_name}")
         self.log.info(f"tick: {tick}")
