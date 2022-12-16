@@ -11,7 +11,7 @@ class Graph:
     OBJECT_ID_COLUMN = "primitiveID"
     RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
     PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
-
+    SWT_PROPERTY_TYPE = "SWT"
     DEFAULT_OPERATIONS_ORDER = 100
 
     def __init__(self, swt_name, graph_string=None, graph_dict=None):
@@ -73,6 +73,9 @@ class Graph:
         return self.graph_string
 
     def new_iteration(self):
+
+        self.swt_queries_resolve()
+
         swt = SourceWideTable(self.swt_name)
         swt = swt.new_iteration(self.graph_dict)
         swt_last_line = swt[-1]
@@ -89,3 +92,25 @@ class Graph:
         path = cls.PATH_TO_GRAPH.format(swt_name)
         with open(path) as fr:
             return Graph(swt_name, fr.read())
+
+    def swt_queries_resolve(self, tick=-1):
+
+        def filter_swt_properties(_property):
+            self.log.debug(f"_property: {_property}")
+            flag = not _property[0].startswith("_") and _property[1]["type"] == self.SWT_PROPERTY_TYPE
+            return flag
+
+        nodes = self.graph_dict["graph"]["nodes"]
+
+        for node in nodes:
+            node_properties = node["properties"]
+            node_swt_properties = list(filter(filter_swt_properties, node_properties.items()))
+            for swt_property_name in node_swt_properties:
+                swt_property = node_swt_properties[swt_property_name]
+                swt_name = swt_property["swt_name"]
+                column = swt_property["column"]
+                swt = SourceWideTable(swt_name)
+                lines = swt.read_tick(tick)
+                value = lines["table"][0][column]
+                # TODO Check if "value" is to be set
+                swt_property["expression"] = value

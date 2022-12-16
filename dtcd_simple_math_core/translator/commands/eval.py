@@ -7,7 +7,8 @@ class Eval:
     RE_IN_PORTS = r"inPort\d+"
     IN_PORT_TYPE = "IN"
     OUT_PORT_TYPE = "OUT"
-    PROPERTY_TYPE = "expression"
+    EXPRESSION_PROPERTY_TYPE = "expression"
+    SWT_PROPERTY_TYPE = "SWT"
     PLUGIN_NAME = "dtcd_simple_math_core"
     OBJECT_ID_COLUMN = "primitiveID"
     OBJECT_PORTS_KEY = "initPorts"
@@ -21,7 +22,7 @@ class Eval:
     @classmethod
     def filter_eval_properties(cls, _property):
         cls.log.debug(f"_property: {_property}")
-        flag = not _property[0].startswith("_") and _property[1]["type"] == cls.PROPERTY_TYPE
+        flag = not _property[0].startswith("_") and (_property[1]["type"] == cls.EXPRESSION_PROPERTY_TYPE or _property[1]["type"] == cls.SWT_PROPERTY_TYPE)
         return flag
 
     @classmethod
