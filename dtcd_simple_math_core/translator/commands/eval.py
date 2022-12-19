@@ -127,8 +127,9 @@ class Eval:
     def make_expression(cls, cp_tuple, node_properties, node_ports_in, edges, nodes):
         cls.log.debug(f"cp_tuple: {cp_tuple}")
         column, _property, node_id = cp_tuple
-        if _property['expression']:
-            _exp = _property["expression"]
+        expression_key = "expression" if _property["type"] == cls.EXPRESSION_PROPERTY_TYPE else "_expression"
+        if _property[expression_key]:
+            _exp = _property[expression_key]
             _exp = re.sub(cls.RE_IN_PORTS, lambda p: cls.resolve_ports_in(p, node_ports_in, edges, nodes), _exp)
             _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, lambda p: cls.make_object_property_full_name(p, node_properties,
                                                                                                     node_id), _exp)
