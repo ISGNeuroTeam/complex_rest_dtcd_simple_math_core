@@ -69,8 +69,8 @@ class Graph:
                 self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
             # TODO move graph key names to external shared object between math core classes
 
-        self.graph_string = json.dumps(self.graph_dict)
-        return self.graph_string
+        # self.graph_string = json.dumps(self.graph_dict)
+        return self.graph_dict
 
     def new_iteration(self):
 
@@ -105,12 +105,11 @@ class Graph:
         for node in nodes:
             node_properties = node["properties"]
             node_swt_properties = list(filter(filter_swt_properties, node_properties.items()))
-            for swt_property_name in node_swt_properties:
-                swt_property = node_swt_properties[swt_property_name]
-                swt_name = swt_property["swt_name"]
-                column = swt_property["column"]
+            for (property_name, swt_property) in node_swt_properties:
+                swt_name = swt_property["expression"]["swt_name"]
+                column = swt_property["expression"]["column"]
                 swt = SourceWideTable(swt_name)
                 lines = swt.read_tick(tick)
-                value = lines["table"][0][column]
+                value = lines[0][column]
                 # TODO Check if "value" is to be set
-                swt_property["expression"] = value
+                swt_property["_expression"] = value
