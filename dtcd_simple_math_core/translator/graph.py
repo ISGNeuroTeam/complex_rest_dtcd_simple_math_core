@@ -112,4 +112,6 @@ class Graph:
                 lines = swt.read_tick(tick)
                 value = lines[0][column]
                 # TODO Check if "value" is to be set
+                if isinstance(value, str) and not value.startswith("\"") and not value.endswith("\""):
+                    value = f'"{value}"'
                 swt_property["_expression"] = value
