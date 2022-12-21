@@ -130,9 +130,13 @@ class Eval:
         expression_key = "expression" if _property["type"] == cls.EXPRESSION_PROPERTY_TYPE else "_expression"
         if _property[expression_key]:
             _exp = _property[expression_key]
-            _exp = re.sub(cls.RE_IN_PORTS, lambda p: cls.resolve_ports_in(p, node_ports_in, edges, nodes), _exp)
-            _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, lambda p: cls.make_object_property_full_name(p, node_properties,
+            cls.log.debug(f"_exp: {_exp}")
+            if isinstance(_exp, str):
+                _exp = re.sub(cls.RE_IN_PORTS, lambda p: cls.resolve_ports_in(p, node_ports_in, edges, nodes), _exp)
+                cls.log.debug(f"_exp: {_exp}")
+                _exp = re.sub(cls.RE_OBJECT_PROPERTY_NAME, lambda p: cls.make_object_property_full_name(p, node_properties,
                                                                                                     node_id), _exp)
+                cls.log.debug(f"_exp: {_exp}")
             expression = f'eval \'{node_id}.{column}\' = {_exp}'
         else:
             expression = ''
