@@ -12,6 +12,7 @@ class Graph:
     RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
     PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
     SWT_PROPERTY_TYPE = "SWT"
+    SWT_EXPORT_PROPERTY_TYPE = "SWTexp"
     DEFAULT_OPERATIONS_ORDER = 100
 
     def __init__(self, swt_name, graph_string=None, graph_dict=None):
@@ -97,7 +98,8 @@ class Graph:
 
         def filter_swt_properties(_property):
             self.log.debug(f"_property: {_property}")
-            flag = not _property[0].startswith("_") and _property[1]["type"] == self.SWT_PROPERTY_TYPE
+            flag = not _property[0].startswith("_") and (_property[1]["type"] == self.SWT_PROPERTY_TYPE or
+                                                         _property[1]["type"] == self.SWT_EXPORT_PROPERTY_TYPE)
             return flag
 
         nodes = self.graph_dict["graph"]["nodes"]
