@@ -21,8 +21,9 @@ class GraphHandler(APIView):
     def post(self, request):
         """
         Updates a linked SWT and merges executed calculations with an incoming graph. Returns it.
+
         :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
-        :return
+        :return:
         """
         swt_name = request.data['swt_name']
         graph = request.data['graph']
@@ -66,5 +67,3 @@ class GraphHandler(APIView):
                     'swt_name': swt_name,
                     'graph': graph.graph_dict,
                 })
-
-    pass

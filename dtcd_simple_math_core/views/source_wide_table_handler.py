@@ -1,3 +1,5 @@
+import logging
+
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
@@ -10,6 +12,9 @@ class SourceWideTableHandler(APIView):
     Endpoint for Source Wide Table.
     It provides update by an incoming graph and reading a linked table.
     """
+    PLUGIN_NAME = "dtcd_simple_math_core"
+    log = logging.getLogger(PLUGIN_NAME)
+
     http_method_names = ['post', 'get']
     permission_classes = (AllowAny,)
 
@@ -55,5 +60,3 @@ class SourceWideTableHandler(APIView):
                 {
                     'table': table
                 })
-
-    pass

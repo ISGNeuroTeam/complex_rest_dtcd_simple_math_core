@@ -1,45 +1,33 @@
 import json
+import logging
 
-from ot_simple_connector.connector import Connector
-from dtcd_simple_math_core.translator.commands.reader import Reader
-from dtcd_simple_math_core.translator.commands.writer import Writer
-from dtcd_simple_math_core.translator.commands.eval import Eval
+from dtcd_simple_math_core.translator.queries.read import ReadQuery
+from dtcd_simple_math_core.translator.queries.write import WriteQuery
+from dtcd_simple_math_core.translator.queries.eval import EvalQuery
+from dtcd_simple_math_core.settings import plugin_name
+from settings import connector
 
 
 class SourceWideTable:
+    log = logging.getLogger(plugin_name)
 
-    CONNECTOR_CONFIG = {"host": "s-dev-2.dev.isgneuro.com",
-                        "port": "6080",
-                        "user": "admin",
-                        "password": "12345678"}
-
-    CACHE_TTL = 5
-
-    def __init__(self, swt_name):
+    def __init__(self, swt_name: str, ) -> None:
+        self.log.debug(f'Input {swt_name=}')
         self.swt_name = swt_name
-        self.connector = Connector(**self.CONNECTOR_CONFIG)
 
-    def read(self):
-        query = Reader.read(self.swt_name)
-        swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
+    def read(self, last_row: bool = False) -> list:
+        query = ReadQuery.get(self.swt_name, last_row=last_row)
+        swt = connector.create_query_job(query)
         return swt
 
-    def read_last_row(self):
-        query = Reader.read_last_row(self.swt_name)
-        swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
-        return swt
-
-    def new_iteration(self, graph):
-        # read_query = Reader.read_last_row(self.swt_name)
-        read_query = Reader.read(self.swt_name)
-        eval_query = Eval.from_graph(graph)
-        write_query = Writer.rewrite(self.swt_name)
+    def new_iteration(self, graph_name: str) -> list:
+        read_query = ReadQuery.get(self.swt_name)
+        eval_query = EvalQuery.get_from_graph(graph_name)
+        write_query = WriteQuery.get(self.swt_name)
 
         # TODO fix the problem with overwriting or switch to append mode
         subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
 
         query = " | ".join((subquery, write_query))
-        swt = self.connector.jobs.create(query, cache_ttl=self.CACHE_TTL).dataset.load()
+        swt = connector.create_query_job(query)
         return swt
-
-
