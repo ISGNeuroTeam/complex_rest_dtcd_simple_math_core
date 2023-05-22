@@ -1,8 +1,9 @@
 import json
-from rest.test import TestCase, APIClient
+import unittest
+from rest_framework.test import APIClient
 
 
-class TestExample(TestCase):
+class TestExample(unittest.TestCase):
     def setUp(self):
         """
         define instructions that will be executed before each test method

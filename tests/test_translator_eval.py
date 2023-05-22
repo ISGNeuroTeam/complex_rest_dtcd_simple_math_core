@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from translator.commands.eval import Eval
+from dtcd_simple_math_core.translator.queries.eval import EvalQuery
 
 
 class TestTranslatorEval(unittest.TestCase):
@@ -13,7 +13,7 @@ class TestTranslatorEval(unittest.TestCase):
                     " | eval 'TargetRichLabelNode1_1.testField' = cos('TargetRichLabelNode1_1.R') |" \
                     " eval 'TargetRichLabelNode1_1.P' = 'ControlledRichLabelNode01_207.V'" \
                     "*'ControlledRichLabelNode01_207.I'*'StepRichLabelNode11_1.Enabled'"
-            second = Eval.from_graph(json.loads(fr.read()))
+            second = EvalQuery.get_from_graph(json.loads(fr.read()))
             self.assertEqual(first, second)
 
 

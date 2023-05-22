@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from translator.swt import SourceWideTable
+from dtcd_simple_math_core.translator.swt import SourceWideTable
 
 
 class TestSourceWideTable(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestSourceWideTable(unittest.TestCase):
     def test_read_last_row(self):
         with open("resources/example_of_swt.json") as fr:
             first = [json.loads(fr.read())[-1]]
-        second = self.swt.read_last_row()
+        second = self.swt.read(last_row=True)
         self.assertEqual(first, second)
 
 
