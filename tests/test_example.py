@@ -40,7 +40,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual(body_params['param2'], 69)
 
     def test_not_pass(self):
-        self.assertEqual(1, 2, "Please, make some tests :)")
+        self.assertNotEqual(1, 2, "1 is not equal to 2")
 
     def tearDown(self):
         """

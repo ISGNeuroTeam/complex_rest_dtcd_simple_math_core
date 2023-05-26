@@ -25,12 +25,9 @@ class EvalQuery:
         cls.log.debug(f'result: {name}')
         return name
 
-    @staticmethod
-    def sort_eval_expressions(expr):
-        return expr[""]
-
     @classmethod
     def make_expression(cls, cp_tuple, node_properties):
+        eval_re = r"[\.\w]+"
         cls.log.debug(f'input: {cp_tuple=} | {node_properties=}')
         column, _property, node_id = cp_tuple
         if _property['expression']:
@@ -44,22 +41,31 @@ class EvalQuery:
         return expression
 
     @classmethod
-    def get_from_graph(cls, graph):
-        nodes = graph["graph"]["nodes"]
-        cls.log.debug(f'input graph: {graph=}')
-        cls.log.debug(f"{nodes=}")
+    def get_from_graph(cls, nodes):
+        # extract nodes from graph and save them to nodes variable
+        cls.log.debug(f"input {nodes=}")
+        # let's sort that nodes by its expressions,
+        # by default they are digits saved as strings: `expression' = {str} '3'
         try:
             sorted_nodes = sorted(nodes, key=lambda n: int(n["properties"]["_operations_order"]["expression"]))
             cls.log.debug(f"Sorted nodes: {sorted_nodes}")
         except KeyError:
             raise Exception("Not all nodes have _operations_order property")
+        # start creating evaluation expressions | make an empty list for it
         eval_expressions = []
         cls.log.debug(f'Looping through {sorted_nodes=}')
+        # loop through nodes
         for node in sorted_nodes:
-            object_id = node[EVAL_GLOBALS['object_id_column']]
+            # get object id from column with the name saved at EVAL_GLOBALS['object_id_column']
+            # currently it is {str} 'primitiveID'
+            primitive_id = node[EVAL_GLOBALS['object_id_column']]
+            # get node properties
             node_properties = node["properties"]
-            node_eval_properties = filter(cls.filter_eval_properties, node_properties.items())
-            node_eval_properties = map(lambda x: x + (object_id,), node_eval_properties)
+            # now let's filter node properties by
+            # if its type is equal to value saved at EVAL['property_type'], currently is 'expression'
+            # and if its key is not started with '_' symbol
+            node_eval_properties = list(filter(cls.filter_eval_properties, node_properties.items()))
+            node_eval_properties = list(map(lambda x: x + (primitive_id,), node_eval_properties))
             node_eval_expressions = list(filter(None, map(lambda p: cls.make_expression(p, node["properties"].keys()),
                                                           node_eval_properties)))
             eval_expressions += node_eval_expressions

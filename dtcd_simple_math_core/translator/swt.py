@@ -4,8 +4,7 @@ import logging
 from dtcd_simple_math_core.translator.queries.read import ReadQuery
 from dtcd_simple_math_core.translator.queries.write import WriteQuery
 from dtcd_simple_math_core.translator.queries.eval import EvalQuery
-from dtcd_simple_math_core.settings import plugin_name
-from settings import connector
+from dtcd_simple_math_core.settings import plugin_name, connector
 
 
 class SourceWideTable:
@@ -25,7 +24,6 @@ class SourceWideTable:
         eval_query = EvalQuery.get_from_graph(graph_name)
         write_query = WriteQuery.get(self.swt_name)
 
-        # TODO fix the problem with overwriting or switch to append mode
         subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
 
         query = " | ".join((subquery, write_query))

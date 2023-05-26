@@ -4,7 +4,7 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from dtcd_simple_math_core.translator.graph import Graph
+from dtcd_simple_math_core.translator.test_graph import Graphy as Graph
 
 
 class GraphHandler(APIView):
@@ -25,12 +25,12 @@ class GraphHandler(APIView):
         :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
         :return:
         """
-        swt_name = request.data['swt_name']
-        graph = request.data['graph']
+        filename = request.data['swt_name']
+        graph_dict = request.data['graph']
 
         try:
-            _graph = Graph(swt_name, graph_dict=graph)
-            _graph.new_iteration()
+            graph = Graph(filename, graph=graph_dict)
+            graph.calc()
         except Exception as e:
             # TODO Add logging of a caught  exception.
             return ErrorResponse(
@@ -41,8 +41,8 @@ class GraphHandler(APIView):
 
         return SuccessResponse(
             {
-                'swt_name': swt_name,
-                'graph': _graph.graph_dict,
+                'swt_name': filename,
+                'graph': graph.dictionary,
             })
 
     @staticmethod
@@ -52,8 +52,8 @@ class GraphHandler(APIView):
         :param request: Consists of a "swt_name" (a graph fragment name)
         :return:
         """
-        swt_name = request.GET.get("swt_name", None)
-        if swt_name is None:
+        filename = request.GET.get("swt_name", None)
+        if filename is None:
             return ErrorResponse(
                 {
                     'message': 'A source wide table name is required'
@@ -61,9 +61,9 @@ class GraphHandler(APIView):
             )
         else:
 
-            graph = Graph.read(swt_name)
+            graph = Graph.read_from_file(filename)
             return SuccessResponse(
                 {
-                    'swt_name': swt_name,
-                    'graph': graph.graph_dict,
+                    'swt_name': filename,
+                    'graph': graph.dictionary,
                 })
