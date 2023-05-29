@@ -1,103 +1,100 @@
 import json
-import re
 import logging
+import re
 
-from dtcd_simple_math_core.translator.swt import SourceWideTable
-from dtcd_simple_math_core.settings import GRAPH_GLOBALS, plugin_name, GRAPH_KEY_NAMES as GK
-from dtcd_simple_math_core.translator.node import Node
+from ..settings import GRAPH_GLOBALS, plugin_name
+from swt import SourceWideTable
+
+from node import Node
+from typing import Dict
 
 
 class Graph:
     log = logging.getLogger(plugin_name)
-    nodes: [Node]
 
-    def __init__(self, swt_name, graph_string=None, graph_dict=None):
-        self.log.debug(f'input: {swt_name=} | {graph_string=} | {graph_dict=}')
-        self.swt_name = swt_name
-        if graph_string:
-            self.graph_string = graph_string
-            self.graph_dict = json.loads(graph_string)
-            self.log.debug(f'we have graph_string, so {graph_dict=}')
-        elif graph_dict:
-            self.graph_dict = graph_dict
-            self.graph_string = json.dumps(graph_dict)
-            self.log.debug(f'we have graph_string, so {graph_string=}')
-        else:
-            raise Exception("Can`t load graph, no graph_string or graph_dict provided.")
+    def __init__(self, name: str, graph: Dict):
+        self.nodes: Dict[str, Node] = {}
+        self.name = name
+        self.dictionary = graph
+        self.parse_nodes()
 
-    def parse_nodes(self, graph: []):
-        for node in graph['graph']['nodes']:
-            self.nodes.append(Node(node))
+    def initialize(self) -> None:
+        self.dictionary = json.loads(self.dictionary) if isinstance(self.dictionary, str) else self.dictionary
+        self.parse_nodes()
 
-    def get_node_by_id(self, nid):
-        self.log.debug(f'input: {nid=}')
-        nodes = self.graph_dict["graph"]["nodes"]
-        node = next(filter(lambda n: n[GRAPH_GLOBALS['object_id_column']] == nid, nodes), None)
-        self.log.debug(f'result: {node=}')
-        return node
+    def parse_nodes(self) -> None:
+        for node in self.dictionary['graph']['nodes']:
+            self.nodes[node['primitiveID']] = Node(node)
 
     @staticmethod
-    def filtered_columns(swr: []):
+    def filtered_columns(swr: []) -> []:
         return filter(lambda c: not c.startswith("_"), swr)
 
-    @staticmethod
-    def get_property(self, node: [], object_property: str):
-        return node["properties"][object_property]
+    def get_property_of_the_node_by_id(self, object_id: str) -> Dict:
+        nodes = self.dictionary['graph']['nodes']
+        for node in nodes:
+            if node['primitiveID'] == object_id:
+                return node['properties']
 
-    def update_property(self, node: [], object_property: str, object_id: str, result: []):
-        _property = self.get_property(node=node, object_property=object_property)
-        _property["value"] = result[f'{object_id}.{object_property}']
-        _property["status"] = GK['status_complete']
-        self.log.debug(f"_property: {_property}")
+    def update_property_at_graph(self, object_id: str, _property: str, value: str) -> None:
+        _properties = self.get_property_of_the_node_by_id(object_id=object_id)
+        _properties[_property]['value'] = value
 
-    def update_node(self, object_id: str, object_property: str, result: []):
-        node = self.get_node_by_id(object_id)
-        if node is None or object_property not in node['properties']:
-            self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
-            return
-
-        # update property
-        self.update_property(node=node, object_property=object_property, object_id=object_id, result=result)
-        # update _operations_order property
-        # if we have 17 properties updated per one node, then this code will be repeated 17 times
-        node["properties"][GK['ops_order']]["value"] = node["properties"][GK['ops_order']]["expression"]
-        node["properties"][GK['ops_order']]["status"] = GK['status_complete']
-
-    def update(self, swt_line):
-        self.log.debug(f"input: {swt_line=}")
-
-        for column in self.filtered_columns(swr=swt_line):
+    def update(self, swr: []) -> Dict:
+        for column in self.filtered_columns(swr=swr):
             object_id, object_property = re.match(GRAPH_GLOBALS['re_object_id_and_property'], column).groups()
 
-            self.update_node(object_id=object_id, object_property=object_property, result=swt_line)
+            try:
+                self.nodes[object_id].update_property(object_property, swr[column])
+                self.update_property_at_graph(object_id=object_id, _property=object_property, value=swr[column])
 
-        self.graph_string = json.dumps(self.graph_dict)
-        self.log.debug(f"result: {self.graph_string=}")
-        return self.graph_string
+            except KeyError:
+                self.log.warning(f'No {object_id} node found, only {self.nodes.keys()} got')
 
-    @staticmethod
-    def get_last_line_of(_swt: list) -> []:
-        return _swt[-1]
+        return self.dictionary
 
-    def new_iteration(self):
-        self.log.debug(f'starting a new graph iteration...')
-        swt = SourceWideTable(self.swt_name)
-        swt = swt.new_iteration(self.graph_dict)
-        swt_last_line = self.get_last_line_of(swt)
-        self.log.debug(f'result: {swt_last_line=}')
-        return self.update(swt_last_line)
+    def calc(self) -> Dict:
+        swt = SourceWideTable(self.name)
+        list_of_sw_rows = swt.calc(self.get_nodes_eval_expressions())
+        return self.update(list_of_sw_rows[-1])
 
-    def save(self):
-        self.log.debug(f'saving a graph...')
-        path = GRAPH_GLOBALS['path_to_graph'].format(self.swt_name)
-        self.log.debug(f'{path=}')
-        with open(path, 'w') as fw:
-            fw.write(self.graph_string)
+    def swt(self) -> Dict:
+        swt = SourceWideTable(self.name)
+        return swt.calc(self.get_nodes_eval_expressions())
+
+    def get_nodes_eval_expressions(self) -> str:
+        sorted_nodes = self.get_sorted_nodes()
+        eval_expressions = []
+        for name, node in sorted_nodes.items():
+            eval_expressions += node.get_eval_expressions(name)
+        return eval_expressions
+
+    def get_sorted_nodes(self) -> dict:
+        try:
+            return dict(sorted(self.nodes.items(), key=lambda x: int(x[1].properties['_operations_order'].expression)))
+        except KeyError:
+            raise Exception('Not all nodes have _operations_order property')
+
+    def __str__(self):
+        return f'{self.name=}\n' + '\n'.join(f'\t{node}' for node in self.nodes)
 
     @classmethod
-    def read(cls, swt_name):
-        cls.log.debug(f'reading a graph {swt_name=}')
-        path = GRAPH_GLOBALS['path_to_graph'].format(swt_name)
+    def read_from_file(cls, filename: str) -> 'Graph':
+        path = GRAPH_GLOBALS['path_to_graph'].format(filename)
+        cls.log.debug(f'reading a graph {filename=} at {path=}')
         cls.log.debug(f'{path=}')
         with open(path) as fr:
-            return Graph(swt_name, fr.read())
+            return Graph(filename, fr.read())
+
+
+def main():
+    with open('../graphs/budget.json', 'r') as f:
+        graph = Graph('budget', f.read())
+
+    print(graph.get_nodes_eval_expressions())
+
+    print('bye')
+
+
+if __name__ == "__main__":
+    main()

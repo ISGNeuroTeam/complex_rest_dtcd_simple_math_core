@@ -4,7 +4,7 @@ import os
 
 from pathlib import Path
 from core.settings.ini_config import merge_ini_config_with_defaults, configparser_to_dict
-from dtcd_simple_math_core.translator.connector import OTSimpleConnector
+from ot_simple_connector.connector import Connector
 
 __author__ = "Andrey Starchenkov"
 __copyright__ = "Copyright 2023, ISG Neuro"
@@ -120,7 +120,7 @@ GRAPH_GLOBALS = ini_config['graph_globals']
 db_conf = dict(ini_config['db_conf'])
 
 # create connector
-connector = OTSimpleConnector(CONNECTOR_CONFIG)
+connector = Connector(**CONNECTOR_CONFIG)
 
 # set logger
 base_logs_dir = ini_config['general'].get('logs_path', '.')

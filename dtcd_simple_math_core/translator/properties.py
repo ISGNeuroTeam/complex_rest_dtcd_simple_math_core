@@ -1,5 +1,5 @@
 import re
-from dtcd_simple_math_core.settings import EVAL_GLOBALS
+from plugins.dtcd_simple_math_core.settings import EVAL_GLOBALS
 
 
 class Property:

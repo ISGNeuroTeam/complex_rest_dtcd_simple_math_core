@@ -1,7 +1,7 @@
 from rest.urls import path
 from cache import cache_page
-from .views.source_wide_table_handler import SourceWideTableHandler
-from .views.graph_handler import GraphHandler
+from .views.source_wide_table_view import SourceWideTableView
+from .views.graph_view import GraphView
 
 # Use cache_page decorator for caching view
 
@@ -10,6 +10,6 @@ from .views.graph_handler import GraphHandler
 # ]
 
 urlpatterns = [
-    path('swt/', SourceWideTableHandler.as_view()),
-    path('graph/', GraphHandler.as_view())
+    path('swt/', SourceWideTableView.as_view()),
+    path('graph/', GraphView.as_view())
 ]

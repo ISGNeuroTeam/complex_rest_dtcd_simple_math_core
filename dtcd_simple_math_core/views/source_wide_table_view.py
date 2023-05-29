@@ -4,10 +4,11 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from dtcd_simple_math_core.translator.swt import SourceWideTable
+from ..translator.swt import SourceWideTable
+from ..translator.graph import Graph
 
 
-class SourceWideTableHandler(APIView):
+class SourceWideTableView(APIView):
     """
     Endpoint for Source Wide Table.
     It provides update by an incoming graph and reading a linked table.
@@ -27,10 +28,11 @@ class SourceWideTableHandler(APIView):
         :return:
         """
         swt_name = request.data['swt_name']
-        graph = request.data['graph']
+        graph_data = request.data['graph']
 
-        swt = SourceWideTable(swt_name)
-        swt = swt.new_iteration(graph)
+        graph = Graph(swt_name, graph=graph_data)
+        graph.initialize()
+        swt = graph.swt()
 
         return SuccessResponse(
             {

@@ -1,8 +1,8 @@
 import logging
 import re
 
-from dtcd_simple_math_core.translator.properties import Property
-from dtcd_simple_math_core.settings import EVAL_GLOBALS, plugin_name
+from properties import Property
+from plugins.dtcd_simple_math_core.settings import EVAL_GLOBALS, plugin_name
 from typing import Dict
 
 
@@ -69,12 +69,9 @@ class Node:
                 _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
                               lambda p: self.make_object_property_full_name(p, self.properties.values(),
                                                                             name), _exp)
-                expression = f'eval \'{name}.{_prop_name}\' = {_exp}'
+                expression = {f'{name}.{_prop_name}': {_exp}}
                 result.append(expression)
         return result
 
     def __str__(self):
         return f'{self.object_id=}\n' + '\n'.join(f'\t\t{prop}' for prop in self.properties)
-
-    def get_dictionary(self):
-        ...        # return {'primitiveID' : }

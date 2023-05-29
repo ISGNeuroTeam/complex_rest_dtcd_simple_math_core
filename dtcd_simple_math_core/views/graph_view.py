@@ -4,10 +4,10 @@ from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
 
-from dtcd_simple_math_core.translator.test_graph import Graphy as Graph
+from ..translator.graph import Graph
 
 
-class GraphHandler(APIView):
+class GraphView(APIView):
     """
     Endpoint for graph.
     It provides update SWT by new expressions in graph and a merged graph with a linked SWT last row.
@@ -30,9 +30,10 @@ class GraphHandler(APIView):
 
         try:
             graph = Graph(filename, graph=graph_dict)
+            graph.initialize()
             graph.calc()
         except Exception as e:
-            # TODO Add logging of a caught  exception.
+            self.log.error(f'Got an error: {e}')
             return ErrorResponse(
                 {
                     'message': str(e)
@@ -45,8 +46,7 @@ class GraphHandler(APIView):
                 'graph': graph.dictionary,
             })
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         """
         Returns a saved graph fragment by its name.
         :param request: Consists of a "swt_name" (a graph fragment name)
@@ -54,6 +54,7 @@ class GraphHandler(APIView):
         """
         filename = request.GET.get("swt_name", None)
         if filename is None:
+            self.log.error(f'Got an error: A source wide table name is required, got None.')
             return ErrorResponse(
                 {
                     'message': 'A source wide table name is required'
