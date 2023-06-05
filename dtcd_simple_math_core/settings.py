@@ -4,13 +4,13 @@ import os
 
 from pathlib import Path
 from core.settings.ini_config import merge_ini_config_with_defaults, configparser_to_dict
-from ot_simple_connector.connector import Connector
+
 
 __author__ = "Andrey Starchenkov"
 __copyright__ = "Copyright 2023, ISG Neuro"
 __credits__ = ["Nikita Serditov"]
 __license__ = "OT.PLATFORM. License agreement."
-__version__ = "0.2.0"
+__version__ = "0.1.0"
 __maintainer__ = "Andrey Starchenkov"
 __email__ = "astarchnenkov@isgneuro.com"
 __status__ = "Pre-release"
@@ -119,8 +119,6 @@ GRAPH_GLOBALS = ini_config['graph_globals']
 # db conf
 db_conf = dict(ini_config['db_conf'])
 
-# create connector
-connector = Connector(**CONNECTOR_CONFIG)
 
 # set logger
 base_logs_dir = ini_config['general'].get('logs_path', '.')

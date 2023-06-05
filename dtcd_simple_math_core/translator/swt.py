@@ -2,7 +2,7 @@ import logging
 
 
 from ..settings import plugin_name
-from data_collector import DataCollector
+from .data_collector import DataCollector
 
 
 class SourceWideTable:

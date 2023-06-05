@@ -1,10 +1,10 @@
 import re
-from plugins.dtcd_simple_math_core.settings import EVAL_GLOBALS
+from ..settings import EVAL_GLOBALS
 
 
 class Property:
 
-    def __init__(self, value=None, status=None, type=None, expression=None, **kwargs):
+    def __init__(self, value='', status='complete', type='expression', expression='', **kwargs):
         self.value = value
         self.status = status
         self.type = type

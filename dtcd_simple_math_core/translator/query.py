@@ -1,7 +1,7 @@
 import json
 import logging
 
-from plugins.dtcd_simple_math_core.settings import plugin_name
+from ..settings import plugin_name
 
 
 class Query:
@@ -28,18 +28,19 @@ class Query:
         self.log.debug(f'result: {result}')
         return result
 
-    def get_write_expression(self, swt_name: str, append: bool = False, _path: str = "SWT",
+    def get_write_expression(self, append: bool = False, _path: str = "SWT",
                              _format: str = "JSON") -> str:
-        self.log.debug(f'input: {swt_name=}{" | " + append if append else ""} | {_path=} | {_format=}')
-        result = f'writeFile format={_format} {"mode=append " if append else ""}path={_path}/{swt_name}'
+        self.log.debug(f'input: {self.name=}{" | " + str(append) if append else ""} | {_path=} | {_format=}')
+        result = f'writeFile format={_format} {"mode=append " if append else ""}path={_path}/{self.name}'
         self.log.debug(f'result: {result}')
         return result
 
     @staticmethod
-    def get_eval_expressions(self, eval_names: []) -> str:
+    def get_eval_expressions(eval_names: []) -> str:
         result: str = ''
         for name in eval_names:
-            _exp: str = f'| eval \'{name[0]}\' = {name[1]}'
+            _name, _expression = next(iter(name.items()))
+            _exp: str = f'| eval \'{_name}\' = {_expression}'
             result += _exp
 
         return result

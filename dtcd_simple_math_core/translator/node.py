@@ -1,8 +1,8 @@
 import logging
 import re
 
-from properties import Property
-from plugins.dtcd_simple_math_core.settings import EVAL_GLOBALS, plugin_name
+from .properties import Property
+from settings import EVAL_GLOBALS, plugin_name
 from typing import Dict
 
 
@@ -11,7 +11,8 @@ class Node:
     properties: Dict[str, Property] = {}
     log = logging.getLogger(plugin_name)
 
-    def __init__(self, node: []):
+    def __init__(self, node: {}):
+        self.object_id = node.get('primitiveID', '')
         for _property, data in node['properties'].items():
             self.fill_default_properties(_property, data=data)
         if '_operations_order' not in self.properties.keys():
@@ -47,19 +48,6 @@ class Node:
             name = f"'{name}'"
         return name
 
-    @classmethod
-    def make_expression(cls, cp_tuple, node_properties):
-        column, _property, node_id = cp_tuple
-        if _property['expression']:
-            _exp = _property["expression"]
-            _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
-                          lambda p: cls.make_object_property_full_name(p, node_properties,
-                                                                       node_id), _exp)
-            expression = f'eval \'{node_id}.{column}\' = {_exp}'
-        else:
-            expression = ''
-        return expression
-
     def get_eval_expressions(self, name: str):
         result = []
         node_properties = self.get_eval_properties()
@@ -69,7 +57,7 @@ class Node:
                 _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
                               lambda p: self.make_object_property_full_name(p, self.properties.values(),
                                                                             name), _exp)
-                expression = {f'{name}.{_prop_name}': {_exp}}
+                expression = {f'{name}.{_prop_name}': _exp}
                 result.append(expression)
         return result
 

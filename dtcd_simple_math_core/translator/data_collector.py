@@ -1,7 +1,8 @@
 import logging
 
-from ..settings import connector, plugin_name
-from query import Query
+from ..settings import plugin_name, CONNECTOR_CONFIG
+from ot_simple_connector.connector import Connector
+from .query import Query
 
 
 class DataCollector:
@@ -15,13 +16,14 @@ class DataCollector:
 
     def __init__(self, name):
         self.name = name
+        self.connector = Connector(**CONNECTOR_CONFIG)
 
     def read_swt(self, last_row: bool) -> list:
-        self.log(f'getting swt table {self.name}')
+        self.log.debug(f'getting swt table {self.name}')
         expression = Query(name=self.name).get_read_expression(last_row=last_row)
-        return connector.create_query_job(expression)
+        return self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
 
     def calc_swt(self, eval_names: [str]) -> list:
-        query = Query(name=self.name).get(eval_names=eval_names)
+        expression = Query(name=self.name).get(eval_names=eval_names)
 
-        return connector.create_query_job(query)
+        return self.connector.jobs.create(expression, cache_ttl=5).dataset.load()

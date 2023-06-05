@@ -3,9 +3,9 @@ import logging
 import re
 
 from ..settings import GRAPH_GLOBALS, plugin_name
-from swt import SourceWideTable
+from .swt import SourceWideTable
 
-from node import Node
+from .node import Node
 from typing import Dict
 
 
@@ -16,7 +16,6 @@ class Graph:
         self.nodes: Dict[str, Node] = {}
         self.name = name
         self.dictionary = graph
-        self.parse_nodes()
 
     def initialize(self) -> None:
         self.dictionary = json.loads(self.dictionary) if isinstance(self.dictionary, str) else self.dictionary
@@ -85,16 +84,3 @@ class Graph:
         cls.log.debug(f'{path=}')
         with open(path) as fr:
             return Graph(filename, fr.read())
-
-
-def main():
-    with open('../graphs/budget.json', 'r') as f:
-        graph = Graph('budget', f.read())
-
-    print(graph.get_nodes_eval_expressions())
-
-    print('bye')
-
-
-if __name__ == "__main__":
-    main()
