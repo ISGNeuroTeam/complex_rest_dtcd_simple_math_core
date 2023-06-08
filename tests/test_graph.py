@@ -2,6 +2,8 @@ from unittest import TestCase
 
 import json
 
+import os
+
 from dtcd_simple_math_core.translator.graph import Graph
 from resources.swt_example import swr
 
@@ -11,7 +13,8 @@ class TestGraph(TestCase):
     def setUp(self):
         # budget.json graph is so big, that it calculates too long | thought it is just breaking
         self.name = 'n_serditov_graph_001'
-        with open(f'resources/{self.name}.json') as file:
+        parent_folder = os.path.dirname(__file__)
+        with open(f'{parent_folder}/resources/{self.name}.json') as file:
             self.graph_from_json_file = json.loads(file.read())
         self.graph = Graph(self.name, self.graph_from_json_file)
         self.graph.initialize()

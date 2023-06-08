@@ -5,15 +5,16 @@ from ..settings import plugin_name
 
 
 class Query:
-    log = logging.getLogger(plugin_name)
+    name: str
+    log: logging.Logger = logging.getLogger(plugin_name)
 
     def __init__(self, name: str = None) -> None:
         self.name = name
 
     def get(self, eval_names: []) -> str:
-        read_query = self.get_read_expression(self.name)
+        read_query = self.get_read_expression()
         eval_query = self.get_eval_expressions(eval_names=eval_names)
-        write_query = self.get_write_expression(self.name)
+        write_query = self.get_write_expression()
 
         subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
         result = " | ".join((subquery, write_query))

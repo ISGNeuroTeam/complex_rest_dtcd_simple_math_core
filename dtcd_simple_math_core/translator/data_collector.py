@@ -7,6 +7,8 @@ from .query import Query
 
 class DataCollector:
     log = logging.getLogger(plugin_name)
+    name: str
+    connector: Connector
     """
     Level of abstraction between SWT and actual data in ExternalData.
     It creates expressions and uses otl connector to exchange data with spark service.
@@ -25,5 +27,4 @@ class DataCollector:
 
     def calc_swt(self, eval_names: [str]) -> list:
         expression = Query(name=self.name).get(eval_names=eval_names)
-
         return self.connector.jobs.create(expression, cache_ttl=5).dataset.load()

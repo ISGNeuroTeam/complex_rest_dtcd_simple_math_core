@@ -6,14 +6,17 @@ from ..settings import GRAPH_GLOBALS, plugin_name
 from .swt import SourceWideTable
 
 from .node import Node
-from typing import Dict
+from typing import Dict, Union
 
 
 class Graph:
     log = logging.getLogger(plugin_name)
+    nodes = Dict[str, Node]
+    name: str
+    dictionary: Union[Dict, str]
 
-    def __init__(self, name: str, graph: Dict):
-        self.nodes: Dict[str, Node] = {}
+    def __init__(self, name: str, graph: Union[Dict, str]):
+        self.nodes = {}
         self.name = name
         self.dictionary = graph
 
@@ -64,13 +67,13 @@ class Graph:
     def get_nodes_eval_expressions(self) -> str:
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
-        for name, node in sorted_nodes.items():
-            eval_expressions += node.get_eval_expressions(name)
+        for node in sorted_nodes:
+            eval_expressions += node.get_eval_expressions()
         return eval_expressions
 
     def get_sorted_nodes(self) -> dict:
         try:
-            return dict(sorted(self.nodes.items(), key=lambda x: int(x[1].properties['_operations_order'].expression)))
+            return sorted(self.nodes.values(), key=lambda x: int(x.properties['_operations_order'].expression))
         except KeyError:
             raise Exception('Not all nodes have _operations_order property')
 
@@ -81,6 +84,5 @@ class Graph:
     def read_from_file(cls, filename: str) -> 'Graph':
         path = GRAPH_GLOBALS['path_to_graph'].format(filename)
         cls.log.debug(f'reading a graph {filename=} at {path=}')
-        cls.log.debug(f'{path=}')
         with open(path) as fr:
             return Graph(filename, fr.read())

@@ -3,6 +3,7 @@ import logging
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
+from typing import Any
 
 from ..translator.swt import SourceWideTable
 from ..translator.graph import Graph
@@ -14,31 +15,10 @@ class SourceWideTableView(APIView):
     It provides update by an incoming graph and reading a linked table.
     """
     PLUGIN_NAME = "dtcd_simple_math_core"
-    log = logging.getLogger(PLUGIN_NAME)
+    log: logging.Logger = logging.getLogger(PLUGIN_NAME)
 
-    http_method_names = ['post', 'get']
-    permission_classes = (AllowAny,)
-
-    @staticmethod
-    def post(request):
-        """
-        Updates a linked SWT by an incoming graph and returns it.
-
-        :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
-        :return:
-        """
-        swt_name = request.data['swt_name']
-        graph_data = request.data['graph']
-
-        graph = Graph(swt_name, graph=graph_data)
-        graph.initialize()
-        swt = graph.swt()
-
-        return SuccessResponse(
-            {
-                'swt_name': swt_name,
-                'swt_body': swt,
-            })
+    http_method_names: list[str] = ['get']
+    permission_classes: tuple[Any] = (AllowAny,)
 
     @staticmethod
     def get(request):

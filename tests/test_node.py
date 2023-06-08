@@ -3,8 +3,7 @@ from unittest import TestCase
 import json
 import re
 
-from dtcd_simple_math_core.translator.node import Node
-from settings import EVAL_GLOBALS
+from dtcd_simple_math_core.translator.node import Node, EVAL_GLOBALS
 
 
 class TestNode(TestCase):
@@ -12,21 +11,21 @@ class TestNode(TestCase):
     def setUp(self):
         data = {'primitiveID': 'UncontrolledRichLabelNode01_1', 'primitiveName': 'UncontrolledRichLabelNode01',
                 'properties': {
-                    'testField': {'expression': '', 'type': 'expression', 'status': 'complete', 'value': ''}},
+                    'testField': {'expression': '', 'type_': 'expression', 'status': 'complete', 'value': ''}},
                 'extensionName': 'ExtensionRiskPrimitives', 'nodeTitle': '$this.primitiveID$', 'initPorts': [
-                {'primitiveName': 'outPort1', 'type': ['OUT'],
-                 'properties': {'status': {'expression': '', 'type': 'expression', 'status': 'complete', 'value': ''}},
+                {'primitiveName': 'outPort1', 'type_': ['OUT'],
+                 'properties': {'status': {'expression': '', 'type_': 'expression', 'status': 'complete', 'value': ''}},
                  'primitiveID': 'UncontrolledRichLabelNode01_1_outPort1', 'location': {'x': 298.75, 'y': 136.29}}],
                 'layout': {'x': 151.75, 'y': 139.25, 'height': 148, 'width': 294}}
         self.node = Node(data)
 
     def test_fill_default_properties(self):
         name = 'testField'
-        sample = {'expression': '', 'status': 'complete', 'type': 'expression', 'value': ''}
+        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': ''}
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
         new_data = {'_operations_order': '100'}
-        sample = {'expression': '', 'status': 'complete', 'type': 'expression', 'value': '', '_operations_order': '100'}
+        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': '', '_operations_order': '100'}
         self.node.fill_default_properties(name=name, data=new_data)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
@@ -34,7 +33,7 @@ class TestNode(TestCase):
     def test_update_property(self):
         name = 'testField'
         value = 'newValueData'
-        sample = {'expression': '', 'status': 'complete', 'type': 'expression', 'value': 'newValueData'}
+        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': 'newValueData'}
         self.node.update_property(name, value)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
@@ -47,8 +46,11 @@ class TestNode(TestCase):
         self.assertEqual(sample, result)
 
     def test_get_eval_properties(self):
+        print(f'\n********\nwe have this properties: {self.node.properties.values()}')
         sample = 1
-        result = len(self.node.get_eval_properties())
+        eval_properties = [n[0] for n in self.node.get_eval_properties()]
+        print(f'eval_properties: {eval_properties}')
+        result = len(eval_properties)
         self.assertEqual(sample, result)
 
     def test_make_object_property_full_name(self):
@@ -66,5 +68,5 @@ class TestNode(TestCase):
         name = 'testField'
         self.node.fill_default_properties(name=name, data=new_data)
         sample = [{'UncontrolledRichLabelNode01_1.testField': '2018'}]
-        result = self.node.get_eval_expressions(self.node.object_id)
+        result = self.node.get_eval_expressions()
         self.assertEqual(sample, result)
