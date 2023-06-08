@@ -113,3 +113,4 @@ dtcd_simple_math_core.conf
 nginx/
 logs/
 /make_build/
+/dtcd_simple_math_core/venv/
