@@ -1,0 +1,251 @@
+{
+  "swt_id": "2c4fd350-7984-4fd7-a671-115aa692b51c",
+  "swt_name": "math_test",
+  "graph": {
+    "graph": {
+      "nodes": [
+        {
+          "defaultLabel": "$this.props.name$ <br>$this.props.value$",
+          "defaulInitialtLabel": "",
+          "properties": {
+            "value": {
+              "title": "res",
+              "type": "expression",
+              "expression": "Data_20.p1 + Data_21.p1",
+              "input": {
+                "component": "textarea"
+              },
+              "status": "inProgress",
+              "value": ""
+            }
+          },
+          "initPorts": [
+            {
+              "primitiveName": "inPort1",
+              "type": [
+                "IN"
+              ],
+              "properties": {
+                "status": {
+                  "title": "",
+                  "type": "expression",
+                  "expression": "",
+                  "input": {
+                    "component": "textarea"
+                  },
+                  "status": "inProgress",
+                  "value": ""
+                }
+              },
+              "primitiveID": "Calc2_14_inPort1",
+              "location": {
+                "x": 542.4,
+                "y": 81
+              }
+            },
+            {
+              "primitiveName": "inPort2",
+              "type": [
+                "IN"
+              ],
+              "properties": {
+                "status": {
+                  "title": "",
+                  "type": "expression",
+                  "expression": "",
+                  "input": {
+                    "component": "textarea"
+                  },
+                  "status": "inProgress",
+                  "value": ""
+                }
+              },
+              "primitiveID": "Calc2_14_inPort2",
+              "location": {
+                "x": 609.6,
+                "y": 81
+              }
+            },
+            {
+              "primitiveName": "outPort1",
+              "type": [
+                "OUT"
+              ],
+              "properties": {
+                "status": {
+                  "title": "",
+                  "type": "expression",
+                  "expression": "value",
+                  "input": {
+                    "component": "textarea"
+                  },
+                  "status": "inProgress",
+                  "value": ""
+                }
+              },
+              "primitiveID": "Calc2_14_outPort1",
+              "location": {
+                "x": 576,
+                "y": 17
+              }
+            }
+          ],
+          "extensionName": "ExtensionRiskPrimitives",
+          "primitiveName": "Calc2",
+          "primitiveTitle": "Расчетный2",
+          "primitiveID": "Calc2_14",
+          "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+          "layout": {
+            "x": 520,
+            "y": 17,
+            "height": 64,
+            "width": 112
+          }
+        },
+        {
+          "defaultLabel": "$this.props.name$ <br>$this.props.value$",
+          "defaulInitialtLabel": "",
+          "properties": {
+            "value": {
+              "title": "p1",
+              "type": "expression",
+              "expression": "1",
+              "input": {
+                "component": "textarea"
+              },
+              "status": "inProgress",
+              "value": ""
+            }
+          },
+          "initPorts": [
+            {
+              "primitiveName": "outPort1",
+              "type": [
+                "OUT"
+              ],
+              "properties": {
+                "status": {
+                  "title": "",
+                  "type": "expression",
+                  "expression": "value",
+                  "input": {
+                    "component": "textarea"
+                  },
+                  "status": "inProgress",
+                  "value": ""
+                }
+              },
+              "primitiveID": "Data_20_outPort1",
+              "location": {
+                "x": 510,
+                "y": 137
+              }
+            }
+          ],
+          "extensionName": "ExtensionRiskPrimitives",
+          "primitiveName": "Data",
+          "primitiveTitle": "Примитив с данными",
+          "primitiveID": "Data_20",
+          "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+          "layout": {
+            "x": 448,
+            "y": 137,
+            "height": 64,
+            "width": 124
+          }
+        },
+        {
+          "defaultLabel": "$this.props.name$ <br>$this.props.value$",
+          "defaulInitialtLabel": "",
+          "properties": {
+            "value": {
+              "title": "p1",
+              "type": "expression",
+              "expression": "2",
+              "input": {
+                "component": "textarea"
+              },
+              "status": "inProgress",
+              "value": ""
+            }
+          },
+          "initPorts": [
+            {
+              "primitiveName": "outPort1",
+              "type": [
+                "OUT"
+              ],
+              "properties": {
+                "status": {
+                  "title": "",
+                  "type": "expression",
+                  "expression": "value",
+                  "input": {
+                    "component": "textarea"
+                  },
+                  "status": "inProgress",
+                  "value": ""
+                }
+              },
+              "primitiveID": "Data_21_outPort1",
+              "location": {
+                "x": 689.5,
+                "y": 137
+              }
+            }
+          ],
+          "extensionName": "ExtensionRiskPrimitives",
+          "primitiveName": "Data",
+          "primitiveTitle": "Примитив с данными",
+          "primitiveID": "Data_21",
+          "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+          "layout": {
+            "x": 615,
+            "y": 137,
+            "height": 64,
+            "width": 149
+          }
+        }
+      ],
+      "edges": [
+        {
+          "bends": [
+            [
+              510,
+              117
+            ],
+            [
+              542.4,
+              117
+            ]
+          ],
+          "sourceNode": "Data_20",
+          "sourcePort": "Data_20_outPort1",
+          "targetNode": "Calc2_14",
+          "targetPort": "Calc2_14_inPort1",
+          "extensionName": "ExtensionCommonPrimitives",
+          "primitiveName": "SimpleEdge"
+        },
+        {
+          "bends": [
+            [
+              689.5,
+              117
+            ],
+            [
+              609.6,
+              117
+            ]
+          ],
+          "sourceNode": "Data_21",
+          "sourcePort": "Data_21_outPort1",
+          "targetNode": "Calc2_14",
+          "targetPort": "Calc2_14_inPort2",
+          "extensionName": "ExtensionCommonPrimitives",
+          "primitiveName": "SimpleEdge"
+        }
+      ],
+      "groups": []
+    }
+  }
+}
