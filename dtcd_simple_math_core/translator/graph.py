@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-This module describes logic of analyzing and merging graph data
+"""This module describes logic of analyzing and merging graph data
 """
 
 import json
@@ -11,12 +10,12 @@ from ..settings import GRAPH_GLOBALS, plugin_name
 from .swt import SourceWideTable
 
 from .node import Node
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 
 class Graph:
-    """
-    This class describes how Graph works:
+    """This class describes how Graph works:
+   
     Args:
         :: log: local instance of plugin logger
         :: nodes: dictionary of all nodes, consist of its names and its Node instances
@@ -51,7 +50,7 @@ class Graph:
             self.nodes[node['primitiveID']] = Node(node)
         self.log.debug(f'parsed nodes successfully...')
 
-    def filtered_columns(self, swr: []) -> []:
+    def filtered_columns(self, swr: List) -> List:
         """We get a row of the source wide table which is "Source Wide Row" >>> swr 
         and filter out all strings that start with "_" symbol
 
@@ -109,7 +108,7 @@ class Graph:
         properties[prop_name]['value'] = value
         self.log.debug(f'update successfully done...')
 
-    def update(self, swr: []) -> Dict:
+    def update(self, swr: List) -> Dict:
         """Function to update nodes objects and actual raw json dictionary
 
         Args: 

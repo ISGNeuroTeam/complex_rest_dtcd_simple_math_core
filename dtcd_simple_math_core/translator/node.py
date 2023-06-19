@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""This module describes logic of working with Node objects.
+"""
 import logging
 import re
 
@@ -7,15 +10,23 @@ from typing import Dict
 
 
 class Node:
+    """This class describes how Node works
+
+    Args:
+        :: object_id: name of the node
+        :: properties: dictionary of the properties Node has
+        :: log: local instance of plugin logger
+    """
     object_id: str
     properties: Dict[str, Property]
-    log = logging.getLogger(plugin_name)
+    log: logging.Logger = logging.getLogger(plugin_name)
 
     def __init__(self, node: {}):
         self.object_id = node.get('primitiveID', '')
         self.properties = {}
-        for _property, data in node['properties'].items():
-            self.fill_default_properties(_property, data=data)
+        # TODO split [initiating object_id and properties] and [filling default parameters]
+        for prop_name, data in node['properties'].items():
+            self.fill_default_properties(prop_name, data=data)
         if '_operations_order' not in self.properties.keys():
             self.fill_default_properties('_operations_order', {'expression': 100})
 
