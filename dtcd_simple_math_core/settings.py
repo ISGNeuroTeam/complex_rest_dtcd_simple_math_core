@@ -100,7 +100,7 @@ def set_logger(loglevel, logfile, logger_name):
 
 
 # try to read path to config from environment
-conf_path_env = os.environ.get('DataCAD_simple_math_core_conf', None)
+conf_path_env = os.environ.get('dtcd_simple_math_core_conf', None)
 base_dir = Path(__file__).resolve().parent
 if conf_path_env is None:
     conf_path = base_dir / 'dtcd_simple_math_core.conf'
