@@ -15,9 +15,14 @@ class Query:
         read_query = self.get_read_expression()
         eval_query = self.get_eval_expressions(eval_names=eval_names)
         write_query = self.get_write_expression()
+        self.log.debug(f'{read_query=}')
+        self.log.debug(f'{eval_query=}')
+        self.log.debug(f'{write_query=}')
 
-        subquery = f"otloadjob otl={json.dumps(' | '.join((read_query, eval_query)))}"
+        subquery = f"otloadjob otl={json.dumps(read_query + eval_query)}"
+        self.log.debug(f'{subquery=}')
         result = " | ".join((subquery, write_query))
+        self.log.debug(f'result: {result=}')
 
         return result
 
@@ -25,7 +30,7 @@ class Query:
                             _format: str = "JSON") -> str:
         self.log.debug(
             f'input: {self.name=}{" | last_row=" + str(last_row) if last_row else ""} | {_path=} | {_format=}')
-        result = f'readFile format={_format} path={_path}/{self.name}{" | tail 1" if last_row else ""}'
+        result = f'readFile format={_format} path={_path}/{self.name}{" | tail 1" if last_row else ""}  '
         self.log.debug(f'result: {result}')
         return result
 
@@ -41,7 +46,7 @@ class Query:
         result: str = ''
         for name in eval_names:
             _name, _expression = next(iter(name.items()))
-            _exp: str = f'| eval \'{_name}\' = {_expression}'
+            _exp: str = f'| eval \'{_name}\' = {_expression} '
             result += _exp
 
         return result
