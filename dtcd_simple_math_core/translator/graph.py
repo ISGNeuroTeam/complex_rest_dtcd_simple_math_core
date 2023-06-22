@@ -65,7 +65,7 @@ class Graph:
             output: ['test', 'row']
         """
         self.log.debug(f'started filtering columns at {swr=}')
-        return filter(lambda c: not c.startswith("_"), swr)
+        return list(filter(lambda c: not c.startswith("_"), swr))
 
     def get_property_of_the_node_by_id(self, object_id: str) -> Dict:
         """This function gets the actual property object out of saved raw json Graph
@@ -143,25 +143,25 @@ class Graph:
         self.log.debug(f'{list_of_sw_rows[-1]=}')
         return self.update(list_of_sw_rows[-1])
 
-    def swt(self) -> Dict:
+    def swt(self) -> List:
         """Function to get the whole source wide table
         """
         self.log.debug(f'getting swt...')
         swt = SourceWideTable(self.name)
         return swt.calc(self.get_nodes_eval_expressions())
 
-    def get_nodes_eval_expressions(self) -> str:
+    def get_nodes_eval_expressions(self) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
         """
         self.log.debug(f'getting nodes eval expressions...')
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
-            eval_expressions += node.get_eval_expressions()
+            eval_expressions.extend(node.get_eval_expressions())
         self.log.debug(f'{eval_expressions=}')
         return eval_expressions
 
-    def get_sorted_nodes(self) -> dict:
+    def get_sorted_nodes(self) -> list[Node]:
         """Function to get the dictionary of all nodes sorted by their _operations_order
         and name
 

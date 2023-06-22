@@ -4,6 +4,8 @@
 
 import logging
 
+from typing import List, Dict
+
 from ..settings import plugin_name
 from .data_collector import DataCollector
 
@@ -37,7 +39,7 @@ class SourceWideTable:
         data_collector: DataCollector = DataCollector(self.swt_name)
         return data_collector.read_swt(last_row=last_row)
 
-    def calc(self, graph_eval_names: str) -> list:
+    def calc(self, graph_eval_names: List[Dict]) -> list:
         """Here we create a data collector and make it calc swt table
 
         Args:
