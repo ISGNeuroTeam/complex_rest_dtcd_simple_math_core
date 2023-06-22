@@ -9,15 +9,18 @@ from .query import Query
 
 
 class DataCollector:
-    log = logging.getLogger(plugin_name)
-    name: str
-    connector: Connector
-    """
-    Level of abstraction between SWT and actual data in ExternalData folder.
+    """Level of abstraction between SWT and actual data in ExternalData folder.
     It creates expressions and uses otl connector to exchange data with spark service.
     If in future otl connector or spark service usage changes -
     it must be changed here only, not in swt or graph layer.
+
+    Args:
+        :: log: local instance of plugin logger
+        :: name: name of the swt table to work with
+        :: connector: local instance of the OTL connector
     """
+    log = logging.getLogger(plugin_name)
+    connector: Connector
 
     def __init__(self, name):
         self.name = name
