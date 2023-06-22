@@ -6,7 +6,7 @@ from rest.response import SuccessResponse, ErrorResponse
 from typing import Any
 
 from ..translator.swt import SourceWideTable
-from ..translator.graph import Graph
+from ..translator.errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID
 
 
 class SourceWideTableView(APIView):
@@ -28,7 +28,7 @@ class SourceWideTableView(APIView):
         :param request: Consists of a "swt_name" (a graph fragment name)
         :return:
         """
-        swt_name = request.GET.get("swt_name", None)
+        swt_name = request.data.get("swt_name", None)
         if swt_name is None:
             return ErrorResponse(
                 {
@@ -37,8 +37,9 @@ class SourceWideTableView(APIView):
             )
         else:
             swt = SourceWideTable(swt_name)
-            table = swt.read()
-            return SuccessResponse(
-                {
-                    'table': table
-                })
+            try:
+                table = swt.read()
+            except Exception as e:
+                return ErrorResponse(error_message=str(e))
+
+            return SuccessResponse({'table': table})
