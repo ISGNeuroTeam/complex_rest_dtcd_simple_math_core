@@ -25,7 +25,8 @@ class TestNode(TestCase):
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
         new_data = {'_operations_order': '100'}
-        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': '', '_operations_order': '100'}
+        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': '',
+                  '_operations_order': '100'}
         self.node.fill_default_properties(name=name, data=new_data)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
@@ -78,7 +79,6 @@ class TestNode(TestCase):
         result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(),
                                                           self.node.object_id)
         self.assertEqual(sample, result)
-
 
     def test_get_eval_expressions(self):
         new_data = {'expression': '2018'}

@@ -30,7 +30,7 @@ class TestQuery(TestCase):
 
     def test_get_write_expression_with_custom_path_and_format(self):
         sample = 'writeFile format=XSLX mode=append path=ISGNeuro/example_of_swt'
-        result = self.query.get_write_expression(append=True, _path='ISGNeuro', _format='XSLX')
+        result = self.query.get_write_expression(append=True, file_path='ISGNeuro', file_format='XSLX')
         self.assertEqual(sample, result)
 
     def test_get_eval_expressions_with_empty_eval_names(self):
