@@ -58,15 +58,27 @@ class TestNode(TestCase):
         result = len(eval_properties)
         self.assertEqual(sample, result)
 
-    def test_make_object_property_full_name(self):
-        new_data = {'expression': '2018'}
-        name = 'testField'
-        self.node.fill_default_properties(name=name, data=new_data)
+    def test_make_object_property_full_name_with_property_link(self):
+        self.node.fill_default_properties(name='testField', data={'expression': '2018'})
+        self.node.fill_default_properties(name='movieStar', data={'expression': 'Sly'})
+        self.node.fill_default_properties(name='theBest', data={'expression': 'movieStar'})
         sample = '2018'
-        _property = self.node.properties['testField']
-        re_group = re.search(EVAL_GLOBALS['re_object_property_name'], _property.get_expression)
-        result = self.node.make_object_property_full_name(re_group, self.node.properties.values(), self.node.object_id)
+        prop = self.node.properties['theBest']
+        re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
+        result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(), self.node.object_id)
         self.assertEqual(sample, result)
+
+    def test_make_object_property_full_name_with_no_property_link(self):
+        self.node.fill_default_properties(name='testField', data={'expression': '2018'})
+        self.node.fill_default_properties(name='movieStar', data={'expression': 'Sly'})
+        self.node.fill_default_properties(name='theBest', data={'expression': 'movieStar'})
+        sample = "'UncontrolledRichLabelNode01_1.movieStar'"
+        prop = self.node.properties['testField']
+        re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
+        result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(),
+                                                          self.node.object_id)
+        self.assertEqual(sample, result)
+
 
     def test_get_eval_expressions(self):
         new_data = {'expression': '2018'}
