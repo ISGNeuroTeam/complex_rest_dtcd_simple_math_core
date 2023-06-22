@@ -6,6 +6,7 @@ import logging
 from ..settings import plugin_name, CONNECTOR_CONFIG
 from ot_simple_connector.connector import Connector
 from .query import Query
+from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID
 
 
 class DataCollector:
@@ -41,8 +42,17 @@ class DataCollector:
         expression = Query(name=self.name).get_read_expression(last_row=last_row)
 
         # TODO describe the situation [and result] when when required swt table does not exist
-        result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
-
+        result = []
+        try:
+            result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+        except Exception as e:
+            if "Error in  'readfile' command." in e.args[0]:
+                raise OTLReadfileError(f"OTL readFile failed to read {self.name} swt table. "
+                                       f"It doesn't seem to be saved.") from e
+            elif "Job with status new has no cache id" in e.args[0]:
+                raise OTLJobWithStatusNewHasNoCacheID(f"Job with status new has no cache id. Just try again") from e
+            else:
+                raise Exception(f"unregistered exception: {e.args[0]}") from e
         return result
 
     def calc_swt(self, eval_names: [str]) -> list:
