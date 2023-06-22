@@ -38,12 +38,17 @@ class TestNode(TestCase):
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
 
-    def test_filter_eval_properties(self):
+    def test_filter_eval_properties_true(self):
         name = 'testField'
-        sample: bool = True
         _property = (name, self.node.properties[name])
-        result = self.node.filter_eval_properties(_property=_property)
-        self.assertEqual(sample, result)
+        result = self.node.filter_eval_properties(prop=_property)
+        self.assertTrue(result)
+
+    def test_filter_eval_properties_false(self):
+        name = '_operations_order'
+        _property = (name, self.node.properties[name])
+        result = self.node.filter_eval_properties(prop=_property)
+        self.assertFalse(result)
 
     def test_get_eval_properties(self):
         print(f'\n********\nwe have this properties: {self.node.properties.values()}')
