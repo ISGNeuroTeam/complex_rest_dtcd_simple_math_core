@@ -65,7 +65,10 @@ class Graph:
             output: ['test', 'row']
         """
         self.log.debug(f'started filtering columns at {swr=}')
-        return list(filter(lambda c: not c.startswith("_"), swr))
+        result = list(filter(lambda c: not c.startswith("_"), swr))
+        self.log.debug(f'{result=}')
+
+        return result
 
     def get_property_of_the_node_by_id(self, object_id: str) -> Dict:
         """This function gets the actual property object out of saved raw json Graph
@@ -119,7 +122,7 @@ class Graph:
         for column in self.filtered_columns(swr=swr):
             reg_exp = GRAPH_GLOBALS['re_object_id_and_property']
             object_id, object_property = re.match(reg_exp, column).groups()
-            
+
             self.log.debug(f'from {column=} we have {object_id=} and {object_property=}')
 
             try:
@@ -184,12 +187,15 @@ class Graph:
         """
         self.log.debug(f'sorting the nodes by operations order...')
         try:
-            return sorted(self.nodes.values(),
-                          key=lambda x: int(x.properties['_operations_order'].expression))
+            result = sorted(self.nodes.values(),
+                            key=lambda x: int(x.properties['_operations_order'].expression))
+            self.log.debug(f'{result=}')
+            return result
+
         except KeyError:
             raise Exception('Not all nodes have _operations_order property')
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Simple string representation of the Graph object
         """
         return f'{self.name=}\n' + '\n'.join(f'\t{node}' for node in self.nodes)

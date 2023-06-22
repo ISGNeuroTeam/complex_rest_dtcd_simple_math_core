@@ -64,6 +64,7 @@ class Query:
             f'input: {self.name=}{" | last_row=" + str(last_row) if last_row else ""} | {file_path=} | {file_format=}')
         result = f'readFile format={file_format} path={file_path}/{self.name}{" | tail 1" if last_row else ""}  '
         self.log.debug(f'result: {result}')
+
         return result
 
     def get_write_expression(self, append: bool = False, file_path: str = "SWT",
@@ -82,10 +83,10 @@ class Query:
         self.log.debug(f'input: {self.name=}{" | " + str(append) if append else ""} | {file_path=} | {file_format=}')
         result = f'writeFile format={file_format} {"mode=append " if append else ""}path={file_path}/{self.name}'
         self.log.debug(f'result: {result}')
+
         return result
 
-    @staticmethod
-    def get_eval_expressions(eval_names: List[Dict]) -> str:
+    def get_eval_expressions(self, eval_names: List[Dict]) -> str:
         """Function to create eval otl queries
         Args:
             :: eval_names: list of dictionaries with object property names and its values
@@ -93,10 +94,13 @@ class Query:
         Returns:
             string of the otl query
         """
+
+        self.log.debug(f'getting eval expressions for {eval_names=}')
         result: str = ''
         for name in eval_names:
             _name, _expression = next(iter(name.items()))
             _exp: str = f'| eval \'{_name}\' = {_expression} '
             result += _exp
+        self.log.debug(f'{result=}')
 
         return result

@@ -37,10 +37,13 @@ class DataCollector:
         Return:
               We get dataset of swt table [or its last row] if swt table exists
         """
-        self.log.debug(f'getting swt table {self.name}')
+        self.log.debug(f'reading swt table {self.name}')
         expression = Query(name=self.name).get_read_expression(last_row=last_row)
+
         # TODO describe the situation [and result] when when required swt table does not exist
-        return self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+        result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+
+        return result
 
     def calc_swt(self, eval_names: [str]) -> list:
         """This function creates an otl query to read, eval and write a swt table
@@ -52,5 +55,10 @@ class DataCollector:
         Return:
               We get dataset of swt table if swt table exists
         """
+        self.log.debug(f'calculating swt table {self.name}')
         expression = Query(name=self.name).get(eval_names=eval_names)
-        return self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+
+        result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+        self.log.debug(f'{result=}')
+
+        return result

@@ -37,7 +37,12 @@ class SourceWideTable:
               # TODO [? or empty table if it does not exist]
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
-        return data_collector.read_swt(last_row=last_row)
+        self.log.debug(f'reading {self.swt_name} swt table | {last_row=}')
+
+        result = data_collector.read_swt(last_row=last_row)
+        self.log.debug(f'{result=}')
+
+        return result
 
     def calc(self, graph_eval_names: List[Dict]) -> list:
         """Here we create a data collector and make it calc swt table
@@ -51,4 +56,9 @@ class SourceWideTable:
               # TODO [? or empty table if it does not exist]
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
-        return data_collector.calc_swt(eval_names=graph_eval_names)
+        self.log.debug(f'calculating {self.swt_name} swt table with {graph_eval_names=}')
+
+        result = data_collector.calc_swt(eval_names=graph_eval_names)
+        self.log.debug(f'{result}')
+
+        return result

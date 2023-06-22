@@ -21,7 +21,7 @@ class Node:
     properties: Dict[str, Property]
     log: logging.Logger = logging.getLogger(plugin_name)
 
-    def __init__(self, node: {}):
+    def __init__(self, node: Dict):
         self.object_id = node.get('primitiveID', '')
         self.properties = {}
         # TODO split [initiating object_id and properties] and [filling default parameters]
@@ -30,13 +30,14 @@ class Node:
         if '_operations_order' not in self.properties.keys():
             self.fill_default_properties('_operations_order', {'expression': 100})
 
-    def fill_default_properties(self, name: str, data: Dict):
+    def fill_default_properties(self, name: str, data: Dict) -> None:
         """Here we save the empty Property instance as a value of the name key
         of the properties' dictionary.
         Args:
               :: name: name of the property to save
               :: data: dictionary of the data we need to save according to the named property.
         """
+        self.log.debug(f'saving {name} property with {data}')
         self.properties[name] = Property(**data)
 
     def update_property(self, prop_name: str, value: Any) -> None:
@@ -44,6 +45,7 @@ class Node:
         and also update _operations_order's expression to "complete",
         if we have such property saved.
         """
+        self.log.debug(f'updating {prop_name} property with {value=}')
         try:
             self.properties[prop_name].update(value, "complete")
             self.properties['_operations_order'].update(self.properties['_operations_order'].expression, "complete")
@@ -63,7 +65,12 @@ class Node:
         Returns:
             True or False depending on whether prop satisfies the conditions described above
         """
+        cls.log.debug(f'checking if property {prop[0]} is valid for evaluation')
+        cls.log.debug(f'its type is {prop[1].type_} and required is {EVAL_GLOBALS["property_type"]}')
+
         result = prop[1].type_ == EVAL_GLOBALS['property_type'] and not prop[0].startswith("_")
+        cls.log.debug(f'{result=}')
+
         return result
 
     def get_eval_properties(self) -> List[Tuple[str, Property]]:
@@ -74,7 +81,10 @@ class Node:
             list of tuples with names and dictionaries of properties that do satisfy
             that conditions
         """
+        self.log.debug(f'Getting eval properties...')
         result = list(filter(self.filter_eval_properties, self.properties.items()))
+        self.log.debug(f'{result=}')
+
         return result
 
     @classmethod
@@ -96,6 +106,7 @@ class Node:
             full object property name
         """
         name = re_group.group(0)
+        cls.log.debug(f'making a {node_id} node property full name for {name} and {node_properties=}')
         if "." not in name and name in node_properties:
             name = ".".join((node_id, name))
 
@@ -103,6 +114,8 @@ class Node:
         # look like this "'StepRichLabelNode11_1.Enabled'"
         if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name:
             name = f"'{name}'"
+        cls.log.debug(f'result={name}')
+
         return name
 
     def get_eval_expressions(self) -> List[Dict]:
@@ -119,8 +132,11 @@ class Node:
             result of all eval expressions ofr this node will be:
             {'UncontrolledRichLabelNode01_1.testField': '2018'}
         """
+        self.log.debug(f'Getting all eval expressions for {self.object_id} node')
+
         result = []
         node_properties = self.get_eval_properties()
+
         for _prop_name, _prop in node_properties:
             if _prop.has_expression():
                 _exp = _prop.get_expression
@@ -129,6 +145,8 @@ class Node:
                                                                             self.object_id), _exp)
                 expression = {f'{self.object_id}.{_prop_name}': _exp}
                 result.append(expression)
+        self.log.debug(f'{result=}')
+
         return result
 
     def __str__(self):

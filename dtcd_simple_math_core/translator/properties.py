@@ -2,11 +2,7 @@
 """This module describes logic of working with Property objects.
 """
 
-import re
-
 from typing import Dict
-
-from ..settings import EVAL_GLOBALS
 
 
 class Property:
@@ -18,7 +14,6 @@ class Property:
          :: status: status of the property
          :: type_: type of the property
          :: expression: expression of the property
-    # TODO add logger
     """
     value: str
     status: str
