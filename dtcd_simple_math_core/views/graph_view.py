@@ -34,25 +34,19 @@ class GraphView(APIView):
             graph.calc()
         except Exception as e:
             self.log.error(f'Got an error: {e}')
-            return ErrorResponse(
-                {
-                    'message': str(e)
-                }
-            )
+            return ErrorResponse(error_message=str(e))
 
-        return SuccessResponse(
-            {
-                'swt_name': filename,
-                'graph': graph.dictionary,
-            })
+        return SuccessResponse({'swt_name': filename, 'graph': graph.dictionary})
 
     def get(self, request):
         """
+        IMPORTANT: Turned out this method is not used in DataCAD. Seem to be deleted soon.
+
         Returns a saved graph fragment by its name.
         :param request: Consists of a "swt_name" (a graph fragment name)
         :return:
         """
-        filename = request.GET.get("swt_name", None)
+        filename = request.data.get("swt_name", None)
         if filename is None:
             self.log.error(f'Got an error: A source wide table name is required, got None.')
             return ErrorResponse(

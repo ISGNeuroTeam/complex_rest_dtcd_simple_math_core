@@ -6,8 +6,9 @@ import logging
 
 from typing import List, Dict
 
-from ..settings import plugin_name
+from ..settings import plugin_name, OTL_CREATE_FRESH_SWT
 from .data_collector import DataCollector
+from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed
 
 
 class SourceWideTable:
@@ -57,8 +58,41 @@ class SourceWideTable:
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
         self.log.debug(f'calculating {self.swt_name} swt table with {graph_eval_names=}')
+        result = []
+        counter = 0
+        while True:
+            try:
+                result = data_collector.calc_swt(eval_names=graph_eval_names)
+                break
+            except OTLReadfileError:  # here we have to save swt table first
+                data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
+            except OTLJobWithStatusNewHasNoCacheID:  # here we need to try again
+                # and make a counter and exit after like 5 tries
+                if counter > 5:
+                    self.log.exception(f'We seem to fail finding swt table because of spark 5 failures in a row')
+                    raise
+                counter += 1
+                continue
+            except OTLSubsearchFailed:
+                """Subsearch may fail because of subsearch error or because there was a readFile error
+                Need to check if swt exists and readFile can read it. 
+                If not - then we create swt table.
+                If yes - than its a subsearch error and we raise 
+                """
+                try:
+                    data_collector.read_swt(last_row=False)
+                    self.log.exception(f'Subsearch failure. Checking if {self.swt_name} swt table exists...')
+                except OTLReadfileError:
+                    data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
+                    self.log.exception(f'swt table was created...')
+                    continue
+                except OTLSubsearchFailed:
+                    self.log.exception(f'Subsearch failure. Check logs')
+                    raise
+            except Exception as e:
+                self.log.exception(f'unregistered exception: {e}')
+                raise
 
-        result = data_collector.calc_swt(eval_names=graph_eval_names)
         self.log.debug(f'{result}')
 
         return result

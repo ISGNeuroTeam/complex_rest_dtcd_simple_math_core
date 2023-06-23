@@ -6,7 +6,7 @@ import logging
 from ..settings import plugin_name, CONNECTOR_CONFIG
 from ot_simple_connector.connector import Connector
 from .query import Query
-from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID
+from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed
 
 
 class DataCollector:
@@ -41,18 +41,7 @@ class DataCollector:
         self.log.debug(f'reading swt table {self.name}')
         expression = Query(name=self.name).get_read_expression(last_row=last_row)
 
-        # TODO describe the situation [and result] when when required swt table does not exist
-        result = []
-        try:
-            result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
-        except Exception as e:
-            if "Error in  'readfile' command." in e.args[0]:
-                raise OTLReadfileError(f"OTL readFile failed to read {self.name} swt table. "
-                                       f"It doesn't seem to be saved.") from e
-            elif "Job with status new has no cache id" in e.args[0]:
-                raise OTLJobWithStatusNewHasNoCacheID(f"Job with status new has no cache id. Just try again") from e
-            else:
-                raise Exception(f"unregistered exception: {e.args[0]}") from e
+        result = self.job_create(expression=expression, cache_ttl=5)
         return result
 
     def calc_swt(self, eval_names: [str]) -> list:
@@ -68,7 +57,33 @@ class DataCollector:
         self.log.debug(f'calculating swt table {self.name}')
         expression = Query(name=self.name).get(eval_names=eval_names)
 
-        result = self.connector.jobs.create(expression, cache_ttl=5).dataset.load()
+        result = self.job_create(expression=expression, cache_ttl=5)
+
+        return result
+
+    def job_create(self, expression: str, cache_ttl: int) -> list:
+        try:
+            result = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset.load()
+        except Exception as e:
+            if "failed because of" in e.args[0]:
+                if "Error in  'readfile' command." in e.args[0]:
+                    raise OTLReadfileError(f"OTL readFile failed to read {self.name} swt table. "
+                                           f"It doesn't seem to be saved.") from e
+                else:
+                    raise OTLSubsearchFailed(f"Subsearch failed. Check logs...") from e
+            elif "Job with status new has no cache id" in e.args[0]:
+                raise OTLJobWithStatusNewHasNoCacheID(f"Job with status new has no cache id. Just try again") from e
+            else:
+                raise Exception(f"unregistered exception: {e.args[0]}") from e
         self.log.debug(f'{result=}')
+        return result
+
+    def create_fresh_swt(self, query_text: str) -> list:
+        self.log.debug(f'creating fresh swt table with name: {self.name}')
+        expression = query_text + self.name
+        self.log.debug(f'{expression=}')
+        if len(expression.split('/')) < 2:
+            self.log.exception(f'we seem to be lacking the name of the file in expression')
+        result = self.job_create(expression=expression, cache_ttl=5)
 
         return result

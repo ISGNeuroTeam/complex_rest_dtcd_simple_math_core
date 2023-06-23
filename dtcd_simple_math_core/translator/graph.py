@@ -144,7 +144,9 @@ class Graph:
         swt = SourceWideTable(self.name)
         list_of_sw_rows = swt.calc(self.get_nodes_eval_expressions())
         self.log.debug(f'{list_of_sw_rows[-1]=}')
-        return self.update(list_of_sw_rows[-1])
+
+        result = self.update(list_of_sw_rows[-1])
+        return result
 
     def swt(self) -> List:
         """Function to get the whole source wide table
@@ -180,7 +182,7 @@ class Graph:
                         "_operations_order": {        <<< this property is used
                             "status": "complete",
                             "type": "expression",
-                            "expression": 100,        <<< this is expression sorted by
+                            "expression": 100,        <<< this expression is current property sorted by
                             "input": {
                                 "component": "textarea"
                             }
