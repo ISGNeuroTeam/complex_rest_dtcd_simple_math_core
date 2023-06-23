@@ -72,6 +72,9 @@ services:
       - ./logs:/complex_rest/logs
       - ./tests:/complex_rest/tests
 
+    environment:
+      - dtcd_simple_math_core_conf=/complex_rest/plugins/dtcd_simple_math_core/dtcd_simple_math_core.conf
+
     user: ${CURRENT_UID}
     ports:
       - "8080:8080"
