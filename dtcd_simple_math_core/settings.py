@@ -119,6 +119,11 @@ GRAPH_GLOBALS = ini_config['graph_globals']
 # db conf
 db_conf = dict(ini_config['db_conf'])
 
+# set graph key names
+GRAPH_KEY_NAMES = ini_config['graph_key_names']
+
+# set otl create fresh swt table query
+OTL_CREATE_FRESH_SWT = GRAPH_GLOBALS['otl_create_fresh_swt']
 
 # set logger
 base_logs_dir = ini_config['general'].get('logs_path', '.')
@@ -126,16 +131,5 @@ logger = set_logger(ini_config['logging'].get('level', 'INFO'),
                     os.path.join(base_logs_dir, 'dtcd_simple_math_core.log'), plugin_name)
 logger.info('Version: %s' % __version__)
 logger.info('DB configuration: %s' % db_conf)
-
-# set graph key names
-GRAPH_KEY_NAMES = ini_config['graph_key_names']
-
-# configure your own database if you need
-# DATABASE = {
-#         "ENGINE": 'django.db.backends.postgresql',
-#         "NAME": ini_config['db_conf']['database'],
-#         "USER": ini_config['db_conf']['user'],
-#         "PASSWORD": ini_config['db_conf']['password'],
-#         "HOST": ini_config['db_conf']['host'],
-#         "PORT": ini_config['db_conf']['port']
-# }
+logger.info('OT simple connector config: %s' % CONNECTOR_CONFIG)
+logger.info(f'OTL create fresh swt table command: {OTL_CREATE_FRESH_SWT}')
