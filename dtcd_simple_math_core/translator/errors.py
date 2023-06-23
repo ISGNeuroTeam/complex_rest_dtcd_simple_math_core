@@ -4,3 +4,7 @@ class OTLReadfileError(Exception):
 
 class OTLJobWithStatusNewHasNoCacheID(Exception):
     pass
+
+
+class OTLSubsearchFailed(Exception):
+    pass
