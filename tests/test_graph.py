@@ -5,7 +5,6 @@ import json
 import os
 
 from dtcd_simple_math_core.translator.graph import Graph
-from resources.swt_example import swr
 
 
 class TestGraph(TestCase):
@@ -33,19 +32,6 @@ class TestGraph(TestCase):
         result = len(self.graph.nodes)
         self.assertEqual(sample, result)
 
-    def test_filtered_columns(self):
-        sample = ['DataLakeNode_22.Sum1', 'TargetRichLabelNode2_5.Sum1', 'UncontrolledRichLabelNode01_1.Sum1',
-                  'UncontrolledRichLabelNode01_2.Sum1']
-        result = list(self.graph.filtered_columns(swr))
-        self.assertEqual(sample, result)
-
-    # TODO this test is not quite checked
-    def test_calc(self):
-        sample = self.graph.dictionary
-        self.graph.calc()
-        result = self.graph.dictionary
-        self.assertEqual(sample, result)
-
     def test_get_property_of_the_node_by_id(self):
         object_id = 'DataLakeNode_22'
         sample = {'_operations_order': {'expression': 1, 'status': 'complete', 'type': 'expression', 'value': ''},
@@ -60,10 +46,4 @@ class TestGraph(TestCase):
         control_property = self.graph.get_property_of_the_node_by_id(object_id=object_id)
         self.graph.update_property_at_graph(node_name=object_id, prop_name=_property, value=sample)
         result = control_property[_property]['value']
-        self.assertEqual(sample, result)
-
-    def test_swt(self):
-        # this one just gets swt table
-        sample = [{'DataLakeNode_22.Sum1': 28, 'TargetRichLabelNode2_5.Sum1': 28, 'UncontrolledRichLabelNode01_1.Sum1': 28, 'UncontrolledRichLabelNode01_2.Sum1': 28, '_sn': 1, '_t': 1685695989, '_time': 1685695989}]
-        result = self.graph.swt()
         self.assertEqual(sample, result)

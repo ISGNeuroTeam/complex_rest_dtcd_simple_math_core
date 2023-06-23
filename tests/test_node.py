@@ -52,10 +52,8 @@ class TestNode(TestCase):
         self.assertFalse(result)
 
     def test_get_eval_properties(self):
-        print(f'\n********\nwe have this properties: {self.node.properties.values()}')
         sample = 1
         eval_properties = [n[0] for n in self.node.get_eval_properties()]
-        print(f'eval_properties: {eval_properties}')
         result = len(eval_properties)
         self.assertEqual(sample, result)
 
@@ -63,7 +61,7 @@ class TestNode(TestCase):
         self.node.fill_default_properties(name='testField', data={'expression': '2018'})
         self.node.fill_default_properties(name='movieStar', data={'expression': 'Sly'})
         self.node.fill_default_properties(name='theBest', data={'expression': 'movieStar'})
-        sample = '2018'
+        sample = "'UncontrolledRichLabelNode01_1.movieStar'"
         prop = self.node.properties['theBest']
         re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
         result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(), self.node.object_id)
@@ -73,7 +71,7 @@ class TestNode(TestCase):
         self.node.fill_default_properties(name='testField', data={'expression': '2018'})
         self.node.fill_default_properties(name='movieStar', data={'expression': 'Sly'})
         self.node.fill_default_properties(name='theBest', data={'expression': 'movieStar'})
-        sample = "'UncontrolledRichLabelNode01_1.movieStar'"
+        sample = '2018'
         prop = self.node.properties['testField']
         re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
         result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(),
