@@ -5,10 +5,10 @@ level = INFO
 logs_path = .
 
 [ot_simple_connector]
-host = 'localhost'
+host = localhost
 port = 80
-user = 'admin'
-password = `VeryComplicatedPassword`
+user = admin
+password = VeryComplicatedPassword
 
 [eval_globals]
 property_type = expression
