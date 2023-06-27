@@ -38,14 +38,14 @@ class Query:
         read_query = self.get_read_expression()
         eval_query = self.get_eval_expressions(eval_names=eval_names)
         write_query = self.get_write_expression()
-        self.log.debug(f'{read_query=}')
-        self.log.debug(f'{eval_query=}')
-        self.log.debug(f'{write_query=}')
+        self.log.debug('read_query=%s', read_query)
+        self.log.debug('eval_query=%s', eval_query)
+        self.log.debug('write_query=%s', write_query)
 
         subquery = f"otloadjob otl={json.dumps(read_query + eval_query)}"
-        self.log.debug(f'{subquery=}')
+        self.log.debug('subquery=%s', subquery)
         result = " | ".join((subquery, write_query))
-        self.log.debug(f'result: {result=}')
+        self.log.debug('result: %s', result)
 
         return result
 
@@ -53,17 +53,19 @@ class Query:
                             file_format: str = "JSON") -> str:
         """Function to create readFile otl query
         Args:
-            :: last_row: flag to point out whether we require the whole table or just the last row of it
+            :: last_row: flag to point out whether we require the whole table or
+                         just the last row of it
             :: file_path: path to swt table file inside ExternalData
             :: file_format: format of the swt table
 
         Returns:
             string of the otl query
         """
-        self.log.debug(
-            f'input: {self.name=}{" | last_row=" + str(last_row) if last_row else ""} | {file_path=} | {file_format=}')
-        result = f'readFile format={file_format} path={file_path}/{self.name}{" | tail 1" if last_row else ""}  '
-        self.log.debug(f'result: {result}')
+        self.log.debug('input: self.name=%s | last_row=%s | file_path=%s | file_format=%s',
+                       self.name, last_row, file_path, file_format)
+        result = f'readFile format={file_format} path={file_path}/{self.name}' \
+                 f'{" | tail 1" if last_row else ""}  '
+        self.log.debug('result: %s', result)
 
         return result
 
@@ -80,9 +82,11 @@ class Query:
         Returns:
             string of the otl query
         """
-        self.log.debug(f'input: {self.name=}{" | " + str(append) if append else ""} | {file_path=} | {file_format=}')
-        result = f'writeFile format={file_format} {"mode=append " if append else ""}path={file_path}/{self.name}'
-        self.log.debug(f'result: {result}')
+        self.log.debug('input: self.name=%s | append=%s | file_path=%s | file_format=%s',
+                       self.name, append, file_path, file_format)
+        result = f'writeFile format={file_format} {"mode=append " if append else ""}' \
+                 f'path={file_path}/{self.name}'
+        self.log.debug('result: %s', result)
 
         return result
 
@@ -95,12 +99,12 @@ class Query:
             string of the otl query
         """
 
-        self.log.debug(f'getting eval expressions for {eval_names=}')
+        self.log.debug('getting eval expressions for eval_names=%s', eval_names)
         result: str = ''
         for name in eval_names:
             _name, _expression = next(iter(name.items()))
             _exp: str = f'| eval \'{_name}\' = {_expression} '
             result += _exp
-        self.log.debug(f'{result=}')
+        self.log.debug('result: %s', result)
 
         return result

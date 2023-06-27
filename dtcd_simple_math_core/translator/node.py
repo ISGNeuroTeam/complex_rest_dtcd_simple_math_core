@@ -3,10 +3,10 @@
 """
 import logging
 import re
+from typing import Dict, Any, Iterable, Tuple, List
 
 from .properties import Property
 from ..settings import EVAL_GLOBALS, plugin_name
-from typing import Dict, Any, Optional, Iterable, Tuple, List
 
 
 class Node:
@@ -27,7 +27,7 @@ class Node:
         # TODO split [initiating object_id and properties] and [filling default parameters]
         for prop_name, data in node['properties'].items():
             self.fill_default_properties(prop_name, data=data)
-        if '_operations_order' not in self.properties.keys():
+        if '_operations_order' not in self.properties:
             self.fill_default_properties('_operations_order', {'expression': 100})
 
     def fill_default_properties(self, name: str, data: Dict) -> None:
@@ -37,7 +37,7 @@ class Node:
               :: name: name of the property to save
               :: data: dictionary of the data we need to save according to the named property.
         """
-        self.log.debug(f'saving {name} property with {data}')
+        self.log.debug('saving %s property with %s', name, data)
         self.properties[name] = Property(**data)
 
     def update_property(self, prop_name: str, value: Any) -> None:
@@ -45,12 +45,13 @@ class Node:
         and also update _operations_order's expression to "complete",
         if we have such property saved.
         """
-        self.log.debug(f'updating {prop_name} property with {value=}')
+        self.log.debug('updating %s property with value=%s', prop_name, value)
         try:
             self.properties[prop_name].update(value, "complete")
+            # pylint: disable=line-too-long
             self.properties['_operations_order'].update(self.properties['_operations_order'].expression, "complete")
         except KeyError:
-            self.log.warning(f'no {prop_name} property found, only {self.properties.keys()} got')
+            self.log.warning('no %s property found, only %s got', prop_name, self.properties.keys())
 
     @classmethod
     def filter_eval_properties(cls, prop: Tuple[str, Property]) -> bool:
@@ -65,11 +66,12 @@ class Node:
         Returns:
             True or False depending on whether prop satisfies the conditions described above
         """
-        cls.log.debug(f'checking if property {prop[0]} is valid for evaluation')
-        cls.log.debug(f'its type is {prop[1].type_} and required is {EVAL_GLOBALS["property_type"]}')
+        cls.log.debug('checking if property %s is valid for evaluation', prop[0])
+        cls.log.debug('its type is %s and required is %s', prop[1].type_,
+                      EVAL_GLOBALS["property_type"])
 
         result = prop[1].type_ == EVAL_GLOBALS['property_type'] and not prop[0].startswith("_")
-        cls.log.debug(f'{result=}')
+        cls.log.debug('result=%s', result)
 
         return result
 
@@ -81,16 +83,19 @@ class Node:
             list of tuples with names and dictionaries of properties that do satisfy
             that conditions
         """
-        self.log.debug(f'Getting eval properties...')
+        self.log.debug('Getting eval properties...')
         result = list(filter(self.filter_eval_properties, self.properties.items()))
-        self.log.debug(f'{result=}')
+        self.log.debug('result=%s', result)
 
         return result
 
     @classmethod
-    def make_object_property_full_name(cls, re_group: re.Match, node_properties: Iterable, node_id: str) -> str:
+    def make_object_property_full_name(cls, re_group: re.Match, node_properties: Iterable,
+                                       node_id: str) -> str:
         """
-        Here we make several manipulations and checks in order to create proper object property names.
+        Here we make several manipulations and checks in order to create proper object
+        property names.
+
         Example:
             if we have a node: 'UncontrolledRichLabelNode01_1'
             and it has properties:
@@ -106,7 +111,8 @@ class Node:
             full object property name
         """
         name = re_group.group(0)
-        cls.log.debug(f'making a {node_id} node property full name for {name} and {node_properties=}')
+        cls.log.debug('making a %s node property full name for %s and '
+                      'node_properties=%s', node_id, name, node_properties)
         if "." not in name and name in node_properties:
             name = ".".join((node_id, name))
 
@@ -114,7 +120,7 @@ class Node:
         # look like this "'StepRichLabelNode11_1.Enabled'"
         if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name:
             name = f"'{name}'"
-        cls.log.debug(f'result={name}')
+        cls.log.debug('result=%s', name)
 
         return name
 
@@ -132,7 +138,7 @@ class Node:
             result of all eval expressions ofr this node will be:
             {'UncontrolledRichLabelNode01_1.testField': '2018'}
         """
-        self.log.debug(f'Getting all eval expressions for {self.object_id} node')
+        self.log.debug('Getting all eval expressions for %s node', self.object_id)
 
         result = []
         node_properties = self.get_eval_properties()
@@ -141,11 +147,12 @@ class Node:
             if _prop.has_expression():
                 _exp = _prop.get_expression
                 _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
-                              lambda p: self.make_object_property_full_name(p, self.properties.keys(),
+                              lambda p: self.make_object_property_full_name(p,
+                                                                            self.properties.keys(),
                                                                             self.object_id), _exp)
                 expression = {f'{self.object_id}.{_prop_name}': _exp}
                 result.append(expression)
-        self.log.debug(f'{result=}')
+        self.log.debug('result=%s', result)
 
         return result
 

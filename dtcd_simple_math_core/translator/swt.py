@@ -23,7 +23,7 @@ class SourceWideTable:
     swt_name: str
 
     def __init__(self, swt_name: str) -> None:
-        self.log.debug(f'Input {swt_name=}')
+        self.log.debug('Input swt_name=%s', swt_name)
         self.swt_name = swt_name
 
     def read(self, last_row: bool = False) -> list:
@@ -38,10 +38,10 @@ class SourceWideTable:
               # TODO [? or empty table if it does not exist]
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
-        self.log.debug(f'reading {self.swt_name} swt table | {last_row=}')
+        self.log.debug('reading %s swt table | last_row=%s', self.swt_name, last_row)
 
         result = data_collector.read_swt(last_row=last_row)
-        self.log.debug(f'{result=}')
+        self.log.debug('result=%s', result)
 
         return result
 
@@ -57,7 +57,7 @@ class SourceWideTable:
               # TODO [? or empty table if it does not exist]
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
-        self.log.debug(f'calculating {self.swt_name} swt table with {graph_eval_names=}')
+        self.log.debug('calculating %s swt table with %s', self.swt_name, graph_eval_names)
         result = []
         counter = 0
         while True:
@@ -68,31 +68,39 @@ class SourceWideTable:
                 data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
             except OTLJobWithStatusNewHasNoCacheID:  # here we need to try again
                 # and make a counter and exit after like 5 tries
+                self.log.exception('We seem to fail finding swt table because of spark '
+                                   '| %s try', counter + 1)
                 if counter > 5:
-                    self.log.exception(f'We seem to fail finding swt table because of spark 5 failures in a row')
+                    self.log.exception('We failed to find swt table because of spark for '
+                                       '5 attempts in a row')
                     raise
                 counter += 1
                 continue
             except OTLSubsearchFailed:
-                """Subsearch may fail because of subsearch error or because there was a readFile error
-                Need to check if swt exists and readFile can read it. 
+                # pylint: disable=pointless-string-statement
+                '''Subsearch may fail because of subsearch error,
+                or because there was a readFile error.
+
+                Need to check if swt exists and readFile can read it.
+
                 If not - then we create swt table.
-                If yes - than its a subsearch error and we raise 
-                """
+                If yes - than its a subsearch error and we raise.
+                '''
                 try:
                     data_collector.read_swt(last_row=False)
-                    self.log.exception(f'Subsearch failure. Checking if {self.swt_name} swt table exists...')
+                    self.log.exception('Subsearch failure. Checking if %s'
+                                       'swt table exists...', self.swt_name )
                 except OTLReadfileError:
                     data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
-                    self.log.exception(f'swt table was created...')
+                    self.log.exception('swt table was created...')
                     continue
                 except OTLSubsearchFailed:
-                    self.log.exception(f'Subsearch failure. Check logs')
+                    self.log.exception('Subsearch failure. Check logs')
                     raise
-            except Exception as e:
-                self.log.exception(f'unregistered exception: {e}')
+            except Exception as e:  # pylint: disable=broad-except, invalid-name
+                self.log.exception('unregistered exception: %s', e)
                 raise
 
-        self.log.debug(f'{result}')
+        self.log.debug('result=%s', result)
 
         return result

@@ -20,7 +20,8 @@ class Property:
     type_: str
     expression: str
 
-    def __init__(self, value: str = '', status: str = 'complete', type_: str = 'expression', expression='', **kwargs):
+    def __init__(self, value: str = '', status: str = 'complete', type_: str = 'expression',
+                 expression='', **kwargs):
         self.value = value
         self.status = status
         self.type_ = type_

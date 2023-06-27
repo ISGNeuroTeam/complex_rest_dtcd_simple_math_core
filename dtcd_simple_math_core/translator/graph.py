@@ -5,17 +5,17 @@
 import json
 import logging
 import re
+from typing import Dict, Union, List
 
 from ..settings import GRAPH_GLOBALS, plugin_name
 from .swt import SourceWideTable
 
 from .node import Node
-from typing import Dict, Union, List
 
 
 class Graph:
     """This class describes how Graph works:
-   
+
     Args:
         :: log: local instance of plugin logger
         :: nodes: dictionary of all nodes, consist of its names and its Node instances
@@ -37,7 +37,7 @@ class Graph:
         And then parse all the nodes of the graph from json to nodes dictionary in order
         to keep them in Nodes objects.
         """
-        self.log.debug(f'started initialization of graph')
+        self.log.debug('started initialization of graph')
         self.dictionary = json.loads(self.dictionary) if isinstance(self.dictionary, str) \
             else self.dictionary
         self.parse_nodes()
@@ -45,16 +45,16 @@ class Graph:
     def parse_nodes(self) -> None:
         """We parse graph from json into Nodes objects
         """
-        self.log.debug(f'started parsing the nodes...')
+        self.log.debug('started parsing the nodes...')
         for node in self.dictionary['graph']['nodes']:
             self.nodes[node['primitiveID']] = Node(node)
-        self.log.debug(f'parsed nodes successfully...')
+        self.log.debug('parsed nodes successfully...')
 
     def filtered_columns(self, swr: List) -> List:
-        """We get a row of the source wide table which is "Source Wide Row" >>> swr 
+        """We get a row of the source wide table which is "Source Wide Row" >>> swr
         and filter out all strings that start with "_" symbol
 
-        Args: 
+        Args:
             swr: list of strings to filter
 
         Returns:
@@ -64,9 +64,9 @@ class Graph:
             input: swr = ['test', 'row', '_operations_order', '_size']
             output: ['test', 'row']
         """
-        self.log.debug(f'started filtering columns at {swr=}')
+        self.log.debug('started filtering columns at swr=%s', swr)
         result = list(filter(lambda c: not c.startswith("_"), swr))
-        self.log.debug(f'{result=}')
+        self.log.debug('result=%s', result)
 
         return result
 
@@ -78,24 +78,24 @@ class Graph:
 
         Args:
             object_id: name of the object to find and return
-        
+
         Return:
             dictionary with data of the object with name object_id found
             in raw json dictionary of the Graph
 
         TODO:
             * it seems that here we haven't checked the situation when object is not found
-              this is actually impossible because we check if we have this object in graph 
+              this is actually impossible because we check if we have this object in graph
               before using this function.
         """
-        self.log.debug(f'getting the properties object of the {object_id} node')
+        self.log.debug('getting the properties object of the %s node', object_id)
         nodes = self.dictionary['graph']['nodes']
         for node in nodes:
             if node['primitiveID'] == object_id:
-                self.log.debug(f'properties object is found')
+                self.log.debug('properties object is found')
                 return node['properties']
 
-        self.log.warning(f'{object_id} node is not found, returning empty dictionary...')
+        self.log.warning('%s node is not found, returning empty dictionary...', object_id)
         return {}
 
     def update_property_at_graph(self, node_name: str, prop_name: str, value: str) -> None:
@@ -106,44 +106,46 @@ class Graph:
             prop_name: name of the property to update
             value: actual value to set to property
         """
-        self.log.debug(f'updating {prop_name=} of the {node_name} node with {value=}...')
+        self.log.debug('updating prop_name=%s of the %s node with value=%s...',
+                       prop_name, node_name, value)
         properties = self.get_property_of_the_node_by_id(object_id=node_name)
         properties[prop_name]['value'] = value
-        self.log.debug(f'update successfully done...')
+        self.log.debug('update successfully done...')
 
     def update(self, swr: List) -> Dict:
         """Function to update nodes objects and actual raw json dictionary
 
-        Args: 
+        Args:
             swr: the least row of the source wide table
         """
-        self.log.debug(f'updating the graph...')
-        self.log.debug(f'input: {swr=}')
+        self.log.debug('updating the graph...')
+        self.log.debug('input: swr=%s', swr)
         for column in self.filtered_columns(swr=swr):
             reg_exp = GRAPH_GLOBALS['re_object_id_and_property']
             object_id, object_property = re.match(reg_exp, column).groups()
 
-            self.log.debug(f'from {column=} we have {object_id=} and {object_property=}')
+            self.log.debug('from column=%s we have object_id=%s and object_property=%s',
+                           column, object_id, object_property)
 
             try:
                 self.nodes[object_id].update_property(object_property, swr[column])
-                self.log.debug(f'updated property at the self.nodes dictionary')
+                self.log.debug('updated property at the self.nodes dictionary')
                 self.update_property_at_graph(node_name=object_id, prop_name=object_property,
                                               value=swr[column])
-                self.log.debug(f'updated property at the self.graph dictionary')
+                self.log.debug('updated property at the self.graph dictionary')
 
             except KeyError:
-                self.log.warning(f'No {object_id} node found, only {self.nodes.keys()} got')
+                self.log.warning('No %s node found, only %s got', object_id, self.nodes.keys())
 
         return self.dictionary
 
     def calc(self) -> Dict:
         """Main calculation function of Graph
         """
-        self.log.debug(f'calculating graph...')
+        self.log.debug('calculating graph...')
         swt = SourceWideTable(self.name)
         list_of_sw_rows = swt.calc(self.get_nodes_eval_expressions())
-        self.log.debug(f'{list_of_sw_rows[-1]=}')
+        self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
 
         result = self.update(list_of_sw_rows[-1])
         return result
@@ -151,19 +153,19 @@ class Graph:
     def swt(self) -> List:
         """Function to get the whole source wide table
         """
-        self.log.debug(f'getting swt...')
+        self.log.debug('getting swt...')
         swt = SourceWideTable(self.name)
         return swt.calc(self.get_nodes_eval_expressions())
 
     def get_nodes_eval_expressions(self) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
         """
-        self.log.debug(f'getting nodes eval expressions...')
+        self.log.debug('getting nodes eval expressions...')
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
             eval_expressions.extend(node.get_eval_expressions())
-        self.log.debug(f'{eval_expressions=}')
+        self.log.debug('eval_expressions=%s', eval_expressions)
         return eval_expressions
 
     def get_sorted_nodes(self) -> list[Node]:
@@ -182,20 +184,20 @@ class Graph:
                         "_operations_order": {        <<< this property is used
                             "status": "complete",
                             "type": "expression",
-                            "expression": 100,        <<< this expression is current property sorted by
+                            "expression": 100,        <<< this is what current property sorted by
                             "input": {
                                 "component": "textarea"
                             }
         """
-        self.log.debug(f'sorting the nodes by operations order...')
+        self.log.debug('sorting the nodes by operations order...')
         try:
             result = sorted(self.nodes.values(),
                             key=lambda x: int(x.properties['_operations_order'].expression))
-            self.log.debug(f'{result=}')
+            self.log.debug('result=%s', result)
             return result
 
-        except KeyError:
-            raise Exception('Not all nodes have _operations_order property')
+        except KeyError as error:
+            raise Exception('Not all nodes have _operations_order property') from error
 
     def __str__(self) -> str:
         """Simple string representation of the Graph object
@@ -206,13 +208,13 @@ class Graph:
     def read_from_file(cls, filename: str) -> 'Graph':
         """Function to read Graph from file on disk
 
-        Args: 
+        Args:
             filename: name of the file to read
 
         Returns:
             Function returns already parsed Graph object of the json read from file.
         """
         path = GRAPH_GLOBALS['path_to_graph'].format(filename)
-        cls.log.debug(f'reading a graph {filename=} at {path=}')
-        with open(path) as fr:
-            return Graph(filename, fr.read())
+        cls.log.debug('reading a graph %s at %s', filename, path)
+        with open(path, encoding='utf-8') as file:
+            return Graph(filename, file.read())
