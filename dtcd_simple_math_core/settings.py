@@ -116,9 +116,6 @@ CONNECTOR_CONFIG = ini_config['ot_simple_connector']
 EVAL_GLOBALS = ini_config['eval_globals']
 GRAPH_GLOBALS = ini_config['graph_globals']
 
-# db conf
-db_conf = dict(ini_config['db_conf'])
-
 # set graph key names
 GRAPH_KEY_NAMES = ini_config['graph_key_names']
 
@@ -130,6 +127,5 @@ base_logs_dir = ini_config['general'].get('logs_path', '.')
 logger = set_logger(ini_config['logging'].get('level', 'INFO'),
                     os.path.join(base_logs_dir, 'dtcd_simple_math_core.log'), plugin_name)
 logger.info('Version: %s' % __version__)
-logger.info('DB configuration: %s' % db_conf)
 logger.info('OT simple connector config: %s' % CONNECTOR_CONFIG)
 logger.info(f'OTL create fresh swt table command: {OTL_CREATE_FRESH_SWT}')
