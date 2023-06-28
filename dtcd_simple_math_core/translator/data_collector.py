@@ -6,7 +6,8 @@ import logging
 from ot_simple_connector.connector import Connector  # pylint: disable=import-error
 from ..settings import plugin_name, CONNECTOR_CONFIG
 from .query import Query
-from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed
+from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, \
+    OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID
 
 
 class DataCollector:
@@ -75,6 +76,9 @@ class DataCollector:
             if "Job with status new has no cache id" in e.args[0]:
                 raise OTLJobWithStatusNewHasNoCacheID("Job with status new has no cache id. "
                                                       "Just try again") from e
+            if "Job with status failed has no cache id" in e.args[0]:
+                raise OTLJobWithStatusFailedHasNoCacheID("Job with status failed has no cache id. "
+                                                         "Just try again") from e
             raise Exception(f"unregistered exception: {e.args[0]}") from e
         self.log.debug('result=%s', result)
         return result

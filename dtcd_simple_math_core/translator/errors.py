@@ -21,6 +21,14 @@ class OTLJobWithStatusNewHasNoCacheID(Exception):
     error"""
     pass
 
+class OTLJobWithStatusFailedHasNoCacheID(Exception):
+    """Exception when there is a
+
+    'Job with status new has no cache id'
+
+    error"""
+    pass
+
 
 class OTLSubsearchFailed(Exception):
     """Exception when there is a

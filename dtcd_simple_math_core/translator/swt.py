@@ -8,7 +8,8 @@ from typing import List, Dict
 
 from ..settings import plugin_name, OTL_CREATE_FRESH_SWT
 from .data_collector import DataCollector
-from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed
+from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed, \
+    OTLJobWithStatusFailedHasNoCacheID
 
 
 class SourceWideTable:
@@ -94,7 +95,7 @@ class SourceWideTable:
                     data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
                     self.log.exception('swt table was created...')
                     continue
-                except OTLSubsearchFailed:
+                except (OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID):
                     self.log.exception('Subsearch failure. Check logs')
                     raise
             except Exception as e:  # pylint: disable=broad-except, invalid-name
