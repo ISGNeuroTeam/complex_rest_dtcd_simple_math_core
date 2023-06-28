@@ -1,5 +1,5 @@
-from rest.urls import path
-from cache import cache_page
+"""Usual Django urls module for dtcd_simple_math_core plugin"""
+from rest.urls import path  # pylint: disable=import-error
 from .views.source_wide_table_view import SourceWideTableView
 from .views.graph_view import GraphView
 
