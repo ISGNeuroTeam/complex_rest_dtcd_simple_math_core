@@ -42,7 +42,7 @@ class Query:
         self.log.debug('eval_query=%s', eval_query)
         self.log.debug('write_query=%s', write_query)
 
-        subquery = f"otloadjob otl={json.dumps(read_query + eval_query)}"
+        subquery = f"otloadjob otl={json.dumps(read_query + eval_query, ensure_ascii=False)}"
         self.log.debug('subquery=%s', subquery)
         result = " | ".join((subquery, write_query))
         self.log.debug('result: %s', result)
