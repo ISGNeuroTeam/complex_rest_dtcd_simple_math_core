@@ -23,12 +23,13 @@ class SourceWideTableView(APIView):
     @staticmethod
     def get(request):
         """
+        Receives data about swt in URL.
         Reads an SWT table and returns it.
 
         :param request: Consists of a "swt_name" (a graph fragment name)
         :return:
         """
-        swt_name = request.data.get("swt_name", None)
+        swt_name = request.GET.get("swt_name", None)
         if swt_name is None:
             return ErrorResponse(
                 {
