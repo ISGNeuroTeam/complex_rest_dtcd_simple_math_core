@@ -1,8 +1,10 @@
+"""Plugin's settings module"""
 import configparser
 import logging.config
 import os
 
 from pathlib import Path
+# pylint: disable=import-error
 from core.settings.ini_config import merge_ini_config_with_defaults, configparser_to_dict
 
 
@@ -30,6 +32,7 @@ default_ini_config = {
 
 
 def set_logger(loglevel, logfile, logger_name):
+    """Function to set up local logger"""
     levels = {
         'CRITICAL': logging.CRITICAL,
         'ERROR': logging.ERROR,
@@ -47,8 +50,8 @@ def set_logger(loglevel, logfile, logger_name):
                           "func=%(funcName)s - %(message)s"
             },
             'with_hid': {
-                'format': "%(asctime)s %(levelname)-s PID=%(process)d HID=%(hid)s %(module)s:%(lineno)d "
-                          "func=%(funcName)s - %(message)s"
+                'format': "%(asctime)s %(levelname)-s PID=%(process)d HID=%(hid)s "
+                          "%(module)s:%(lineno)d func=%(funcName)s - %(message)s"
             }
         },
         'handlers': {
@@ -111,7 +114,7 @@ config = configparser.ConfigParser()
 config.read(conf_path)
 config = configparser_to_dict(config)
 ini_config = merge_ini_config_with_defaults(config, default_ini_config)
-plugin_name = 'dtcd_simple_math_core'
+plugin_name = 'dtcd_simple_math_core'  # pylint: disable=invalid-name
 CONNECTOR_CONFIG = ini_config['ot_simple_connector']
 EVAL_GLOBALS = ini_config['eval_globals']
 GRAPH_GLOBALS = ini_config['graph_globals']
@@ -126,6 +129,6 @@ OTL_CREATE_FRESH_SWT = GRAPH_GLOBALS['otl_create_fresh_swt']
 base_logs_dir = ini_config['general'].get('logs_path', '.')
 logger = set_logger(ini_config['logging'].get('level', 'INFO'),
                     os.path.join(base_logs_dir, 'dtcd_simple_math_core.log'), plugin_name)
-logger.info('Version: %s' % __version__)
-logger.info('OT simple connector config: %s' % CONNECTOR_CONFIG)
-logger.info(f'OTL create fresh swt table command: {OTL_CREATE_FRESH_SWT}')
+logger.info('Version: %s',  __version__)
+logger.info('OT simple connector config: %s', CONNECTOR_CONFIG)
+logger.info('OTL create fresh swt table command: %s', OTL_CREATE_FRESH_SWT)
