@@ -20,6 +20,8 @@ class GraphView(APIView):
 
     def post(self, request):
         """
+        Receives data about graph in request body.
+
         Updates a linked SWT and merges executed calculations with an incoming graph. Returns it.
 
         :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
