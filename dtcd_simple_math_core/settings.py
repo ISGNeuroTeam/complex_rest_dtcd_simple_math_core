@@ -81,12 +81,12 @@ def set_logger(loglevel, logfile, logger_name):
             },
         },
         'loggers': {
-            'osr': {
+            logger_name: {
                 'handlers': ['file_handler_standard', 'stream_handler_standard'],
                 'level': levels[loglevel],
                 'propagate': False
             },
-            'osr_hid': {
+            logger_name + '_hid': {
                 'handlers': ['file_handler_with_hid', 'stream_handler_with_hid'],
                 'level': levels[loglevel]
             },
