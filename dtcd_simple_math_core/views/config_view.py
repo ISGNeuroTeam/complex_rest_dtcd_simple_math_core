@@ -4,7 +4,7 @@ import json
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
-from settings import SETTINGS_FILE_PATH
+from ..settings import SETTINGS_FILE_PATH
 
 
 class ConfigView(APIView):
