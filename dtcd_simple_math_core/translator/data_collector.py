@@ -7,7 +7,7 @@ from ot_simple_connector.connector import Connector  # pylint: disable=import-er
 from ..settings import plugin_name, CONNECTOR_CONFIG
 from .query import Query
 from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, \
-    OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID
+    OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID,LackingPathNameError
 
 
 class DataCollector:
@@ -65,18 +65,31 @@ class DataCollector:
     def job_create(self, expression: str, cache_ttl: int) -> list:
         """Wrapper for working with ot_simple_connector.job.create and
         parse and handle its exceptions"""
+        self.log.debug('data_collector: job_create | expression: %s | cache_ttl: %s',
+                       expression, cache_ttl)
         try:
+            self.log.debug("data_collector-job_create | trying to create job...")
+            self.log.debug("data_collector-job_create | expression: %s", expression)
             result = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset.load()
         except Exception as e:  # pylint: disable=broad-except, invalid-name
+            self.log.debug("data_collector-job_create | exception: %s", e.args[0])
             if "failed because of" in e.args[0]:
                 if "Error in  'readfile' command." in e.args[0]:
+                    self.log.debug('data_collector-job_create | readFile error - raising '
+                                   'OTLReadFileError exception')
                     raise OTLReadfileError(f"OTL readFile failed to read {self.name} swt table. "
                                            f"It doesn't seem to be saved.") from e
+                self.log.debug('data_collector-job_create | not readFile error >> '
+                               'raising OTLSubsearchFailed exception')
                 raise OTLSubsearchFailed("Subsearch failed. Check logs...") from e
             if "Job with status new has no cache id" in e.args[0]:
+                self.log.debug('data_collector-job_create | job with status new has no cache id >>> '
+                               'raising OTLJobWithStatusNewHasNoCacheID exception')
                 raise OTLJobWithStatusNewHasNoCacheID("Job with status new has no cache id. "
                                                       "Just try again") from e
             if "Job with status failed has no cache id" in e.args[0]:
+                self.log.debug('data_collector-job_create | job with status failed has no cache id >>> '
+                               'raising OTLJobWithStatusFailedHasNoCacheID exception')
                 raise OTLJobWithStatusFailedHasNoCacheID("Job with status failed has no cache id. "
                                                          "Just try again") from e
             raise Exception(f"unregistered exception: {e.args[0]}") from e
@@ -90,6 +103,9 @@ class DataCollector:
         self.log.debug('expression=%s', expression)
         if len(expression.split('/')) < 2:
             self.log.exception('we seem to be lacking the name of the file in expression')
+            raise LackingPathNameError('Some how DataCollector has no swt name given, '
+                                       'so we can not proceed the writeFile query. Call the developer '
+                                       'to check DataCollector:create_fresh_swt function')
         result = self.job_create(expression=expression, cache_ttl=5)
 
         return result

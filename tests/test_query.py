@@ -45,3 +45,10 @@ class TestQuery(TestCase):
                  "eval 'TargetRichLabelNode2_5.Sum1' = 28 | eval 'DataLakeNode_22.Sum1' = 28 "
         result = self.query.get_eval_expressions(eval_names=eval_names)
         self.assertEqual(sample, result)
+
+    def test_get_fields_expression(self):
+        eval_names = [{'Goal_3.type': '"Цель"'}, {'Goal_3.value': '12'},
+                      {'Data_96.type': '"Примитив с данными"'}, {'Data_96.value': '12'}]
+        sample = 'fields _t, _sn, _time, Goal_3.type, Goal_3.value, Data_96.type, Data_96.value'
+        result = self.query.get_fields_expression(eval_names=eval_names)
+        self.assertEqual(sample, result)

@@ -37,14 +37,16 @@ class Query:
         """
         read_query = self.get_read_expression()
         eval_query = self.get_eval_expressions(eval_names=eval_names)
+        fields_query = self.get_fields_expression(eval_names=eval_names)
         write_query = self.get_write_expression()
         self.log.debug('read_query=%s', read_query)
         self.log.debug('eval_query=%s', eval_query)
+        self.log.debug('fields_query=%s', fields_query)
         self.log.debug('write_query=%s', write_query)
 
         subquery = f"otloadjob otl={json.dumps(read_query + eval_query, ensure_ascii=False)}"
         self.log.debug('subquery=%s', subquery)
-        result = " | ".join((subquery, write_query))
+        result = " | ".join((subquery, fields_query, write_query))
         self.log.debug('result: %s', result)
 
         return result
@@ -105,6 +107,29 @@ class Query:
             _name, _expression = next(iter(name.items()))
             _exp: str = f'| eval \'{_name}\' = {_expression} '
             result += _exp
+        self.log.debug('result: %s', result)
+
+        return result
+
+    def get_fields_expression(self, eval_names: List[Dict]) -> str:
+        """Function to create fields part of the expression
+        It must include the names of the fields, that must stay at the swt table
+
+        Stay by default: _t, _sn and _time fields
+        """
+
+        self.log.debug('start getting fields expression with this names: %s', eval_names)
+        eval_names_list: list = []
+        for eval_name in eval_names:
+            eval_names_list.append(list(eval_name.items())[0][0])
+        self.log.debug('eval_names_list: %s', eval_names_list)
+
+        eval_names_list_string = ', '.join(eval_names_list)
+        self.log.debug('eval_names_list_str: %s', eval_names_list_string)
+
+        result = 'fields _t, _sn, _time'
+        if eval_names_list:
+            result += ', ' + eval_names_list_string
         self.log.debug('result: %s', result)
 
         return result
