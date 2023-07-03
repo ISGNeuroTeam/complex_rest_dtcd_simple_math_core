@@ -38,3 +38,18 @@ class OTLSubsearchFailed(Exception):
 
      error"""
     pass
+
+class LackingPathNameError(Exception):
+    """Exception when there is no path name provided
+
+    Usually when we create query for writing swt and use template query
+    from dtcd_simple_math_core.conf:[graph_globals]:otl_create_fresh_swt
+
+    otl_create_fresh_swt = | makeresults count=1 | eval _sn=1 | eval _t=_time | writeFile format=json path=SWT/
+
+    and add path name to the end of that line. But if we send this query without added path name,
+    then otl will calc that query and delete all the SWT folder, so we must not allow that to happen.
+
+    So if path name is not given we must raise error and try again.
+    """
+    pass
