@@ -63,13 +63,17 @@ class SourceWideTable:
         counter = 0
         while True:
             try:
+                self.log.debug('swt-calc | trying..')
                 result = data_collector.calc_swt(eval_names=graph_eval_names)
                 break
             except OTLReadfileError:  # here we have to save swt table first
+                self.log.debug('swt-calc | OTLReadFileError caught, '
+                               'trying to create fresh swt table')
                 data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
             except OTLJobWithStatusNewHasNoCacheID:  # here we need to try again
                 # and make a counter and exit after like 5 tries
-                self.log.exception('We seem to fail finding swt table because of spark '
+                self.log.exception('swt-calc | OTLJobWithStatusNewHasNoCacheID caught >>> '
+                                   'We seem to fail finding swt table because of spark '
                                    '| %s try', counter + 1)
                 if counter > 5:
                     self.log.exception('We failed to find swt table because of spark for '
@@ -78,6 +82,8 @@ class SourceWideTable:
                 counter += 1
                 continue
             except OTLSubsearchFailed:
+                self.log.debug('swt-calc | OTLSubsearchFailed caught, '
+                               'trying to check if swt table exists...')
                 # pylint: disable=pointless-string-statement
                 '''Subsearch may fail because of subsearch error,
                 or because there was a readFile error.
@@ -88,14 +94,24 @@ class SourceWideTable:
                 If yes - than its a subsearch error and we raise.
                 '''
                 try:
+                    self.log.debug('swt-calc-subsearchFailed | try read_swt...')
                     data_collector.read_swt(last_row=False)
-                    self.log.exception('Subsearch failure. Checking if %s'
-                                       'swt table exists...', self.swt_name )
+                    self.log.debug('swt-calc-subsearchFailed | swt table exists...')
                 except OTLReadfileError:
+                    self.log.debug('swt-calc-subsearchFailed | OTLReadfileError caught >>> '
+                                   'there is no swt table, creating...')
                     data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
-                    self.log.exception('swt table was created...')
+                    self.log.debug('swt-calc-subsearchFailed | OTLReadfileError caught >>> '
+                                   'swt table was created...')
                     continue
-                except (OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID):
+                except OTLSubsearchFailed:
+                    self.log.debug('swt-calc-subsearchFailed | OTLSubsearchFailed caught >>> '
+                                   'there is no swt table, creating...')
+                    self.log.exception('Subsearch failure. Check logs')
+                    raise
+                except OTLJobWithStatusFailedHasNoCacheID:
+                    self.log.debug('swt-calc-subsearchFailed | OTLJobWithStatusFailedHasNoCacheID caught >>> '
+                                   'there is no swt table, creating...')
                     self.log.exception('Subsearch failure. Check logs')
                     raise
             except Exception as e:  # pylint: disable=broad-except, invalid-name
