@@ -7,7 +7,6 @@ from pathlib import Path
 # pylint: disable=import-error
 from core.settings.ini_config import merge_ini_config_with_defaults, configparser_to_dict
 
-
 __author__ = "Andrey Starchenkov"
 __copyright__ = "Copyright 2023, ISG Neuro"
 __credits__ = ["Nikita Serditov"]
@@ -29,78 +28,6 @@ default_ini_config = {
         'password': 'dtcd_simple_math_core'
     }
 }
-
-
-def set_logger(loglevel, logfile, logger_name):
-    """Function to set up local logger"""
-    levels = {
-        'CRITICAL': logging.CRITICAL,
-        'ERROR': logging.ERROR,
-        'WARNING': logging.WARNING,
-        'INFO': logging.INFO,
-        'DEBUG': logging.DEBUG
-    }
-
-    log_dict = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'standard': {
-                'format': "%(asctime)s %(levelname)-s PID=%(process)d %(module)s:%(lineno)d "
-                          "func=%(funcName)s - %(message)s"
-            },
-            'with_hid': {
-                'format': "%(asctime)s %(levelname)-s PID=%(process)d HID=%(hid)s "
-                          "%(module)s:%(lineno)d func=%(funcName)s - %(message)s"
-            }
-        },
-        'handlers': {
-            'file_handler_standard': {
-                'filename': logfile,
-                'level': levels[loglevel],
-                'class': 'logging.FileHandler',
-                'formatter': 'standard'
-            },
-            'file_handler_with_hid': {
-                'filename': logfile,
-                'level': levels[loglevel],
-                'class': 'logging.FileHandler',
-                'formatter': 'with_hid'
-            },
-            'stream_handler_standard': {
-                'stream': 'ext://sys.stdout',
-                'level': levels[loglevel],
-                'class': 'logging.StreamHandler',
-                'formatter': 'standard'
-            },
-            'stream_handler_with_hid': {
-                'stream': 'ext://sys.stdout',
-                'level': levels[loglevel],
-                'class': 'logging.StreamHandler',
-                'formatter': 'with_hid'
-            },
-        },
-        'loggers': {
-            logger_name: {
-                'handlers': ['file_handler_standard', 'stream_handler_standard'],
-                'level': levels[loglevel],
-                'propagate': False
-            },
-            logger_name + '_hid': {
-                'handlers': ['file_handler_with_hid', 'stream_handler_with_hid'],
-                'level': levels[loglevel]
-            },
-        },
-        'root': {
-            'handlers': ['file_handler_standard', 'stream_handler_standard'],
-            'level': levels[loglevel]
-        }
-    }
-
-    logging.config.dictConfig(log_dict)
-    result = logging.getLogger(logger_name)
-    return result
-
 
 # try to read path to config from environment
 conf_path_env = os.environ.get('dtcd_simple_math_core_conf', None)
@@ -128,8 +55,7 @@ OTL_CREATE_FRESH_SWT = GRAPH_GLOBALS['otl_create_fresh_swt']
 
 # set logger
 base_logs_dir = ini_config['general'].get('logs_path', '.')
-logger = set_logger(ini_config['logging'].get('level', 'INFO'),
-                    os.path.join(base_logs_dir, 'dtcd_simple_math_core.log'), plugin_name)
-logger.info('Version: %s',  __version__)
+logger = logging.getLogger('dtcd_simple_math_core')
+logger.info('Version: %s', __version__)
 logger.info('OT simple connector config: %s', CONNECTOR_CONFIG)
 logger.info('OTL create fresh swt table command: %s', OTL_CREATE_FRESH_SWT)
