@@ -144,7 +144,9 @@ class Graph:
         """
         self.log.debug('calculating graph...')
         swt = SourceWideTable(self.name)
-        list_of_sw_rows = swt.calc(self.get_nodes_eval_expressions())
+        nodes_eval_expressions = self.get_nodes_eval_expressions()
+        self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
+        list_of_sw_rows = swt.calc(nodes_eval_expressions)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
 
         result = self.update(list_of_sw_rows[-1])
