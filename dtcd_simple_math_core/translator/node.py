@@ -37,7 +37,7 @@ class Node:
               :: name: name of the property to save
               :: data: dictionary of the data we need to save according to the named property.
         """
-        self.log.debug('saving %s property with %s', name, data)
+        self.log.debug('saving %s property with %s' % (name, data))
         self.properties[name] = Property(**data)
 
     def update_property(self, prop_name: str, value: Any) -> None:
