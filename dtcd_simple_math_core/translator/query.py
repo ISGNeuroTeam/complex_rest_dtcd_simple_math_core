@@ -23,7 +23,7 @@ class Query:
     def __init__(self, name: str = None) -> None:
         self.name = name
 
-    def get(self, eval_names: []) -> str:
+    def get(self, eval_names: List[Dict]) -> str:
         """Function to create a major otl query to:
         - read swt table
         - calc swt table
@@ -102,6 +102,15 @@ class Query:
         """
 
         self.log.debug('getting eval expressions for eval_names=%s', eval_names)
+        len_of_eval_names = len(eval_names)
+        self.log.debug('printing all %s names', len_of_eval_names)
+
+        for name in eval_names:
+            for key, value in name.items():
+                self.log.debug('eval_name: %s:%s', key, value)
+
+        self.log.debug('now calculating eval expression...')
+
         result: str = ''
         for name in eval_names:
             _name, _expression = next(iter(name.items()))
