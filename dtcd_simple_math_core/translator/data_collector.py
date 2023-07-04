@@ -2,6 +2,7 @@
 and to actual data in ExternalData folder through OTL service
 """
 import logging
+from typing import List, Dict
 
 from ot_simple_connector.connector import Connector  # pylint: disable=import-error
 from ..settings import plugin_name, CONNECTOR_CONFIG
@@ -45,7 +46,7 @@ class DataCollector:
         result = self.job_create(expression=expression, cache_ttl=5)
         return result
 
-    def calc_swt(self, eval_names: [str]) -> list:
+    def calc_swt(self, eval_names: List[Dict]) -> list:
         """This function creates an otl query to read, eval and write a swt table
         and makes a connection through otl connector
 
@@ -65,11 +66,8 @@ class DataCollector:
     def job_create(self, expression: str, cache_ttl: int) -> list:
         """Wrapper for working with ot_simple_connector.job.create and
         parse and handle its exceptions"""
-        self.log.debug('data_collector: job_create | expression: %s | cache_ttl: %s',
-                       expression, cache_ttl)
         try:
             self.log.debug("data_collector-job_create | trying to create job...")
-            self.log.debug("data_collector-job_create | expression: %s", expression)
             result = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset.load()
         except Exception as e:  # pylint: disable=broad-except, invalid-name
             self.log.debug("data_collector-job_create | exception: %s", e.args[0])
