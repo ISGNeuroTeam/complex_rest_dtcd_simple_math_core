@@ -59,6 +59,8 @@ class SourceWideTable:
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
         self.log.debug('calculating %s swt table with %s', self.swt_name, graph_eval_names)
+
+        # proceed calculations
         result = []
         counter = 0
         while True:
@@ -70,7 +72,7 @@ class SourceWideTable:
                 self.log.debug('swt-calc | OTLReadFileError caught, '
                                'trying to create fresh swt table')
                 data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
-            except OTLJobWithStatusNewHasNoCacheID:  # here we need to try again
+            except (OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID):  # here we need to try again
                 # and make a counter and exit after like 5 tries
                 self.log.exception('swt-calc | OTLJobWithStatusNewHasNoCacheID caught >>> '
                                    'We seem to fail finding swt table because of spark '
