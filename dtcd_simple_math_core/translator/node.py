@@ -39,6 +39,7 @@ class Node:
         """
         self.log.debug('saving %s property with %s' % (name, data))
         self.properties[name] = Property(**data)
+        self.properties[name].initialize()
 
     def update_property(self, prop_name: str, value: Any) -> None:
         """Here we update the property with prop_name with its value
