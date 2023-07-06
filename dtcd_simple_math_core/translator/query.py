@@ -107,7 +107,7 @@ class Query:
 
         for name in eval_names:
             for key, value in name.items():
-                self.log.debug('eval_name: %s:%s', key, value)
+                self.log.debug('eval_name: %(key)s:%(value)s', {'key': key, 'value': value})
 
         self.log.debug('now calculating eval expression...')
 
