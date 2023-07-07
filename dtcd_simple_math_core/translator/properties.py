@@ -2,7 +2,7 @@
 """This module describes logic of working with Property objects.
 """
 
-from typing import Dict, Union
+from typing import Dict
 
 
 class Property:
@@ -18,7 +18,7 @@ class Property:
     value: str
     status: str
     type_: str
-    expression: Union[str, Dict]
+    expression: str
 
     def __init__(self, value: str = '', status: str = 'complete', type_: str = 'expression',
                  expression='', **kwargs):
@@ -27,16 +27,6 @@ class Property:
         self.type_ = type_
         self.expression = expression
         self.__dict__.update(kwargs)
-
-    def initialize(self):
-        # if expression was set as swt export value
-        if type(self.expression) == dict \
-                and 'swt_name' in self.expression.keys() and len(self.expression['swt_name']) > 0 \
-                and 'column' in self.expression.keys() and len(self.expression['column']) > 0:
-            name = self.expression["swt_name"]
-            column = self.expression["column"]
-            self.expression = f'[| readFile format=JSON path=SWT/{name} tail 1 ' \
-                              f'| rename "{column}" as resultFiled | return $resultFiled]'
 
     @property
     def get_expression(self) -> str:
