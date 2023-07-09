@@ -77,7 +77,6 @@ class Node:
                     if prop_data.has_import and port.primitiveName in prop_data.imports:
                         prop_data.replace_import_expression(port.primitiveName, source_expression)
 
-
     def update_property(self, prop_name: str, value: Any) -> None:
         """Here we update the property with prop_name with its value
         and also update _operations_order's expression to "complete",
