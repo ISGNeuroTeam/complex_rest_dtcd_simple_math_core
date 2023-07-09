@@ -6,6 +6,8 @@ import re
 from typing import Dict, Any, Iterable, Tuple, List
 
 from .properties import Property
+from .ports import Port
+from .edges import Edge
 from ..settings import EVAL_GLOBALS, plugin_name
 
 
@@ -15,23 +17,32 @@ class Node:
     Args:
         :: object_id: name of the node
         :: properties: dictionary of the properties Node has
+        :: ports: list of the ports Node has
         :: log: local instance of plugin logger
     """
     object_id: str
     properties: Dict[str, Property]
+    ports: Dict[str, Port]
     log: logging.Logger = logging.getLogger(plugin_name)
 
-    def __init__(self, node: Dict):
-        self.object_id = node.get('primitiveID', '')
+    def __init__(self, name: str):
+        self.object_id = name
         self.properties = {}
-        # TODO split [initiating object_id and properties] and [filling default parameters]
+        self.ports = {}
+
+    def initialize(self, node: Dict):
+        # init properties
         for prop_name, data in node['properties'].items():
             self.fill_default_properties(prop_name, data=data)
         if '_operations_order' not in self.properties:
             self.fill_default_properties('_operations_order', {'expression': 100})
 
+        # init ports
+        for data in node['initPorts']:
+            self.fill_default_ports(data=data)
+
     def fill_default_properties(self, name: str, data: Dict) -> None:
-        """Here we save the empty Property instance as a value of the name key
+        """Here we save the empty (or not) Property instance as a value of the name key
         of the properties' dictionary.
         Args:
               :: name: name of the property to save
@@ -39,6 +50,33 @@ class Node:
         """
         self.log.debug('saving %s property with %s' % (name, data))
         self.properties[name] = Property(**data)
+
+    def fill_default_ports(self, data: Dict) -> None:
+        """Here we save Port instance as a value of the name key of the 'IN' ports dictionary
+
+        Args:
+            :: data: dictionary of the data to save according to the name of the port
+            """
+        self.log.debug('saving port with %s' % data)
+        self.ports[data['primitiveID']] = Port(data)
+
+    def get_port_primitive_name_by_primitive_id(self, primitive_id: str) -> str:
+        for port in self.ports.values():
+            if primitive_id == port.primitiveID:
+                return port.primitiveName
+
+    def get_port_expression_by_primitive_id(self, primitive_id: str) -> str:
+        for port in self.ports.values():
+            if primitive_id == port.primitiveID:
+                return port.expression
+
+    def change_import_expression_by_primitive_id(self, primitive_id: str, source_expression: str) -> None:
+        for port in self.ports.values():
+            if primitive_id == port.primitiveID:
+                for prop_name, prop_data in self.properties.items():
+                    if prop_data.has_import and port.primitiveName in prop_data.imports:
+                        prop_data.replace_import_expression(port.primitiveName, source_expression)
+
 
     def update_property(self, prop_name: str, value: Any) -> None:
         """Here we update the property with prop_name with its value
@@ -145,11 +183,15 @@ class Node:
 
         for _prop_name, _prop in node_properties:
             if _prop.has_expression():
-                _exp = _prop.get_expression
-                _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
-                              lambda p: self.make_object_property_full_name(p,
-                                                                            self.properties.keys(),
-                                                                            self.object_id), _exp)
+                if _prop.has_import:
+                    _exp = _prop.import_expression
+                else:
+                    _exp = _prop.get_expression
+                    _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
+                                  lambda p: self.make_object_property_full_name(p,
+                                                                                self.properties.keys(),
+                                                                                self.object_id), _exp)
+
                 expression = {f'{self.object_id}.{_prop_name}': _exp}
                 result.append(expression)
         self.log.debug('result=%s', result)

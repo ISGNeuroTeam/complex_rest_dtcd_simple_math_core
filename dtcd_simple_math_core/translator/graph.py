@@ -7,10 +7,11 @@ import logging
 import re
 from typing import Dict, Union, List
 
-from ..settings import GRAPH_GLOBALS, plugin_name
+from ..settings import GRAPH_GLOBALS, plugin_name, EVAL_GLOBALS
 from .swt import SourceWideTable
 
 from .node import Node
+from .edges import Edge
 
 
 class Graph:
@@ -19,16 +20,19 @@ class Graph:
     Args:
         :: log: local instance of plugin logger
         :: nodes: dictionary of all nodes, consist of its names and its Node instances
+        :: edges: list of all edges, consists of all port connections of nodes in graph
         :: name: name of current Graph
         :: dictionary: raw json object to keep, update and send back on api request
     """
     log: logging.Logger = logging.getLogger(plugin_name)
     nodes: Dict[str, Node]
+    edges: List[Edge]
     name: str
-    dictionary: Union[Dict, str]
+    dictionary: Dict
 
     def __init__(self, name: str, graph: Union[Dict, str]):
         self.nodes = {}
+        self.edges = []
         self.name = name
         self.dictionary = graph
 
@@ -41,14 +45,38 @@ class Graph:
         self.dictionary = json.loads(self.dictionary) if isinstance(self.dictionary, str) \
             else self.dictionary
         self.parse_nodes()
+        self.parse_edges()
+        self.parse_ports_of_nodes()
 
     def parse_nodes(self) -> None:
         """We parse graph from json into Nodes objects
         """
         self.log.debug('started parsing the nodes...')
         for node in self.dictionary['graph']['nodes']:
-            self.nodes[node['primitiveID']] = Node(node)
+            self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
+            self.nodes[node['primitiveID']].initialize(node)
+            self.log.debug("parsed node %s" % node['primitiveID'])
         self.log.debug('parsed nodes successfully...')
+
+    def parse_edges(self) -> None:
+        """We parse graph from json to get name connections of inPorts and outPorts
+        It will be a dict of pairs: {targetPort: sourcePort}
+        """
+        self.log.debug('started parsing the edges...')
+        for edge in self.dictionary['graph']['edges']:
+            self.edges.append(Edge(edge))
+        self.log.debug('parsed edges successfully...')
+
+    def parse_ports_of_nodes(self):
+        for edge in self.edges:
+            # get outPort value
+            source_port_expression = self.nodes[edge.sourceNode].get_port_expression_by_primitive_id(edge.sourcePort)
+            if '.' not in source_port_expression:
+                source_port_expression = '.'.join([edge.sourceNode, source_port_expression])
+            if re.fullmatch(EVAL_GLOBALS['re_numbers'], source_port_expression) is None and '.' in source_port_expression:
+                source_port_expression = f"'{source_port_expression}'"
+            # change inPort value
+            self.nodes[edge.targetNode].change_import_expression_by_primitive_id(edge.targetPort, source_port_expression)
 
     def filtered_columns(self, swr: List) -> List:
         """We get a row of the source wide table which is "Source Wide Row" >>> swr

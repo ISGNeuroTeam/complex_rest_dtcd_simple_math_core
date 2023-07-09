@@ -2,7 +2,7 @@
 """This module describes logic of working with Property objects.
 """
 
-from typing import Dict
+from typing import Dict, List
 
 
 class Property:
@@ -14,11 +14,19 @@ class Property:
          :: status: status of the property
          :: type_: type of the property
          :: expression: expression of the property
+         :: has_import: flag that shows if property uses import of data via inPort
+                        technically it says if an expression has 'inPort' string in it
+         :: imports: list of strings, that represent exact `inPort1`, `inPort2` etc.
+         :: import_expression: expression to use when it is imported, in order not to change expression graph value,
+                               but to calc imported value
     """
     value: str
     status: str
     type_: str
     expression: str
+    has_import: bool
+    imports: List[str]
+    import_expression: str
 
     def __init__(self, value: str = '', status: str = 'complete', type_: str = 'expression',
                  expression='', **kwargs):
@@ -26,6 +34,9 @@ class Property:
         self.status = status
         self.type_ = type_
         self.expression = expression
+        self.has_import = type(self.expression) == str and 'inPort' in self.expression
+        self.imports = [value for value in self.expression.split() if 'inPort' in value] if self.has_import else 0
+        self.import_expression = self.expression if self.has_import else ''
         self.__dict__.update(kwargs)
 
     @property
@@ -37,6 +48,10 @@ class Property:
         """Function to save value and status inside Property object"""
         self.value = value
         self.status = status if status else self.status
+
+    def replace_import_expression(self, target: str, source: str):
+        new_exp = self.import_expression.replace(target, source)
+        self.import_expression = new_exp
 
     def has_expression(self) -> bool:
         """Checks if property has an expression"""
