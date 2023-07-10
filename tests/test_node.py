@@ -17,16 +17,20 @@ class TestNode(TestCase):
                  'properties': {'status': {'expression': '', 'type_': 'expression', 'status': 'complete', 'value': ''}},
                  'primitiveID': 'UncontrolledRichLabelNode01_1_outPort1', 'location': {'x': 298.75, 'y': 136.29}}],
                 'layout': {'x': 151.75, 'y': 139.25, 'height': 148, 'width': 294}}
-        self.node = Node(data)
+        self.node = Node(data.get('primitiveID', ''))
+        self.node.initialize(data)
 
     def test_fill_default_properties(self):
         name = 'testField'
-        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': ''}
+        sample = {'expression': '', 'has_import': False, 'has_swt_import': False, 'import_expression': '',
+                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type_': 'expression',
+                  'value': ''}
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
         new_data = {'_operations_order': '100'}
-        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': '',
-                  '_operations_order': '100'}
+        sample = {'_operations_order': '100', 'expression': '', 'has_import': False, 'has_swt_import': False,
+                  'import_expression': '', 'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport',
+                  'type_': 'expression', 'value': ''}
         self.node.fill_default_properties(name=name, data=new_data)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
@@ -34,7 +38,9 @@ class TestNode(TestCase):
     def test_update_property(self):
         name = 'testField'
         value = 'newValueData'
-        sample = {'expression': '', 'status': 'complete', 'type_': 'expression', 'value': 'newValueData'}
+        sample = {'expression': '', 'has_import': False, 'has_swt_import': False, 'import_expression': '',
+                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type_': 'expression',
+                  'value': 'newValueData'}
         self.node.update_property(name, value)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)

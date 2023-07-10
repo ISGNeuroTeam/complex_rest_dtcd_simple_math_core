@@ -2,7 +2,17 @@
 """This module describes logic of working with Property objects.
 """
 
-from typing import Dict, List
+from typing import Dict, List, Union
+
+
+class SWTImport:
+
+    swt_name: str
+    column: str
+
+    def __init__(self, data: Dict):
+        self.swt_name = data['swt_name']
+        self.column = data['column']
 
 
 class Property:
@@ -16,6 +26,12 @@ class Property:
          :: expression: expression of the property
          :: has_import: flag that shows if property uses import of data via inPort
                         technically it says if an expression has 'inPort' string in it
+         :: has_swt_import: flag that show if property uses import of data via swt export
+                        technically the expression will be a dict like
+                            {'swt_name': 'source_graph_001',                <<< name of the swt table to read form
+                             'column': 'ExportNode_9.exportProperty_001',   <<< name of the node a prop to read from
+                             'graphID':	'e6077bbf-c385-46d6-b679-3087feae21f7',}
+         :: swt_import: parameter to store swt import data
          :: imports: list of strings, that represent exact `inPort1`, `inPort2` etc.
          :: import_expression: expression to use when it is imported, in order not to change expression graph value,
                                but to calc imported value
@@ -23,8 +39,10 @@ class Property:
     value: str
     status: str
     type_: str
-    expression: str
+    expression: Union[str, Dict]
     has_import: bool
+    has_swt_import: bool
+    swt_import: SWTImport
     imports: List[str]
     import_expression: str
 
@@ -37,6 +55,8 @@ class Property:
         self.has_import = type(self.expression) == str and 'inPort' in self.expression
         self.imports = [value for value in self.expression.split() if 'inPort' in value] if self.has_import else 0
         self.import_expression = self.expression if self.has_import else ''
+        self.has_swt_import = type(self.expression) == dict
+        self.swt_import = SWTImport(self.expression) if self.has_swt_import else 'SWTImport'
         self.__dict__.update(kwargs)
 
     @property

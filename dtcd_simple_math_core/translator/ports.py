@@ -52,7 +52,7 @@ class Port:
     def __init__(self, data: Dict):
         self.primitiveName = data['primitiveName']
         self.primitiveID = data['primitiveID']
-        self.type = data['type'][0]
+        self.type = data['type'][0] if 'type' in data.keys() and len(data['type']) > 0 else ''
         self.expression = data['properties']['status']['expression']
         self.log.debug('port saved: %s' % self)
 

@@ -24,6 +24,7 @@ class Node:
     properties: Dict[str, Property]
     ports: Dict[str, Port]
     log: logging.Logger = logging.getLogger(plugin_name)
+    has_swt_import: bool
 
     def __init__(self, name: str):
         self.object_id = name
@@ -40,6 +41,11 @@ class Node:
         # init ports
         for data in node['initPorts']:
             self.fill_default_ports(data=data)
+
+        # TODO add swt import parsing
+        # for prop_data in self.properties.values():
+        #     if prop_data.has_swt_import:
+
 
     def fill_default_properties(self, name: str, data: Dict) -> None:
         """Here we save the empty (or not) Property instance as a value of the name key

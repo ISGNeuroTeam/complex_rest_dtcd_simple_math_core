@@ -73,10 +73,12 @@ class Graph:
             source_port_expression = self.nodes[edge.sourceNode].get_port_expression_by_primitive_id(edge.sourcePort)
             if '.' not in source_port_expression:
                 source_port_expression = '.'.join([edge.sourceNode, source_port_expression])
-            if re.fullmatch(EVAL_GLOBALS['re_numbers'], source_port_expression) is None and '.' in source_port_expression:
+            if re.fullmatch(EVAL_GLOBALS['re_numbers'],
+                            source_port_expression) is None and '.' in source_port_expression:
                 source_port_expression = f"'{source_port_expression}'"
             # change inPort value
-            self.nodes[edge.targetNode].change_import_expression_by_primitive_id(edge.targetPort, source_port_expression)
+            self.nodes[edge.targetNode].change_import_expression_by_primitive_id(edge.targetPort,
+                                                                                 source_port_expression)
 
     def filtered_columns(self, swr: List) -> List:
         """We get a row of the source wide table which is "Source Wide Row" >>> swr
