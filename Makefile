@@ -28,7 +28,8 @@ define clean_docker_containers
 	if [[ $$(docker ps -aq -f name=dtcd_simple_math_core) ]]; then docker rm $$(docker ps -aq -f name=dtcd_simple_math_core);  fi;
 endef
 
-pack: make_build
+pack: 
+#make_build
 	$(SET_VERSION)
 	$(SET_BRANCH)
 	rm -f dtcd_simple_math_core-*.tar.gz
