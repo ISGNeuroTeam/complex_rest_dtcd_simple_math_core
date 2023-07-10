@@ -6,6 +6,12 @@ from typing import Dict, List, Union
 
 
 class SWTImport:
+    """Class to store information about swt import
+
+    Args:
+        :: swt_name: name of the swt table to import from
+        :: column: name of the column to import from
+        """
 
     swt_name: str
     column: str
@@ -13,6 +19,14 @@ class SWTImport:
     def __init__(self, data: Dict):
         self.swt_name = data['swt_name']
         self.column = data['column']
+
+    def __str__(self):
+        return f'{self.swt_name=} | {self.column=}'
+
+    @property
+    def name(self):
+        """short wrapper of the swt_name parameter"""
+        return self.swt_name
 
 
 class Property:
@@ -28,14 +42,15 @@ class Property:
                         technically it says if an expression has 'inPort' string in it
          :: has_swt_import: flag that show if property uses import of data via swt export
                         technically the expression will be a dict like
-                            {'swt_name': 'source_graph_001',                <<< name of the swt table to read form
-                             'column': 'ExportNode_9.exportProperty_001',   <<< name of the node a prop to read from
+                            {'swt_name': 'src_graph',       <<< name of the swt table to read from
+                             'column': 'Node_9.Prop_01',    <<< name of the node a prop to read from
                              'graphID':	'e6077bbf-c385-46d6-b679-3087feae21f7',}
          :: swt_import: parameter to store swt import data
          :: imports: list of strings, that represent exact `inPort1`, `inPort2` etc.
-         :: import_expression: expression to use when it is imported, in order not to change expression graph value,
-                               but to calc imported value
+         :: import_expression: expression to use when it is imported, in order not to change
+                               expression graph value, but to calc imported value
     """
+    # pylint: disable=too-many-instance-attributes
     value: str
     status: str
     type_: str
@@ -52,10 +67,11 @@ class Property:
         self.status = status
         self.type_ = type_
         self.expression = expression
-        self.has_import = type(self.expression) == str and 'inPort' in self.expression
-        self.imports = [value for value in self.expression.split() if 'inPort' in value] if self.has_import else 0
+        self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
+        self.imports = [value for value in self.expression.split() if 'inPort' in value] \
+            if self.has_import else 0
         self.import_expression = self.expression if self.has_import else ''
-        self.has_swt_import = type(self.expression) == dict
+        self.has_swt_import = isinstance(self.expression, dict)
         self.swt_import = SWTImport(self.expression) if self.has_swt_import else 'SWTImport'
         self.__dict__.update(kwargs)
 
@@ -70,6 +86,7 @@ class Property:
         self.status = status if status else self.status
 
     def replace_import_expression(self, target: str, source: str):
+        """Function to replace import expression with a different one from source"""
         new_exp = self.import_expression.replace(target, source)
         self.import_expression = new_exp
 
