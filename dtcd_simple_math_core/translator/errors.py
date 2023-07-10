@@ -10,7 +10,7 @@ class OTLReadfileError(Exception):
      Error in  'readfile' command."
 
      error"""
-    pass
+    ...
 
 
 class OTLJobWithStatusNewHasNoCacheID(Exception):
@@ -19,7 +19,8 @@ class OTLJobWithStatusNewHasNoCacheID(Exception):
     'Job with status new has no cache id'
 
     error"""
-    pass
+    ...
+
 
 class OTLJobWithStatusFailedHasNoCacheID(Exception):
     """Exception when there is a
@@ -27,7 +28,7 @@ class OTLJobWithStatusFailedHasNoCacheID(Exception):
     'Job with status new has no cache id'
 
     error"""
-    pass
+    ...
 
 
 class OTLSubsearchFailed(Exception):
@@ -37,9 +38,11 @@ class OTLSubsearchFailed(Exception):
      Subsearch failed. Check logs..'
 
      error"""
-    pass
+    ...
+
 
 class LackingPathNameError(Exception):
+    # pylint: disable=line-too-long
     """Exception when there is no path name provided
 
     Usually when we create query for writing swt and use template query
@@ -52,4 +55,4 @@ class LackingPathNameError(Exception):
 
     So if path name is not given we must raise error and try again.
     """
-    pass
+    ...
