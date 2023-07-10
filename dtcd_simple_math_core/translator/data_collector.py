@@ -81,13 +81,13 @@ class DataCollector:
                                'raising OTLSubsearchFailed exception')
                 raise OTLSubsearchFailed("Subsearch failed. Check logs...") from e
             if "Job with status new has no cache id" in e.args[0]:
-                self.log.debug('data_collector-job_create | job with status new has no cache id >>> '
-                               'raising OTLJobWithStatusNewHasNoCacheID exception')
+                self.log.debug('data_collector-job_create | job with status new has no cache id >>>'
+                               ' raising OTLJobWithStatusNewHasNoCacheID exception')
                 raise OTLJobWithStatusNewHasNoCacheID("Job with status new has no cache id. "
                                                       "Just try again") from e
             if "Job with status failed has no cache id" in e.args[0]:
-                self.log.debug('data_collector-job_create | job with status failed has no cache id >>> '
-                               'raising OTLJobWithStatusFailedHasNoCacheID exception')
+                self.log.debug('data_collector-job_create | job with status failed has no cache id '
+                               '>>> raising OTLJobWithStatusFailedHasNoCacheID exception')
                 raise OTLJobWithStatusFailedHasNoCacheID("Job with status failed has no cache id. "
                                                          "Just try again") from e
             raise Exception(f"unregistered exception: {e.args[0]}") from e
@@ -102,8 +102,9 @@ class DataCollector:
         if len(expression.split('/')) < 2:
             self.log.exception('we seem to be lacking the name of the file in expression')
             raise LackingPathNameError('Some how DataCollector has no swt name given, '
-                                       'so we can not proceed the writeFile query. Call the developer '
-                                       'to check DataCollector:create_fresh_swt function')
+                                       'so we can not proceed the writeFile query. Call the '
+                                       'developer to check DataCollector:create_fresh_swt '
+                                       'function')
         result = self.job_create(expression=expression, cache_ttl=5)
 
         return result
