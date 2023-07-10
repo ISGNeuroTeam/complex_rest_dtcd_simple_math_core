@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """This module is for connecting to OTL service
 and to actual data in ExternalData folder through OTL service
 """
