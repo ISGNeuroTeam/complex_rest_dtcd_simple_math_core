@@ -14,7 +14,7 @@ class Edge:
                         it is always must include `inPort` string
         :: target_node: name of the target node, like 'Calc2_96'
     """
-    # pylint: disable=too-few-public-methods
+    # pylint: disable=too-few-public-methods, invalid-name
     source_port: str
     source_node: str
     target_port: str
