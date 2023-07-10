@@ -20,6 +20,7 @@ SET_VERSION = $(eval VERSION=$(GENERATE_VERSION))
 SET_BRANCH = $(eval BRANCH=$(GENERATE_BRANCH))
 
 CONDA = conda/miniconda/bin/conda
+ENV_PYTHON = venv/bin/python3.9
 
 define clean_docker_containers
 	@echo "Stopping and removing docker containers"
@@ -61,26 +62,22 @@ make_build: venv venv.tar.gz
 conda/miniconda.sh:
 	echo Download Miniconda
 	mkdir -p conda
-	wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O conda/miniconda.sh; \
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O conda/miniconda.sh
 
 conda/miniconda: conda/miniconda.sh
-	bash conda/miniconda.sh -b -p conda/miniconda; \
+	bash conda/miniconda.sh -b -p conda/miniconda
 
 clean_build:
 	rm -rf make_build
 
 venv: clean_venv conda/miniconda
-	if [ -s requirements.txt ]; then \
-		echo Create venv; \
-		$(CONDA) create --copy -p ./venv -y; \
-		$(CONDA) install -p ./venv python==3.9.7 -y; \
-		./venv/bin/pip install --no-input  -r requirements.txt; \
-	fi
+	echo Create venv
+	$(CONDA) create --copy -p ./venv -y
+	$(CONDA) install -p ./venv python==3.9.7 -y
+	$(ENV_PYTHON) -m pip install --no-input  -r requirements.txt
 
 venv.tar.gz: venv
-	if [ -s requirements.txt ]; then \
-		$(CONDA) pack -p ./venv -o ./venv.tar.gz; \
-	fi
+	$(CONDA) pack -p ./venv -o ./venv.tar.gz
 
 clean_venv:
 	rm -rf venv
