@@ -46,17 +46,25 @@ class SourceWideTable:
 
         return result
 
-    def check_swt_exists(self, dc: DataCollector) -> Tuple[bool, str]:
-        exists: bool = True
-        reason: str = 'Default reason'
+    def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
+        """Function to check if swt table with given name exists or not and why
+
+        Args:
+            :: data_collector: instance of the DataCollector work with otl service
+
+        Returns:
+            :: tuple of flag whether table exists
+               and a string, containing the reason of why it does not exist
+            """
         counter = 0
         while True:
             try:
-                dc.read_swt(last_row=True)
+                data_collector.read_swt(last_row=True)
                 return True, 'swt table exists'
             except OTLReadfileError:
                 return False, 'does not exist'
-            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID) as e:
+            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
+                    OTLJobWithStatusFailedHasNoCacheID):
                 if counter > 5:
                     self.log.exception('we tried to connect to spark 5 times in a row and failed, '
                                        'it seems it is not fine.')
@@ -64,13 +72,20 @@ class SourceWideTable:
                 counter += 1
                 continue
 
-    def create_swt(self, dc: DataCollector) -> None:
+    def create_swt(self, data_collector: DataCollector) -> None:
+        """Function to create swt table
+
+        Args:
+            :: data_collector: DataCollector instance to work with otl service
+            """
+
         counter = 0
         while True:
             try:
-                dc.create_fresh_swt(OTL_CREATE_FRESH_SWT)
+                data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
                 break
-            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID) as e:
+            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
+                    OTLJobWithStatusFailedHasNoCacheID):
                 if counter > 5:
                     self.log.exception('we tried to connect to spark 5 times in a row and failed, '
                                        'it seems it is not fine.')
@@ -80,8 +95,8 @@ class SourceWideTable:
             except OTLReadfileError:  # this should happen actually, because we are here
                 raise
 
-            except Exception as e:
-                raise ('unregistered exception: %s', e.args[0])
+            except Exception as exception:
+                raise Exception(f'unregistered exception: {exception.args[0]}') from exception
 
     def calc(self, graph_eval_names: List[Dict]) -> list:
         """Here we create a data collector and make it calc swt table
@@ -91,8 +106,7 @@ class SourceWideTable:
                                  to be used for creating all eval expressions
 
         Returns:
-              we get either the whole recalculated table
-              # TODO [? or empty table if it does not exist]
+              we get the whole recalculated table
         """
         data_collector: DataCollector = DataCollector(self.swt_name)
         self.log.debug('calculating %s swt table with %s', self.swt_name, graph_eval_names)
@@ -111,7 +125,8 @@ class SourceWideTable:
                 result = data_collector.calc_swt(eval_names=graph_eval_names)
                 break
 
-            except (OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID):  # here we need to try again
+            except (OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID):
+                # here we need to try again
                 # and make a counter and exit after like 5 tries
                 self.log.exception('swt-calc | OTLJobWithStatusNewHasNoCacheID caught >>> '
                                    'We seem to fail finding swt table because of spark '
