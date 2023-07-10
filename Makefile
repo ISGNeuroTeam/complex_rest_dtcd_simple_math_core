@@ -19,6 +19,8 @@ GENERATE_BRANCH = $(shell git name-rev $$(git rev-parse HEAD) | cut -d\  -f2 | s
 SET_VERSION = $(eval VERSION=$(GENERATE_VERSION))
 SET_BRANCH = $(eval BRANCH=$(GENERATE_BRANCH))
 
+CONDA = conda/miniconda/bin/conda
+
 define clean_docker_containers
 	@echo "Stopping and removing docker containers"
 	docker-compose -f docker-compose-test.yml stop
@@ -56,20 +58,28 @@ make_build: venv venv.tar.gz
 		tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv; \
 	fi
 
+conda/miniconda.sh:
+	echo Download Miniconda
+	mkdir -p conda
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O conda/miniconda.sh; \
+
+conda/miniconda: conda/miniconda.sh
+	bash conda/miniconda.sh -b -p conda/miniconda; \
+
 clean_build:
 	rm -rf make_build
 
-venv:
+venv: clean_venv conda/miniconda
 	if [ -s requirements.txt ]; then \
 		echo Create venv; \
-		conda create --copy -p ./venv -y; \
-		conda install -p ./venv python==3.9.7 -y; \
+		$(CONDA) create --copy -p ./venv -y; \
+		$(CONDA) install -p ./venv python==3.9.7 -y; \
 		./venv/bin/pip install --no-input  -r requirements.txt; \
 	fi
 
 venv.tar.gz: venv
 	if [ -s requirements.txt ]; then \
-		conda pack -p ./venv -o ./venv.tar.gz; \
+		$(CONDA) pack -p ./venv -o ./venv.tar.gz; \
 	fi
 
 clean_venv:
