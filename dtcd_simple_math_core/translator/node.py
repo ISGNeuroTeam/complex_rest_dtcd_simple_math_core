@@ -7,7 +7,6 @@ from typing import Dict, Any, Iterable, Tuple, List
 
 from .properties import Property
 from .ports import Port
-from .edges import Edge
 from ..settings import EVAL_GLOBALS, plugin_name
 
 
@@ -32,6 +31,7 @@ class Node:
         self.ports = {}
 
     def initialize(self, node: Dict):
+        """here we parse the node data"""
         # init properties
         for prop_name, data in node['properties'].items():
             self.fill_default_properties(prop_name, data=data)
@@ -42,11 +42,6 @@ class Node:
         for data in node['initPorts']:
             self.fill_default_ports(data=data)
 
-        # TODO add swt import parsing
-        # for prop_data in self.properties.values():
-        #     if prop_data.has_swt_import:
-
-
     def fill_default_properties(self, name: str, data: Dict) -> None:
         """Here we save the empty (or not) Property instance as a value of the name key
         of the properties' dictionary.
@@ -54,7 +49,7 @@ class Node:
               :: name: name of the property to save
               :: data: dictionary of the data we need to save according to the named property.
         """
-        self.log.debug('saving %s property with %s' % (name, data))
+        self.log.debug('saving %s property with %s', name, data)
         self.properties[name] = Property(**data)
 
     def fill_default_ports(self, data: Dict) -> None:
@@ -63,23 +58,37 @@ class Node:
         Args:
             :: data: dictionary of the data to save according to the name of the port
             """
-        self.log.debug('saving port with %s' % data)
+        self.log.debug('saving port with %s', data)
         self.ports[data['primitiveID']] = Port(data)
 
-    def get_port_primitive_name_by_primitive_id(self, primitive_id: str) -> str:
-        for port in self.ports.values():
-            if primitive_id == port.primitiveID:
-                return port.primitiveName
-
     def get_port_expression_by_primitive_id(self, primitive_id: str) -> str:
+        """Function to get expression of the port.
+
+        Args:
+            :: primitive_id: primitiveID name of the port
+
+        Returns:
+            :: expression of the port instance
+        """
         for port in self.ports.values():
             if primitive_id == port.primitiveID:
                 return port.expression
+        return ''
 
-    def change_import_expression_by_primitive_id(self, primitive_id: str, source_expression: str) -> None:
+    def change_import_expression_by_primitive_id(self, primitive_id: str,
+                                                 source_expression: str) -> None:
+        """Function to change import_expression of the property. It is required because
+        we must save it for future query generating without changing the actual expression
+        of the property
+
+            Args:
+                :: primitive_id: primitiveID value of the port
+                :: source_expression: actual expression of the imported data
+                                      to be calculated at the property
+        """
         for port in self.ports.values():
             if primitive_id == port.primitiveID:
-                for prop_name, prop_data in self.properties.items():
+                for prop_data in self.properties.values():
                     if prop_data.has_import and port.primitiveName in prop_data.imports:
                         prop_data.replace_import_expression(port.primitiveName, source_expression)
 
@@ -133,8 +142,8 @@ class Node:
         return result
 
     @classmethod
-    def make_object_property_full_name(cls, re_group: re.Match, node_properties: Iterable,
-                                       node_id: str) -> str:
+    def make_obj_prop_full_name(cls, re_group: re.Match, node_properties: Iterable,
+                                node_id: str) -> str:
         """
         Here we make several manipulations and checks in order to create proper object
         property names.
@@ -193,9 +202,9 @@ class Node:
                 else:
                     _exp = _prop.get_expression
                     _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
-                                  lambda p: self.make_object_property_full_name(p,
-                                                                                self.properties.keys(),
-                                                                                self.object_id), _exp)
+                                  lambda p: self.make_obj_prop_full_name(p,
+                                                                         self.properties.keys(),
+                                                                         self.object_id), _exp)
 
                 expression = {f'{self.object_id}.{_prop_name}': _exp}
                 result.append(expression)
