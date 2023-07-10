@@ -33,6 +33,7 @@ pack:
 	$(SET_VERSION)
 	$(SET_BRANCH)
 	rm -f dtcd_simple_math_core-*.tar.gz
+	rm -f *.tar.gz
 	echo Create archive \"dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz\"
 	cd make_build; tar czf ../dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz dtcd_simple_math_core
 
