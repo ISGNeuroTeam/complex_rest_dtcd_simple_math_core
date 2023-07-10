@@ -41,14 +41,13 @@ make pack
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
-
+Starchenkov Andrey
+Serditov Nikita
 
 ## License
 
 [OT.PLATFORM. License agreement.](LICENSE.md)
 
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+## Features
+- Creates swt table when graph is calculated first time and has no swt table.
+- Supports importing data through inPort/outPort in terms of one graph. As it works with data from swt table, not graph, then sometimes it requires two consequent graph calculations to calc all imported data.
