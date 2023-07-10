@@ -70,7 +70,7 @@ class TestNode(TestCase):
         sample = "'UncontrolledRichLabelNode01_1.movieStar'"
         prop = self.node.properties['theBest']
         re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
-        result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(), self.node.object_id)
+        result = self.node.make_obj_prop_full_name(re_group, self.node.properties.keys(), self.node.object_id)
         self.assertEqual(sample, result)
 
     def test_make_object_property_full_name_with_no_property_link(self):
@@ -80,8 +80,8 @@ class TestNode(TestCase):
         sample = '2018'
         prop = self.node.properties['testField']
         re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
-        result = self.node.make_object_property_full_name(re_group, self.node.properties.keys(),
-                                                          self.node.object_id)
+        result = self.node.make_obj_prop_full_name(re_group, self.node.properties.keys(),
+                                                   self.node.object_id)
         self.assertEqual(sample, result)
 
     def test_get_eval_expressions(self):
