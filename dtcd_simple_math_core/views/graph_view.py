@@ -1,5 +1,7 @@
-import json
+# -*- coding: utf-8 -*-
+"""Module to return response for graph calc request view"""
 import logging
+# pylint: disable=import-error, broad-except
 
 from rest.views import APIView
 from rest.permissions import AllowAny
@@ -11,7 +13,8 @@ from ..translator.graph import Graph
 class GraphView(APIView):
     """
     Endpoint for graph.
-    It provides update SWT by new expressions in graph and a merged graph with a linked SWT last row.
+    It provides update SWT by new expressions in graph and a merged graph
+    with a linked SWT last row.
     """
     PLUGIN_NAME = "dtcd_simple_math_core"
     log = logging.getLogger(PLUGIN_NAME)
@@ -25,7 +28,8 @@ class GraphView(APIView):
 
         Updates a linked SWT and merges executed calculations with an incoming graph. Returns it.
 
-        :param request: Consists of a "swt_name" (a graph fragment name) and a "graph" body in a JSON format.
+        :param request: Consists of a "swt_name" (a graph fragment name) and
+                        a "graph" body in a JSON format.
         :return:
         """
         filename = request.data['swt_name']
@@ -35,9 +39,9 @@ class GraphView(APIView):
             graph = Graph(filename, graph=graph_dict)
             graph.initialize()
             graph.calc()
-        except Exception as e:
-            self.log.error(f'Got an error: {e}')
-            return ErrorResponse(error_message=str(e))
+        except Exception as exception:
+            self.log.error('Got an error: %s', exception)
+            return ErrorResponse(error_message=str(exception))
 
         return SuccessResponse({'swt_name': filename, 'graph': graph.dictionary})
 
@@ -50,18 +54,18 @@ class GraphView(APIView):
         :return:
         """
         filename = request.data.get("swt_name", None)
+
         if filename is None:
-            self.log.error(f'Got an error: A source wide table name is required, got None.')
+            self.log.error('Got an error: A source wide table name is required, got None.')
             return ErrorResponse(
                 {
                     'message': 'A source wide table name is required'
                 }
             )
-        else:
 
-            graph = Graph.read_from_file(filename)
-            return SuccessResponse(
-                {
-                    'swt_name': filename,
-                    'graph': graph.dictionary,
-                })
+        graph = Graph.read_from_file(filename)
+        return SuccessResponse(
+            {
+                'swt_name': filename,
+                'graph': graph.dictionary,
+            })
