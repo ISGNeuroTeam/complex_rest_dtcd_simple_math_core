@@ -50,14 +50,12 @@ make_build: venv venv.tar.gz
 	mkdir make_build
 
 	cp -R ./dtcd_simple_math_core make_build
-	rm make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
+	rm -f make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
 	mv make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf.example make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
 	cp *.md make_build/dtcd_simple_math_core/
 	cp *.py make_build/dtcd_simple_math_core/
-	if [ -s requirements.txt ]; then \
-		mkdir make_build/dtcd_simple_math_core/venv;\
-		tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv; \
-	fi
+	mkdir make_build/dtcd_simple_math_core/venv
+	tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv
 
 conda/miniconda.sh:
 	echo Download Miniconda
