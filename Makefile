@@ -67,6 +67,9 @@ conda/miniconda.sh:
 conda/miniconda: conda/miniconda.sh
 	bash conda/miniconda.sh -b -p conda/miniconda
 
+conda/miniconda/bin/conda-pack: conda/miniconda
+	conda/miniconda/bin/conda install conda-pack -c conda-forge  -y
+
 clean_build:
 	rm -rf make_build
 
@@ -76,7 +79,7 @@ venv: clean_venv conda/miniconda
 	$(CONDA) install -p ./venv python==3.9.7 -y
 	$(ENV_PYTHON) -m pip install --no-input  -r requirements.txt
 
-venv.tar.gz: venv
+venv.tar.gz: venv conda/miniconda/bin/conda-pack
 	$(CONDA) pack -p ./venv -o ./venv.tar.gz
 
 clean_venv:
