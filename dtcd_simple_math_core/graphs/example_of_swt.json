@@ -7,7 +7,7 @@
       "primitiveName": "TargetRichLabelNode1",
       "properties": {
         "testField": {
-          "expression": "",
+          "expression": "cos(R)",
           "type": "expression",
           "status": "complete",
           "value": ""
@@ -73,7 +73,7 @@
       "primitiveName": "ControlledRichLabelNode01",
       "properties": {
         "testField": {
-          "expression": "",
+          "expression": "5+5.1",
           "type": "expression",
           "status": "complete",
           "value": ""

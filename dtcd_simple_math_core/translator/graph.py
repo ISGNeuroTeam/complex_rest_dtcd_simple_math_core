@@ -1,119 +1,260 @@
-import json
-import re
-import logging
+# -*- coding: utf-8 -*-
+"""This module describes logic of analyzing and merging graph data
+"""
 
-from dtcd_simple_math_core.translator.swt import SourceWideTable
+import json
+import logging
+import re
+from typing import Dict, Union, List
+
+from ..settings import GRAPH_GLOBALS, plugin_name, EVAL_GLOBALS
+from .swt import SourceWideTable
+
+from .node import Node
+from .edges import Edge
 
 
 class Graph:
-    PLUGIN_NAME = "dtcd_simple_math_core"
-    log = logging.getLogger(PLUGIN_NAME)
-    OBJECT_ID_COLUMN = "primitiveID"
-    RE_OBJECT_ID_AND_PROPERTY = r"(\w+)\.(\w+)"
-    PATH_TO_GRAPH = "./plugins/dtcd_simple_math_core/graphs/{0}.json"
-    SWT_PROPERTY_TYPE = "SWT"
-    SWT_EXPORT_PROPERTY_TYPE = "SWTexp"
-    DEFAULT_OPERATIONS_ORDER = 100
+    """This class describes how Graph works:
 
-    def __init__(self, swt_name, graph_string=None, graph_dict=None):
-        self.swt_name = swt_name
-        if graph_string is not None:
-            self.graph_string = graph_string
-            self.graph_dict = json.loads(graph_string)
-        elif graph_dict is not None:
-            self.graph_dict = graph_dict
-            self.graph_string = json.dumps(graph_dict)
-        else:
-            raise Exception("Can`t load graph")
+    Args:
+        :: log: local instance of plugin logger
+        :: nodes: dictionary of all nodes, consist of its names and its Node instances
+        :: edges: list of all edges, consists of all port connections of nodes in graph
+        :: name: name of current Graph
+        :: dictionary: raw json object to keep, update and send back on api request
+    """
+    log: logging.Logger = logging.getLogger(plugin_name)
+    nodes: Dict[str, Node]
+    edges: List[Edge]
+    name: str
+    dictionary: Dict
 
-    @classmethod
-    def search_node_by_id(cls, nid, nodes):
-        node = filter(lambda n: n[cls.OBJECT_ID_COLUMN] == nid, nodes)
-        try:
-            node = list(node)[0]
-        except IndexError:
-            node = None
-        return node
+    def __init__(self, name: str, graph: Union[Dict, str]):
+        self.nodes = {}
+        self.edges = []
+        self.name = name
+        self.dictionary = graph
 
-    def _search_node_by_id(self, nid):
-        nodes = self.graph_dict["graph"]["nodes"]
-        node = self.search_node_by_id(nid, nodes)
-        return node
+    def initialize(self) -> None:
+        """Here we parse the graph if it was given as a string.
+        And then parse all the nodes of the graph from json to nodes dictionary in order
+        to keep them in Nodes objects.
+        """
+        self.log.debug('started initialization of graph')
+        self.dictionary = json.loads(self.dictionary) if isinstance(self.dictionary, str) \
+            else self.dictionary
+        self.parse_nodes()
+        self.parse_edges()
+        self.parse_ports_of_nodes()
 
-    def update(self, swt_line):
-        self.log.debug(f"swt_line: {swt_line}")
-        filtered_columns = filter(lambda c: not c.startswith("_"), swt_line)
-        for column in filtered_columns:
-            object_id, object_property = re.match(self.RE_OBJECT_ID_AND_PROPERTY, column).groups()
-            self.log.debug(f"object_id: {object_id}, object_property: {object_property}")
-            node = self._search_node_by_id(object_id)
-            if node is not None and object_property in node["properties"]:
-                self.log.debug(f"node: {node}")
-                _property = node["properties"][object_property]
-                _property["value"] = swt_line[column]
-                _property["status"] = "complete"
-                self.log.debug(f"_property: {_property}")
-                if "_operations_order" in node["properties"]:
-                    node["properties"]["_operations_order"]["value"] = node["properties"]["_operations_order"][
-                        "expression"]
-                    node["properties"]["_operations_order"]["status"] = "complete"
-                    self.log.debug(f"Updated _operations_order: {node['properties']['_operations_order']}")
-                else:
-                    node["properties"]["_operations_order"] = {}
-                    node["properties"]["_operations_order"]["value"] = self.DEFAULT_OPERATIONS_ORDER
-                    node["properties"]["_operations_order"]["status"] = "complete"
-                    node["properties"]["_operations_order"]["type"] = "expression"
-                    node["properties"]["_operations_order"]["expression"] = self.DEFAULT_OPERATIONS_ORDER
-                    node["properties"]["_operations_order"]["input"] = {"component": "textarea"}
-                    self.log.debug(f"Created _operations_order: {node['properties']['_operations_order']}")
-            else:
-                self.log.warning(f"Object property {object_id}.{object_property} from SWT is absent in the graph")
-            # TODO move graph key names to external shared object between math core classes
+    def parse_nodes(self) -> None:
+        """We parse graph from json into Nodes objects
+        """
+        self.log.debug('started parsing the nodes...')
+        for node in self.dictionary['graph']['nodes']:
+            self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
+            self.nodes[node['primitiveID']].initialize(node)
+            self.log.debug("parsed node %s", node['primitiveID'])
+        self.log.debug('parsed nodes successfully...')
 
-        # self.graph_string = json.dumps(self.graph_dict)
-        return self.graph_dict
+    def parse_edges(self) -> None:
+        """We parse graph from json to get name connections of inPorts and outPorts
+        It will be a dict of pairs: {targetPort: sourcePort}
+        """
+        self.log.debug('started parsing the edges...')
+        for edge in self.dictionary['graph']['edges']:
+            self.edges.append(Edge(edge))
+        self.log.debug('parsed edges successfully...')
 
-    def new_iteration(self):
+    def parse_ports_of_nodes(self):
+        """Function to parse ports of the nodes
 
-        self.swt_queries_resolve()
+        As node has OUT or IN ports, and they may be getting data from another nodes
+        we must do this in graph layer.
 
-        swt = SourceWideTable(self.swt_name)
-        swt = swt.new_iteration(self.graph_dict)
-        swt_last_line = swt[-1]
-        self.log.info(f"swt_last_line: {swt_last_line}")
-        return self.update(swt_last_line)
+        Here we loop through edges to know where we take data and where we should put it."""
+        # pylint: disable=line-too-long
+        for edge in self.edges:
+            # get outPort value
+            node = self.nodes[edge.source_node]
+            source_port_expression = node.get_port_expression_by_primitive_id(edge.sp)
+            if '.' not in source_port_expression:
+                source_port_expression = '.'.join([edge.source_node, source_port_expression])
+            if re.fullmatch(EVAL_GLOBALS['re_numbers'],
+                            source_port_expression) is None and '.' in source_port_expression:
+                source_port_expression = f"'{source_port_expression}'"
+            # change inPort value
+            self.nodes[edge.target_node].change_import_expression_by_primitive_id(edge.target_port,
+                                                                                  source_port_expression)
 
-    def save(self):
-        path = self.PATH_TO_GRAPH.format(self.swt_name)
-        with open(path, 'w') as fw:
-            fw.write(self.graph_string)
+    def filtered_columns(self, swr: List) -> List:
+        """We get a row of the source wide table which is "Source Wide Row" >>> swr
+        and filter out all strings that start with "_" symbol
 
-    @classmethod
-    def read(cls, swt_name):
-        path = cls.PATH_TO_GRAPH.format(swt_name)
-        with open(path) as fr:
-            return Graph(swt_name, fr.read())
+        Args:
+            swr: list of strings to filter
 
-    def swt_queries_resolve(self, tick=-1):
+        Returns:
+            list of filtered strings
 
-        def filter_swt_properties(_property):
-            self.log.debug(f"_property: {_property}")
-            flag = not _property[0].startswith("_") and (_property[1]["type"] == self.SWT_PROPERTY_TYPE or
-                                                         _property[1]["type"] == self.SWT_EXPORT_PROPERTY_TYPE)
-            return flag
+        Example:
+            input: swr = ['test', 'row', '_operations_order', '_size']
+            output: ['test', 'row']
+        """
+        self.log.debug('started filtering columns at swr=%s', swr)
+        result = list(filter(lambda c: not c.startswith("_"), swr))
+        self.log.debug('result=%s', result)
 
-        nodes = self.graph_dict["graph"]["nodes"]
+        return result
 
+    def get_property_of_the_node_by_id(self, object_id: str) -> Dict:
+        """This function gets the actual property object out of saved raw json Graph
+        by its 'primitiveID'
+
+        It is required for its' further update
+
+        Args:
+            object_id: name of the object to find and return
+
+        Return:
+            dictionary with data of the object with name object_id found
+            in raw json dictionary of the Graph
+
+        TODO:
+            * it seems that here we haven't checked the situation when object is not found
+              this is actually impossible because we check if we have this object in graph
+              before using this function.
+        """
+        self.log.debug('getting the properties object of the %s node', object_id)
+        nodes = self.dictionary['graph']['nodes']
         for node in nodes:
-            node_properties = node["properties"]
-            node_swt_properties = list(filter(filter_swt_properties, node_properties.items()))
-            for (property_name, swt_property) in node_swt_properties:
-                swt_name = swt_property["expression"]["swt_name"]
-                column = swt_property["expression"]["column"]
-                swt = SourceWideTable(swt_name)
-                lines = swt.read_tick(tick)
-                value = lines[0][column]
-                # TODO Check if "value" is to be set
-                if isinstance(value, str) and not value.startswith("\"") and not value.endswith("\""):
-                    value = f'"{value}"'
-                swt_property["_expression"] = value
+            if node['primitiveID'] == object_id:
+                self.log.debug('properties object is found')
+                return node['properties']
+
+        self.log.warning('%s node is not found, returning empty dictionary...', object_id)
+        return {}
+
+    def update_property_at_graph(self, node_name: str, prop_name: str, value: str) -> None:
+        """Function to update given property with data
+
+        Args:
+            node_name: name of the node where to look for property
+            prop_name: name of the property to update
+            value: actual value to set to property
+        """
+        self.log.debug('updating prop_name=%s of the %s node with value=%s...',
+                       prop_name, node_name, value)
+        properties = self.get_property_of_the_node_by_id(object_id=node_name)
+        properties[prop_name]['value'] = value
+        self.log.debug('update successfully done...')
+
+    def update(self, swr: List) -> Dict:
+        """Function to update nodes objects and actual raw json dictionary
+
+        Args:
+            swr: the least row of the source wide table
+        """
+        self.log.debug('updating the graph...')
+        self.log.debug('input: swr=%s', swr)
+        for column in self.filtered_columns(swr=swr):
+            reg_exp = GRAPH_GLOBALS['re_object_id_and_property']
+            object_id, object_property = re.match(reg_exp, column).groups()
+
+            self.log.debug('from column=%s we have object_id=%s and object_property=%s',
+                           column, object_id, object_property)
+
+            try:
+                self.nodes[object_id].update_property(object_property, swr[column])
+                self.log.debug('updated property at the self.nodes dictionary')
+                self.update_property_at_graph(node_name=object_id, prop_name=object_property,
+                                              value=swr[column])
+                self.log.debug('updated property at the self.graph dictionary')
+
+            except KeyError:
+                self.log.warning('No %s node found, only %s got', object_id, self.nodes.keys())
+
+        return self.dictionary
+
+    def calc(self) -> Dict:
+        """Main calculation function of Graph
+        """
+        self.log.debug('calculating graph...')
+        swt = SourceWideTable(self.name)
+        nodes_eval_expressions = self.get_nodes_eval_expressions()
+        self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
+        list_of_sw_rows = swt.calc(nodes_eval_expressions)
+        self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
+
+        result = self.update(list_of_sw_rows[-1])
+        return result
+
+    def swt(self) -> List:
+        """Function to get the whole source wide table
+        """
+        self.log.debug('getting swt...')
+        swt = SourceWideTable(self.name)
+        return swt.calc(self.get_nodes_eval_expressions())
+
+    def get_nodes_eval_expressions(self) -> List[Dict]:
+        """Function to get all the eval expressions for all nodes and properties
+        """
+        self.log.debug('getting nodes eval expressions...')
+        sorted_nodes = self.get_sorted_nodes()
+        eval_expressions = []
+        for node in sorted_nodes:
+            eval_expressions.extend(node.get_eval_expressions())
+        self.log.debug('eval_expressions=%s', eval_expressions)
+        return eval_expressions
+
+    def get_sorted_nodes(self) -> list[Node]:
+        """Function to get the dictionary of all nodes sorted by their _operations_order
+        and name
+
+        Example:
+            "nodes": [
+                {
+                    "primitiveID": "Data_685",
+                    "primitiveName": "Data",
+                    "properties": {
+                        "type": {...},
+                        "name": {...},
+                        "description": {...},
+                        "_operations_order": {        <<< this property is used
+                            "status": "complete",
+                            "type": "expression",
+                            "expression": 100,        <<< this is what current property sorted by
+                            "input": {
+                                "component": "textarea"
+                            }
+        """
+        self.log.debug('sorting the nodes by operations order...')
+        try:
+            result = sorted(self.nodes.values(),
+                            key=lambda x: int(x.properties['_operations_order'].expression))
+            self.log.debug('result=%s', result)
+            return result
+
+        except KeyError as error:
+            raise Exception('Not all nodes have _operations_order property') from error
+
+    def __str__(self) -> str:
+        """Simple string representation of the Graph object
+        """
+        return f'{self.name=}\n' + '\n'.join(f'\t{node}' for node in self.nodes)
+
+    @classmethod
+    def read_from_file(cls, filename: str) -> 'Graph':
+        """Function to read Graph from file on disk
+
+        Args:
+            filename: name of the file to read
+
+        Returns:
+            Function returns already parsed Graph object of the json read from file.
+        """
+        path = GRAPH_GLOBALS['path_to_graph'].format(filename)
+        cls.log.debug('reading a graph %s at %s', filename, path)
+        with open(path, encoding='utf-8') as file:
+            return Graph(filename, file.read())
