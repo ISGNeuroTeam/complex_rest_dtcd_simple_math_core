@@ -34,7 +34,8 @@ class Port:
             so
             - inPort1 >>> Calc2_96_inPort1 >>> Data1_12_outPort1 >>> '2000`
             - inPort2 >>> Calc2_96_inPort2 >>> Data1_12_outPort2 >>> '100`
-            - inPort1 + inPort2 >>> Data1_12_outPort1 + Data1_12_outPort2 >>> all the rest will otl do
+            - inPort1 + inPort2 >>> Data1_12_outPort1 + Data1_12_outPort2
+            >>> all the rest will otl do
 
         Args:
             :: primitiveName: short name of the port in terms of the Node, like 'outPort1'
@@ -43,27 +44,28 @@ class Port:
             :: expression: value of properties.status.expression to import to target port
             :: log: local logger instance
     """
-    primitiveName: str
-    primitiveID: str
+    primitive_name: str
+    primitive_id: str
     type: str
     expression: str
     log: logging.Logger = logging.getLogger(plugin_name)
 
     def __init__(self, data: Dict):
-        self.primitiveName = data['primitiveName']
-        self.primitiveID = data['primitiveID']
+        self.primitive_name = data['primitiveName']
+        self.primitive_id = data['primitiveID']
         self.type = data['type'][0] if 'type' in data.keys() and len(data['type']) > 0 else ''
         self.expression = data['properties']['status']['expression']
-        self.log.debug('port saved: %s' % self)
-
+        self.log.debug('port saved: %s', self)
 
     @property
     def is_in_type(self):
+        """short wrapper to know if port is of IN type"""
         return self.type == 'IN'
 
     @property
     def is_out_type(self):
+        """short wrapper to know if port is of OUT type"""
         return self.type == 'OUT'
 
     def __str__(self):
-        return f'{self.primitiveID=} | {self.primitiveName=} | {self.type=}'
+        return f'{self.primitive_id=} | {self.primitive_name=} | {self.type=}'

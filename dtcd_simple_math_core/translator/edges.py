@@ -25,3 +25,8 @@ class Edge:
         self.source_port = data['sourcePort']
         self.target_node = data['targetNode']
         self.target_port = data['targetPort']
+
+    @property
+    def sp(self):
+        """short wrapper of the source_port parameter"""
+        return self.source_port

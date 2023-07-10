@@ -71,7 +71,7 @@ class Node:
             :: expression of the port instance
         """
         for port in self.ports.values():
-            if primitive_id == port.primitiveID:
+            if primitive_id == port.primitive_id:
                 return port.expression
         return ''
 
@@ -87,10 +87,10 @@ class Node:
                                       to be calculated at the property
         """
         for port in self.ports.values():
-            if primitive_id == port.primitiveID:
+            if primitive_id == port.primitive_id:
                 for prop_data in self.properties.values():
-                    if prop_data.has_import and port.primitiveName in prop_data.imports:
-                        prop_data.replace_import_expression(port.primitiveName, source_expression)
+                    if prop_data.has_import and port.primitive_name in prop_data.imports:
+                        prop_data.replace_import_expression(port.primitive_name, source_expression)
 
     def update_property(self, prop_name: str, value: Any) -> None:
         """Here we update the property with prop_name with its value

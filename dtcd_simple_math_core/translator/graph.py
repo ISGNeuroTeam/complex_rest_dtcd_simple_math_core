@@ -55,7 +55,7 @@ class Graph:
         for node in self.dictionary['graph']['nodes']:
             self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
             self.nodes[node['primitiveID']].initialize(node)
-            self.log.debug("parsed node %s" % node['primitiveID'])
+            self.log.debug("parsed node %s", node['primitiveID'])
         self.log.debug('parsed nodes successfully...')
 
     def parse_edges(self) -> None:
@@ -68,9 +68,17 @@ class Graph:
         self.log.debug('parsed edges successfully...')
 
     def parse_ports_of_nodes(self):
+        """Function to parse ports of the nodes
+
+        As node has OUT or IN ports, and they may be getting data from another nodes
+        we must do this in graph layer.
+
+        Here we loop through edges to know where we take data and where we should put it."""
+        # pylint: disable=line-too-long
         for edge in self.edges:
             # get outPort value
-            source_port_expression = self.nodes[edge.source_node].get_port_expression_by_primitive_id(edge.source_port)
+            node = self.nodes[edge.source_node]
+            source_port_expression = node.get_port_expression_by_primitive_id(edge.sp)
             if '.' not in source_port_expression:
                 source_port_expression = '.'.join([edge.source_node, source_port_expression])
             if re.fullmatch(EVAL_GLOBALS['re_numbers'],
