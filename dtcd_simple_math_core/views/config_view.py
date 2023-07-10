@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
+"""Module to return configuration of the plugin view"""
+# pylint: disable=import-error, too-few-public-methods
 import logging
 
-import json
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
@@ -18,7 +20,7 @@ class ConfigView(APIView):
     http_method_names = ['get']
     permission_classes = (AllowAny,)
 
-    def get(self, request):
+    def get(self):
         """Receives nothing
 
         Returns: configuration of the plugin based on a settings.py"""
