@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
+"""Module to return response for swt request view"""
+# pylint: disable=import-error, broad-except, too-few-public-methods
 import logging
+from typing import Any
 
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse, ErrorResponse
-from typing import Any
 
 from ..translator.swt import SourceWideTable
-from ..translator.errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID
 
 
 class SourceWideTableView(APIView):
@@ -36,11 +38,11 @@ class SourceWideTableView(APIView):
                     'message': 'A source wide table name is required'
                 }
             )
-        else:
-            swt = SourceWideTable(swt_name)
-            try:
-                table = swt.read()
-            except Exception as e:
-                return ErrorResponse(error_message=str(e))
 
-            return SuccessResponse({'table': table})
+        swt = SourceWideTable(swt_name)
+        try:
+            table = swt.read()
+        except Exception as exception:
+            return ErrorResponse(error_message=str(exception))
+
+        return SuccessResponse({'table': table})
