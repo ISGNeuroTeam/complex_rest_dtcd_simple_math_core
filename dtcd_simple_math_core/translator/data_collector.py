@@ -9,7 +9,9 @@ from ot_simple_connector.connector import Connector  # pylint: disable=import-er
 from ..settings import plugin_name, CONNECTOR_CONFIG
 from .query import Query
 from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, \
-    OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID,LackingPathNameError
+    OTLSubsearchFailed, OTLJobWithStatusFailedHasNoCacheID, LackingPathNameError, \
+    OTLServiceUnavailable
+from requests.exceptions import ConnectionError
 
 
 class DataCollector:
@@ -45,7 +47,7 @@ class DataCollector:
         expression = Query(name=self.name).get_read_expression(last_row=last_row)
 
         result = self.job_create(expression=expression, cache_ttl=5)
-        return result
+        return list(result)
 
     def calc_swt(self, eval_names: List[Dict]) -> list:
         """This function creates an otl query to read, eval and write a swt table
@@ -64,12 +66,23 @@ class DataCollector:
 
         return result
 
+    def read_multiple_swts(self, names: List[str], tick: str) -> Dict:
+        expression = Query().get_read_expressions(names, tick)
+        result = self.job_create(expression=expression, cache_ttl=5)
+        return result[0] if len(result) > 0 else {}
+
     def job_create(self, expression: str, cache_ttl: int) -> list:
         """Wrapper for working with ot_simple_connector.job.create and
         parse and handle its exceptions"""
         try:
             self.log.debug("data_collector-job_create | trying to create job...")
             result = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset.load()
+        except ConnectionError as exception:
+            message: str = 'OTL service at {%s}:{%s} seem to be unavailable, ' \
+                           'check ot_simple_connector ports in a config' % (
+                               CONNECTOR_CONFIG['host'], CONNECTOR_CONFIG['port'])
+            self.log.exception(message)
+            raise OTLServiceUnavailable(message) from exception
         except Exception as e:  # pylint: disable=broad-except, invalid-name
             self.log.debug("data_collector-job_create | exception: %s", e.args[0])
             if "failed because of" in e.args[0]:
@@ -91,6 +104,12 @@ class DataCollector:
                                '>>> raising OTLJobWithStatusFailedHasNoCacheID exception')
                 raise OTLJobWithStatusFailedHasNoCacheID("Job with status failed has no cache id. "
                                                          "Just try again") from e
+            if "MaxRetryError" in e.args[0]:
+                message: str = 'OTL service at {%s}:{%s} seem to be unavailable, ' \
+                               'check ot_simple_connector ports in a config' % (
+                                   CONNECTOR_CONFIG['port'], CONNECTOR_CONFIG['host'])
+                self.log.exception(message)
+                raise OTLServiceUnavailable(message) from e
             raise Exception(f"unregistered exception: {e.args[0]}") from e
         self.log.debug('result=%s', result)
         return result
@@ -108,4 +127,4 @@ class DataCollector:
                                        'function')
         result = self.job_create(expression=expression, cache_ttl=5)
 
-        return result
+        return list(result)

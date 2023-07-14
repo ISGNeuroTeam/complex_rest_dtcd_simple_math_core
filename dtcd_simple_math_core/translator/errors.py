@@ -56,3 +56,13 @@ class LackingPathNameError(Exception):
     So if path name is not given we must raise error and try again.
     """
     ...
+
+
+class OTLServiceUnavailable(Exception):
+    """Exception when there is a
+
+     'Job[d647dd24-119d-11ee-9d6c-0242ac140006] failed because of [SearchId:12350]
+     Subsearch failed. Check logs..'
+
+     error"""
+    ...
