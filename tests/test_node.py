@@ -89,5 +89,5 @@ class TestNode(TestCase):
         name = 'testField'
         self.node.fill_default_properties(name=name, data=new_data)
         sample = [{'UncontrolledRichLabelNode01_1.testField': '2018'}]
-        result = self.node.get_eval_expressions()
+        result = self.node.get_eval_expressions({})
         self.assertEqual(sample, result)
