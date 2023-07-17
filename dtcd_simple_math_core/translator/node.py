@@ -179,7 +179,8 @@ class Node:
 
         # here we must make this 'StepRichLabelNode11_1.Enabled'
         # look like this "'StepRichLabelNode11_1.Enabled'"
-        if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name:
+        if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name \
+                and not name.startswith("'") and not name.endswith("'"):
             name = f"'{name}'"
         cls.log.debug('result=%s', name)
 
@@ -200,6 +201,7 @@ class Node:
             {'UncontrolledRichLabelNode01_1.testField': '2018'}
         """
         self.log.debug('Getting all eval expressions for %s node', self.object_id)
+        email_pattern = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
         result = []
         node_properties = self.get_eval_properties()
@@ -215,7 +217,8 @@ class Node:
                 else:
                     _exp = _prop.get_expression
 
-                _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
+                if not _exp.startswith('"') and not _exp.endswith('"'):
+                    _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
                                   lambda p: self.make_obj_prop_full_name(p,
                                                                          self.properties.keys(),
                                                                          self.object_id), _exp)

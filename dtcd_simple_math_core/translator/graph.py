@@ -88,7 +88,7 @@ class Graph:
                 source_port_expression = '.'.join([edge.source_node, source_port_expression])
             if re.fullmatch(EVAL_GLOBALS['re_numbers'],
                             source_port_expression) is None and '.' in source_port_expression:
-                source_port_expression = f"'{source_port_expression}'"
+                source_port_expression = f"{source_port_expression}"
             # change inPort value
             self.nodes[edge.target_node].change_import_expression_by_primitive_id(edge.target_port,
                                                                                   source_port_expression)
