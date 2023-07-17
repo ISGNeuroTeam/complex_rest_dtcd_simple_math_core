@@ -23,18 +23,22 @@ class Graph:
         :: edges: list of all edges, consists of all port connections of nodes in graph
         :: name: name of current Graph
         :: dictionary: raw json object to keep, update and send back on api request
+        :: swt_imported_tables: list of strings that represent names of the swt_tables
+                                that are required to be imported
     """
     log: logging.Logger = logging.getLogger(plugin_name)
     nodes: Dict[str, Node]
     edges: List[Edge]
     name: str
     dictionary: Dict
+    swt_import_tables: List[str]
 
     def __init__(self, name: str, graph: Union[Dict, str]):
         self.nodes = {}
         self.edges = []
         self.name = name
         self.dictionary = graph
+        self.swt_import_tables = []
 
     def initialize(self) -> None:
         """Here we parse the graph if it was given as a string.
@@ -56,6 +60,7 @@ class Graph:
             self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
             self.nodes[node['primitiveID']].initialize(node)
             self.log.debug("parsed node %s", node['primitiveID'])
+            self.swt_import_tables.extend(self.nodes[node['primitiveID']].swt_imported_tables)
         self.log.debug('parsed nodes successfully...')
 
     def parse_edges(self) -> None:
@@ -83,7 +88,7 @@ class Graph:
                 source_port_expression = '.'.join([edge.source_node, source_port_expression])
             if re.fullmatch(EVAL_GLOBALS['re_numbers'],
                             source_port_expression) is None and '.' in source_port_expression:
-                source_port_expression = f"'{source_port_expression}'"
+                source_port_expression = f"{source_port_expression}"
             # change inPort value
             self.nodes[edge.target_node].change_import_expression_by_primitive_id(edge.target_port,
                                                                                   source_port_expression)
@@ -182,7 +187,9 @@ class Graph:
         """
         self.log.debug('calculating graph...')
         swt = SourceWideTable(self.name)
-        nodes_eval_expressions = self.get_nodes_eval_expressions()
+        swt.initialize()
+        imported_data = swt.import_data(self.swt_import_tables)
+        nodes_eval_expressions = self.get_nodes_eval_expressions(imported_data=imported_data)
         self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
         list_of_sw_rows = swt.calc(nodes_eval_expressions)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
@@ -195,16 +202,16 @@ class Graph:
         """
         self.log.debug('getting swt...')
         swt = SourceWideTable(self.name)
-        return swt.calc(self.get_nodes_eval_expressions())
+        return swt.calc(self.get_nodes_eval_expressions({}))
 
-    def get_nodes_eval_expressions(self) -> List[Dict]:
+    def get_nodes_eval_expressions(self, imported_data: Dict) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
         """
         self.log.debug('getting nodes eval expressions...')
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
-            eval_expressions.extend(node.get_eval_expressions())
+            eval_expressions.extend(node.get_eval_expressions(imported_data))
         self.log.debug('eval_expressions=%s', eval_expressions)
         return eval_expressions
 
@@ -238,6 +245,9 @@ class Graph:
 
         except KeyError as error:
             raise Exception('Not all nodes have _operations_order property') from error
+
+    def get_imported_data(self):
+        ...
 
     def __str__(self) -> str:
         """Simple string representation of the Graph object
