@@ -5,17 +5,17 @@ level = INFO
 logs_path = .
 
 [ot_simple_connector]
-host = localhost
-port = 80
+host = s-dev-2.dev.isgneuro.com
+port = 6080
 user = admin
-password = VeryComplicatedPassword
+password = 12345678
 
 [eval_globals]
 property_type = expression
 plugin_name = dtcd_simple_math_core
 object_id_column = primitiveID
 re_object_property_name = [\.\w]+
-re_numbers = r"^\d+\.?\d*$"
+re_numbers = ^\d+\.?\d*$
 
 [graph_globals]
 plugin_name = dtcd_simple_math_core

@@ -108,7 +108,12 @@ stop.sh
 DataCAD_simple_math_core-*.tar.gz
 DataCAD_simple_math_core.conf
 venv.tar.gz
+dtcd_simple_math_core.conf
 
 nginx/
-
 logs/
+/make_build/
+/dtcd_simple_math_core/venv/
+
+# conda
+conda/

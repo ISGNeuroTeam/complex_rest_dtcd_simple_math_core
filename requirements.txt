@@ -1,3 +1,3 @@
-ot-simple-connector
+ot-simple-connector==0.1.9
 --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple
 --trusted-host s.dev.isgneuro.com

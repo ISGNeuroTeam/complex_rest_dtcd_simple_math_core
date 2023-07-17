@@ -41,14 +41,20 @@ make pack
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
-
+Starchenkov Andrey
+Serditov Nikita
 
 ## License
 
 [OT.PLATFORM. License agreement.](LICENSE.md)
 
-## Acknowledgments
+## Features
+- Creates swt table when graph is calculated first time and has no swt table.
+- Supports importing data through inPort/outPort in terms of one graph. As it works with data from swt table, not graph, then sometimes it requires two consequent graph calculations to calc all imported data.
+- Support `SWT` and `SWT Export` data import from a different graph only if source graph has the same `_t` tick value as the latest `-t` tick value of the target swt table.
 
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+## Setup of the plugin
+Go to dtcd_simple_math_core/dtcd_simple_math_core.conf and edit it:
+- set logging `level` at the [logging] section
+- set parameters of [ot_simple_connector], usually `host` is `localhost`, all the rest parameters get from your administrator
+- if you are using `smc` at FGK production server, you must change the `otl_create_fresh_swt` of the [graph_globals] section to `| readFile format=json path=wide | fields _sn, _t | writeFile format=json path=SWT/` 

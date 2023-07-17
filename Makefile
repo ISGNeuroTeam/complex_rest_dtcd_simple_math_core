@@ -19,16 +19,21 @@ GENERATE_BRANCH = $(shell git name-rev $$(git rev-parse HEAD) | cut -d\  -f2 | s
 SET_VERSION = $(eval VERSION=$(GENERATE_VERSION))
 SET_BRANCH = $(eval BRANCH=$(GENERATE_BRANCH))
 
+CONDA = conda/miniconda/bin/conda
+ENV_PYTHON = venv/bin/python3.9
+
 define clean_docker_containers
 	@echo "Stopping and removing docker containers"
 	docker-compose -f docker-compose-test.yml stop
 	if [[ $$(docker ps -aq -f name=dtcd_simple_math_core) ]]; then docker rm $$(docker ps -aq -f name=dtcd_simple_math_core);  fi;
 endef
 
-pack: make_build
+pack: 
+#make_build
 	$(SET_VERSION)
 	$(SET_BRANCH)
 	rm -f dtcd_simple_math_core-*.tar.gz
+	rm -f *.tar.gz
 	echo Create archive \"dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz\"
 	cd make_build; tar czf ../dtcd_simple_math_core-$(VERSION)-$(BRANCH).tar.gz dtcd_simple_math_core
 
@@ -47,30 +52,35 @@ make_build: venv venv.tar.gz
 	mkdir make_build
 
 	cp -R ./dtcd_simple_math_core make_build
-	rm make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
+	rm -f make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
 	mv make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf.example make_build/dtcd_simple_math_core/dtcd_simple_math_core.conf
 	cp *.md make_build/dtcd_simple_math_core/
 	cp *.py make_build/dtcd_simple_math_core/
-	if [ -s requirements.txt ]; then \
-		mkdir make_build/dtcd_simple_math_core/venv;\
-		tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv; \
-	fi
+	mkdir make_build/dtcd_simple_math_core/venv
+	tar -xzf ./venv.tar.gz -C make_build/dtcd_simple_math_core/venv
+
+conda/miniconda.sh:
+	echo Download Miniconda
+	mkdir -p conda
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh -O conda/miniconda.sh
+
+conda/miniconda: conda/miniconda.sh
+	bash conda/miniconda.sh -b -p conda/miniconda
+
+conda/miniconda/bin/conda-pack: conda/miniconda
+	conda/miniconda/bin/conda install conda-pack -c conda-forge  -y
 
 clean_build:
 	rm -rf make_build
 
-venv:
-	if [ -s requirements.txt ]; then \
-		echo Create venv; \
-		conda create --copy -p ./venv -y; \
-		conda install -p ./venv python==3.9.7 -y; \
-		./venv/bin/pip install --no-input  -r requirements.txt; \
-	fi
+venv: clean_venv conda/miniconda
+	echo Create venv
+	$(CONDA) create --copy -p ./venv -y
+	$(CONDA) install -p ./venv python==3.9.7 -y
+	$(ENV_PYTHON) -m pip install --no-input  -r requirements.txt
 
-venv.tar.gz: venv
-	if [ -s requirements.txt ]; then \
-		conda pack -p ./venv -o ./venv.tar.gz; \
-	fi
+venv.tar.gz: venv conda/miniconda/bin/conda-pack
+	$(CONDA) pack -p ./venv -o ./venv.tar.gz
 
 clean_venv:
 	rm -rf venv

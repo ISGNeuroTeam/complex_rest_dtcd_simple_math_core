@@ -23,21 +23,12 @@
         },
         "P": {
           "type": "expression",
-          "expression": "\"ControlledRichLabelNode01_207.V*ControlledRichLabelNode01_207.I*StepRichLabelNode11_1.Enabled\"",
+          "expression": "ControlledRichLabelNode01_207.V*ControlledRichLabelNode01_207.I*StepRichLabelNode11_1.Enabled",
           "status": "complete",
           "input": {
             "component": "textarea"
           },
           "value": "ControlledRichLabelNode01_207.V*ControlledRichLabelNode01_207.I*StepRichLabelNode11_1.Enabled"
-        },
-        "_operations_order": {
-          "type": "expression",
-          "expression": "3",
-          "status": "complete",
-          "value": 3,
-          "input": {
-            "component": "textarea"
-          }
         }
       },
       "extensionName": "ExtensionRiskPrimitives",
@@ -89,7 +80,7 @@
         },
         "I": {
           "type": "expression",
-          "expression": "\"StepRichLabelNode11_1.Enabled*V/TargetRichLabelNode1_1.R\"",
+          "expression": "StepRichLabelNode11_1.Enabled*V/TargetRichLabelNode1_1.R",
           "status": "complete",
           "input": {
             "component": "textarea"
@@ -155,7 +146,7 @@
         },
         "_operations_order": {
           "type": "expression",
-          "expression": "2",
+          "expression": 2,
           "status": "complete",
           "value": 2,
           "input": {
