@@ -32,11 +32,13 @@ class SWTImport:
 class Property:
     """This class describes how Property works.
     Wrapper for simple data storage
+    Property may import value from port of the Node it belongs to,
+    or from another property of another node.
 
     Args:
          :: value: value of the property
          :: status: status of the property
-         :: type_: type of the property
+         :: type: type of the property
          :: expression: expression of the property
          :: has_import: flag that shows if property uses import of data via inPort
                         technically it says if an expression has 'inPort' string in it
@@ -51,9 +53,10 @@ class Property:
                                expression graph value, but to calc imported value
     """
     # pylint: disable=too-many-instance-attributes
+    # TODO is it a big problem that class has more than 7 attributes?
     value: str
     status: str
-    type_: str
+    type: str
     expression: Union[str, Dict]
     has_import: bool
     has_swt_import: bool
@@ -61,19 +64,21 @@ class Property:
     imports: List[str]
     import_expression: str
 
-    def __init__(self, value: str = '', status: str = 'complete', type_: str = 'expression',
-                 expression='', **kwargs):
+    def __init__(self, value: str = '', status: str = 'complete', type: str = 'expression',
+                 expression: Union[str, Dict] = '', **kwargs):
         self.value = value
         self.status = status
-        self.type_ = type_
+        self.type = type
         self.expression = expression
+        self.__dict__.update(kwargs)
+
+    def initialize(self):
         self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
         self.imports = [value for value in self.expression.split() if 'inPort' in value] \
             if self.has_import else 0
         self.import_expression = self.expression if self.has_import else ''
         self.has_swt_import = isinstance(self.expression, dict)
         self.swt_import = SWTImport(self.expression) if self.has_swt_import else 'SWTImport'
-        self.__dict__.update(kwargs)
 
     @property
     def get_expression(self) -> str:
