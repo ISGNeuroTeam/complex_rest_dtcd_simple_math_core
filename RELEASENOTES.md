@@ -1,3 +1,8 @@
+## [0.1.1] - 2023-07-18
+
+### Changed
+- update of the `ot_simple_connector` version
+
 ## [0.1.0] - 2023-07-10
 
 ### New
