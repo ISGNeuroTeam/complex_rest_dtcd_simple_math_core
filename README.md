@@ -57,4 +57,3 @@ Serditov Nikita
 Go to dtcd_simple_math_core/dtcd_simple_math_core.conf and edit it:
 - set logging `level` at the [logging] section
 - set parameters of [ot_simple_connector], usually `host` is `localhost`, all the rest parameters get from your administrator
-- if you are using `smc` at FGK production server, you must change the `otl_create_fresh_swt` of the [graph_globals] section to `| readFile format=json path=wide | fields _sn, _t | writeFile format=json path=SWT/` 
