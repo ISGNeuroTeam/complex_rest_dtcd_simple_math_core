@@ -9,7 +9,7 @@ from typing import List, Dict, Tuple
 from ..settings import plugin_name, OTL_CREATE_FRESH_SWT
 from .data_collector import DataCollector
 from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed, \
-    OTLJobWithStatusFailedHasNoCacheID
+    OTLJobWithStatusFailedHasNoCacheID, OTLServiceUnavailable
 
 
 class SourceWideTable:
@@ -19,13 +19,29 @@ class SourceWideTable:
     Args:
         :: log: local instance of plugin logger
         :: swt_name: name of the swt table to work with
+        :: data_collector instance of current swt table
+        :: latest_tick_value: value of the _t parameter of the latest tick
     """
     log = logging.getLogger(plugin_name)
     swt_name: str
+    data_collector: DataCollector
+    latest_tick_value: str
 
     def __init__(self, swt_name: str) -> None:
         self.log.debug('Input swt_name=%s', swt_name)
         self.swt_name = swt_name
+        self.data_collector = DataCollector(name=swt_name)
+        self.latest_tick_value = ''
+
+    def initialize(self):
+        # we need to check if swt table exists
+        # we need to get _t value of the latest tick of swt in order to use
+        # for later imports from other swt table
+
+        exists, reason = self.check_swt_exists(self.data_collector)
+        if not exists and reason == 'does not exist':
+            # if not > create
+            self.create_swt(self.data_collector)
 
     def read(self, last_row: bool = False) -> list:
         """Here we create a data collector and make it read swt table
@@ -46,6 +62,10 @@ class SourceWideTable:
 
         return result
 
+    def import_data(self, names) -> Dict:
+        result = self.data_collector.read_multiple_swts(names, self.latest_tick_value)
+        return result
+
     def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
         """Function to check if swt table with given name exists or not and why
 
@@ -59,10 +79,13 @@ class SourceWideTable:
         counter = 0
         while True:
             try:
-                data_collector.read_swt(last_row=True)
+                result = data_collector.read_swt(last_row=True)
+                self.latest_tick_value = result[0]['_t']
                 return True, 'swt table exists'
             except OTLReadfileError:
                 return False, 'does not exist'
+            except ConnectionError:
+                raise
             except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
                     OTLJobWithStatusFailedHasNoCacheID):
                 if counter > 5:
@@ -82,7 +105,8 @@ class SourceWideTable:
         counter = 0
         while True:
             try:
-                data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
+                result = data_collector.create_fresh_swt(OTL_CREATE_FRESH_SWT)
+                self.latest_tick_value = result[0]['_t']
                 break
             except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
                     OTLJobWithStatusFailedHasNoCacheID):
@@ -93,6 +117,9 @@ class SourceWideTable:
                 counter += 1
                 continue
             except OTLReadfileError:  # this should happen actually, because we are here
+                raise
+
+            except OTLServiceUnavailable:
                 raise
 
             except Exception as exception:
@@ -113,11 +140,6 @@ class SourceWideTable:
 
         result = []
         counter = 0
-        # check if swt table is created
-        exists, reason = self.check_swt_exists(data_collector)
-        if not exists and reason == 'does not exist':
-            # if not > create
-            self.create_swt(data_collector)
 
         while True:
             try:

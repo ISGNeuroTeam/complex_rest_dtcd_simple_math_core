@@ -52,7 +52,7 @@ class Query:
         return result
 
     def get_read_expression(self, last_row: bool = False, file_path: str = "SWT",
-                            file_format: str = "JSON") -> str:
+                            file_format: str = "JSON", where: str = '') -> str:
         """Function to create readFile otl query
         Args:
             :: last_row: flag to point out whether we require the whole table or
@@ -66,9 +66,20 @@ class Query:
         self.log.debug('input: self.name=%s | last_row=%s | file_path=%s | file_format=%s',
                        self.name, last_row, file_path, file_format)
         result = f'readFile format={file_format} path={file_path}/{self.name}' \
-                 f'{" | tail 1" if last_row else ""}  '
+                 f'{" | tail 1" if last_row else ""}{where} '
         self.log.debug('result: %s', result)
 
+        return result
+
+    @staticmethod
+    def get_read_expressions(names: List[str], tick: str) -> str:
+        result = ''
+        for index, name in enumerate(names):
+            string = f'| readFile format=json path=SWT/{name} | where _t={tick}'
+            if index > 0:
+                result += f'| join _t [{string}]'
+            else:
+                result += string
         return result
 
     def get_write_expression(self, append: bool = False, file_path: str = "SWT",

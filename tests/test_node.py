@@ -11,10 +11,10 @@ class TestNode(TestCase):
     def setUp(self):
         data = {'primitiveID': 'UncontrolledRichLabelNode01_1', 'primitiveName': 'UncontrolledRichLabelNode01',
                 'properties': {
-                    'testField': {'expression': '', 'type_': 'expression', 'status': 'complete', 'value': ''}},
+                    'testField': {'expression': '', 'type': 'expression', 'status': 'complete', 'value': ''}},
                 'extensionName': 'ExtensionRiskPrimitives', 'nodeTitle': '$this.primitiveID$', 'initPorts': [
-                {'primitiveName': 'outPort1', 'type_': ['OUT'],
-                 'properties': {'status': {'expression': '', 'type_': 'expression', 'status': 'complete', 'value': ''}},
+                {'primitiveName': 'outPort1', 'type': ['OUT'],
+                 'properties': {'status': {'expression': '', 'type': 'expression', 'status': 'complete', 'value': ''}},
                  'primitiveID': 'UncontrolledRichLabelNode01_1_outPort1', 'location': {'x': 298.75, 'y': 136.29}}],
                 'layout': {'x': 151.75, 'y': 139.25, 'height': 148, 'width': 294}}
         self.node = Node(data.get('primitiveID', ''))
@@ -23,14 +23,14 @@ class TestNode(TestCase):
     def test_fill_default_properties(self):
         name = 'testField'
         sample = {'expression': '', 'has_import': False, 'has_swt_import': False, 'import_expression': '',
-                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type_': 'expression',
+                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type': 'expression',
                   'value': ''}
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
         new_data = {'_operations_order': '100'}
         sample = {'_operations_order': '100', 'expression': '', 'has_import': False, 'has_swt_import': False,
                   'import_expression': '', 'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport',
-                  'type_': 'expression', 'value': ''}
+                  'type': 'expression', 'value': ''}
         self.node.fill_default_properties(name=name, data=new_data)
         result = self.node.properties[name].get_dictionary()
         self.assertEqual(sample, result)
@@ -39,7 +39,7 @@ class TestNode(TestCase):
         name = 'testField'
         value = 'newValueData'
         sample = {'expression': '', 'has_import': False, 'has_swt_import': False, 'import_expression': '',
-                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type_': 'expression',
+                  'imports': 0, 'status': 'complete', 'swt_import': 'SWTImport', 'type': 'expression',
                   'value': 'newValueData'}
         self.node.update_property(name, value)
         result = self.node.properties[name].get_dictionary()
@@ -89,5 +89,5 @@ class TestNode(TestCase):
         name = 'testField'
         self.node.fill_default_properties(name=name, data=new_data)
         sample = [{'UncontrolledRichLabelNode01_1.testField': '2018'}]
-        result = self.node.get_eval_expressions()
+        result = self.node.get_eval_expressions({})
         self.assertEqual(sample, result)

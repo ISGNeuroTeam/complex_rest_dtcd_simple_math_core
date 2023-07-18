@@ -42,6 +42,14 @@ class Node:
         for data in node['initPorts']:
             self.fill_default_ports(data=data)
 
+    @property
+    def swt_imported_tables(self):
+        result = []
+        for prop_data in self.properties.values():
+            if prop_data.type == "SWT" or prop_data.type == "SWTexp":
+                result.append(prop_data.swt_import.swt_name)
+        return result
+
     def fill_default_properties(self, name: str, data: Dict) -> None:
         """Here we save the empty (or not) Property instance as a value of the name key
         of the properties' dictionary.
@@ -51,6 +59,7 @@ class Node:
         """
         self.log.debug('saving %s property with %s', name, data)
         self.properties[name] = Property(**data)
+        self.properties[name].initialize()
 
     def fill_default_ports(self, data: Dict) -> None:
         """Here we save Port instance as a value of the name key of the 'IN' ports dictionary
@@ -119,10 +128,10 @@ class Node:
             True or False depending on whether prop satisfies the conditions described above
         """
         cls.log.debug('checking if property %s is valid for evaluation', prop[0])
-        cls.log.debug('its type is %s and required is %s', prop[1].type_,
+        cls.log.debug('its type is %s and required is %s', prop[1].type,
                       EVAL_GLOBALS["property_type"])
 
-        result = prop[1].type_ == EVAL_GLOBALS['property_type'] and not prop[0].startswith("_")
+        result = prop[1].type in [EVAL_GLOBALS['property_type'], 'SWT', 'SWTexp'] and not prop[0].startswith("_")
         cls.log.debug('result=%s', result)
 
         return result
@@ -170,13 +179,14 @@ class Node:
 
         # here we must make this 'StepRichLabelNode11_1.Enabled'
         # look like this "'StepRichLabelNode11_1.Enabled'"
-        if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name:
+        if re.fullmatch(EVAL_GLOBALS['re_numbers'], name) is None and '.' in name \
+                and not name.startswith("'") and not name.endswith("'"):
             name = f"'{name}'"
         cls.log.debug('result=%s', name)
 
         return name
 
-    def get_eval_expressions(self) -> List[Dict]:
+    def get_eval_expressions(self, imported_data: Dict) -> List[Dict]:
         """This function loops through the node and its properties to get the string of
         all possible eval expressions.
 
@@ -191,6 +201,7 @@ class Node:
             {'UncontrolledRichLabelNode01_1.testField': '2018'}
         """
         self.log.debug('Getting all eval expressions for %s node', self.object_id)
+        email_pattern = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
         result = []
         node_properties = self.get_eval_properties()
@@ -199,8 +210,14 @@ class Node:
             if _prop.has_expression():
                 if _prop.has_import:
                     _exp = _prop.import_expression
+                elif _prop.has_swt_import:
+                    empty_string = ''
+                    temp = f'"{imported_data.get(_prop.swt_import.column, empty_string)}"'
+                    _exp = temp
                 else:
                     _exp = _prop.get_expression
+
+                if not _exp.startswith('"') and not _exp.endswith('"'):
                     _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
                                   lambda p: self.make_obj_prop_full_name(p,
                                                                          self.properties.keys(),

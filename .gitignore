@@ -114,3 +114,6 @@ nginx/
 logs/
 /make_build/
 /dtcd_simple_math_core/venv/
+
+# conda
+conda/
