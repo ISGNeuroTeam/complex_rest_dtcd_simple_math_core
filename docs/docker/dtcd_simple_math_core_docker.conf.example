@@ -20,6 +20,8 @@ re_numbers = ^\d+\.?\d*$
 [graph_globals]
 plugin_name = dtcd_simple_math_core
 object_id_column = primitiveID
+re_datalakenode = DataLakeNode
+use_re_datalakenode = True
 re_object_id_and_property = (\w+)\.(\w+)
 path_to_graph = ../dtcd_simple_math_core/graphs/{0}.json
 otl_create_fresh_swt = | makeresults count=1 | eval _sn=1 | eval _t=_time | writeFile format=json path=SWT/
