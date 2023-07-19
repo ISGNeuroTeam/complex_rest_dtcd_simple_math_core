@@ -17,10 +17,12 @@ RUN git clone https://github.com/ISGNeuroTeam/complex_rest.git
 RUN chmod -R 0777 /complex_rest
 
 ADD ./docs/docker/dtcd_simple_math_core_docker.conf.example /complex_rest/complex_rest/dtcd_simple_math_core.conf
+ADD ./ot_simple_connector-0.1.11-py2.py3-none-any.whl /complex_rest/ot_simple_connector-0.1.11-py2.py3-none-any.whl
 WORKDIR /complex_rest
 
-RUN pip install --no-cache-dir  -r requirements.txt
-RUN pip install --no-cache-dir --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple --trusted-host s.dev.isgneuro.com ot-simple-connector
+RUN pip install ot_simple_connector-0.1.11-py2.py3-none-any.whl
+# RUN pip install --no-cache-dir  -r requirements.txt
+# RUN pip install --no-cache-dir --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple --trusted-host s.dev.isgneuro.com ot-simple-connector
 
 ENTRYPOINT ["/complex_rest/docs/docker_dev/complex_rest/entrypoint.sh"]
 CMD ["python /complex_rest/complex_rest/manage.py runserver [::]:8080"]
