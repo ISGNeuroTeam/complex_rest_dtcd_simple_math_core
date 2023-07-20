@@ -49,7 +49,7 @@ class DataCollector:
         result = self.job_create(expression=expression, cache_ttl=5)
         return list(result)
 
-    def calc_swt(self, eval_names: List[Dict]) -> list:
+    def calc_swt(self, eval_names: List[Dict], saved_columns_names: List[str]) -> list:
         """This function creates an otl query to read, eval and write a swt table
         and makes a connection through otl connector
 
@@ -60,7 +60,7 @@ class DataCollector:
               We get dataset of swt table if swt table exists
         """
         self.log.debug('calculating swt table %s', self.name)
-        expression = Query(name=self.name).get(eval_names=eval_names)
+        expression = Query(name=self.name).get(eval_names=eval_names, saved_columns_names=saved_columns_names)
 
         result = self.job_create(expression=expression, cache_ttl=5)
 
