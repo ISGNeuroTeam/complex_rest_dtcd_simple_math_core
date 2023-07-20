@@ -52,6 +52,8 @@ GRAPH_KEY_NAMES = ini_config['graph_key_names']
 
 # set otl create fresh swt table query
 OTL_CREATE_FRESH_SWT = GRAPH_GLOBALS['otl_create_fresh_swt']
+RE_DATALAKENODE = GRAPH_GLOBALS['re_datalakenode']
+FILTER_DATALAKENODE_COLUMNS = bool(GRAPH_GLOBALS['use_re_datalakenode'])
 
 # set logger
 base_logs_dir = ini_config['general'].get('logs_path', '.')

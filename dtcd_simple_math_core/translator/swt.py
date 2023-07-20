@@ -3,10 +3,11 @@
 """
 
 import logging
+import re
 
 from typing import List, Dict, Tuple
 
-from ..settings import plugin_name, OTL_CREATE_FRESH_SWT
+from ..settings import plugin_name, OTL_CREATE_FRESH_SWT, FILTER_DATALAKENODE_COLUMNS, RE_DATALAKENODE
 from .data_collector import DataCollector
 from .errors import OTLReadfileError, OTLJobWithStatusNewHasNoCacheID, OTLSubsearchFailed, \
     OTLJobWithStatusFailedHasNoCacheID, OTLServiceUnavailable
@@ -21,17 +22,21 @@ class SourceWideTable:
         :: swt_name: name of the swt table to work with
         :: data_collector instance of current swt table
         :: latest_tick_value: value of the _t parameter of the latest tick
+        :: datalakenode_columns: list of columns that will be imported from wide table
+                                 and must not be deleted from target swt table
     """
     log = logging.getLogger(plugin_name)
     swt_name: str
     data_collector: DataCollector
     latest_tick_value: str
+    datalakenode_columns: List[str]
 
     def __init__(self, swt_name: str) -> None:
         self.log.debug('Input swt_name=%s', swt_name)
         self.swt_name = swt_name
         self.data_collector = DataCollector(name=swt_name)
         self.latest_tick_value = ''
+        self.datalakenode_columns = []
 
     def initialize(self):
         # we need to check if swt table exists
@@ -42,6 +47,34 @@ class SourceWideTable:
         if not exists and reason == 'does not exist':
             # if not > create
             self.create_swt(self.data_collector)
+
+        if FILTER_DATALAKENODE_COLUMNS:
+            # get a list of `datalakenodes` saved in 'self.swt_name`.tmp file
+            # 'datalakenodes' are columns from *.tmp swt table that have name matching
+            # GRAPH_GLOBALS['re_datalakenode']
+            counter = 0
+            try:
+                temp_dc = DataCollector(name=self.swt_name + '.tmp')
+                datalakenode_data = temp_dc.read_swt(last_row=True)
+                self.datalakenode_columns = self.get_datalakenodes(datalakenode_data)
+            except OTLReadfileError:
+                self.datalakenode_columns = []
+            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
+                    OTLJobWithStatusFailedHasNoCacheID):
+                if counter > 15:
+                    self.log.exception('we tried to connect to spark 5 times in a row and failed, '
+                                       'it seems it is not fine.')
+                    raise
+                counter += 1
+
+
+
+    @staticmethod
+    def get_datalakenodes(dln_data: List) -> List:
+        if len(dln_data) == 0:
+            return []
+        result = [match for match in dln_data[0].keys() if re.match(RE_DATALAKENODE, match)]
+        return result
 
     def read(self, last_row: bool = False) -> list:
         """Here we create a data collector and make it read swt table
@@ -144,7 +177,8 @@ class SourceWideTable:
         while True:
             try:
                 self.log.debug('swt-calc | trying..')
-                result = data_collector.calc_swt(eval_names=graph_eval_names)
+                result = data_collector.calc_swt(eval_names=graph_eval_names,
+                                                 saved_columns_names=self.datalakenode_columns)
                 break
 
             except (OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID):

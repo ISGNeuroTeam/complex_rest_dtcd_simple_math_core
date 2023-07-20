@@ -50,5 +50,5 @@ class TestQuery(TestCase):
         eval_names = [{'Goal_3.type': '"Цель"'}, {'Goal_3.value': '12'},
                       {'Data_96.type': '"Примитив с данными"'}, {'Data_96.value': '12'}]
         sample = 'fields _t, _sn, _time, Goal_3.type, Goal_3.value, Data_96.type, Data_96.value'
-        result = self.query.get_fields_expression(eval_names=eval_names)
+        result = self.query.get_fields_expression(eval_names=eval_names, saved_columns_names=[])
         self.assertEqual(sample, result)

@@ -19,6 +19,7 @@ RUN chmod -R 0777 /complex_rest
 ADD ./docs/docker/dtcd_simple_math_core_docker.conf.example /complex_rest/complex_rest/dtcd_simple_math_core.conf
 WORKDIR /complex_rest
 
+
 RUN pip install --no-cache-dir  -r requirements.txt
 RUN pip install --no-cache-dir --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple --trusted-host s.dev.isgneuro.com ot-simple-connector
 

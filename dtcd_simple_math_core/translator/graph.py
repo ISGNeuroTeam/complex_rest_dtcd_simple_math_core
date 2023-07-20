@@ -52,6 +52,7 @@ class Graph:
         self.parse_edges()
         self.parse_ports_of_nodes()
 
+
     def parse_nodes(self) -> None:
         """We parse graph from json into Nodes objects
         """

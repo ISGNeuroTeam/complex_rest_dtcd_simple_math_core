@@ -1,7 +1,15 @@
+## [0.1.2] - 2023-07-20
+
+### Changed
+- update of the `ot_simple_connector` version to 0.1.11
+
+### Fixed
+- 400 error on a first calc of a graph with DataLakeNode in it
+
 ## [0.1.1] - 2023-07-18
 
 ### Changed
-- update of the `ot_simple_connector` version
+- update of the `ot_simple_connector` version to 0.1.10
 
 ## [0.1.0] - 2023-07-10
 

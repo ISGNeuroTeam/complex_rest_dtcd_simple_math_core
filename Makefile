@@ -25,7 +25,21 @@ ENV_PYTHON = venv/bin/python3.9
 define clean_docker_containers
 	@echo "Stopping and removing docker containers"
 	docker-compose -f docker-compose-test.yml stop
-	if [[ $$(docker ps -aq -f name=dtcd_simple_math_core) ]]; then docker rm $$(docker ps -aq -f name=dtcd_simple_math_core);  fi;
+	if [[ $$(docker ps -aq -f name=dtcd_simple_math_core) ]]; then \
+		docker rm $$(docker ps -aq -f name=dtcd_simple_math_core);  \
+	else \
+        echo "No Docker containers found to remove."; \
+	fi;
+endef
+
+define clean_docker_images
+	@echo "Removing dtcd_simple_math_core docker images"
+
+	if [[ $$(docker images complex_rest_for_dtcd_simple_math_core -q) ]]; then \
+        docker image rm $$(docker image ls --quiet complex_rest_for_dtcd_simple_math_core); \
+    else \
+        echo "No Docker images found to remove."; \
+    fi
 endef
 
 pack: 
@@ -96,9 +110,11 @@ logs:
 
 docker_test: logs
 	$(call clean_docker_containers)
+	$(call clean_docker_images)
 	@echo "Testing..."
 	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-test.yml run --rm  complex_rest python ./complex_rest/manage.py test ./tests --settings=core.settings.test --no-input
 	$(call clean_docker_containers)
+	$(call clean_docker_images)
 
 clean_docker_test:
 	$(call clean_docker_containers)
