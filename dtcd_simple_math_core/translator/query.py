@@ -23,7 +23,7 @@ class Query:
     def __init__(self, name: str = None) -> None:
         self.name = name
 
-    def get(self, eval_names: List[Dict]) -> str:
+    def get(self, eval_names: List[Dict], saved_columns_names: List[str]) -> str:
         """Function to create a major otl query to:
         - read swt table
         - calc swt table
@@ -37,7 +37,7 @@ class Query:
         """
         read_query = self.get_read_expression()
         eval_query = self.get_eval_expressions(eval_names=eval_names)
-        fields_query = self.get_fields_expression(eval_names=eval_names)
+        fields_query = self.get_fields_expression(eval_names=eval_names, saved_columns_names = saved_columns_names)
         write_query = self.get_write_expression()
         self.log.debug('read_query=%s', read_query)
         self.log.debug('eval_query=%s', eval_query)
@@ -131,7 +131,7 @@ class Query:
 
         return result
 
-    def get_fields_expression(self, eval_names: List[Dict]) -> str:
+    def get_fields_expression(self, eval_names: List[Dict], saved_columns_names: List[str]) -> str:
         """Function to create fields part of the expression
         It must include the names of the fields, that must stay at the swt table
 
@@ -143,6 +143,9 @@ class Query:
         for eval_name in eval_names:
             eval_names_list.append(list(eval_name.items())[0][0])
         self.log.debug('eval_names_list: %s', eval_names_list)
+
+        for saved_column in saved_columns_names:
+            eval_names_list.append(saved_column)
 
         eval_names_list_string = ', '.join(eval_names_list)
         self.log.debug('eval_names_list_str: %s', eval_names_list_string)
