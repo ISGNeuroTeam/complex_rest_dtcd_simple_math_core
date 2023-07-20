@@ -36,6 +36,7 @@ class SourceWideTable:
         self.swt_name = swt_name
         self.data_collector = DataCollector(name=swt_name)
         self.latest_tick_value = ''
+        self.datalakenode_columns = []
 
     def initialize(self):
         # we need to check if swt table exists
@@ -51,12 +52,22 @@ class SourceWideTable:
             # get a list of `datalakenodes` saved in 'self.swt_name`.tmp file
             # 'datalakenodes' are columns from *.tmp swt table that have name matching
             # GRAPH_GLOBALS['re_datalakenode']
+            counter = 0
             try:
                 temp_dc = DataCollector(name=self.swt_name + '.tmp')
                 datalakenode_data = temp_dc.read_swt(last_row=True)
                 self.datalakenode_columns = self.get_datalakenodes(datalakenode_data)
             except OTLReadfileError:
                 self.datalakenode_columns = []
+            except (OTLSubsearchFailed, OTLJobWithStatusNewHasNoCacheID,
+                    OTLJobWithStatusFailedHasNoCacheID):
+                if counter > 15:
+                    self.log.exception('we tried to connect to spark 5 times in a row and failed, '
+                                       'it seems it is not fine.')
+                    raise
+                counter += 1
+
+
 
     @staticmethod
     def get_datalakenodes(dln_data: List) -> List:
