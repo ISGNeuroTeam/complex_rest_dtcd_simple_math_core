@@ -208,20 +208,23 @@ class Node:
 
         for _prop_name, _prop in node_properties:
             if _prop.has_expression():
-                if _prop.has_import:
-                    _exp = _prop.import_expression
-                elif _prop.has_swt_import:
-                    empty_string = ''
-                    temp = f'"{imported_data.get(_prop.swt_import.column, empty_string)}"'
-                    _exp = temp
+                if _prop.is_float_or_int:
+                    _exp = _prop.expression
                 else:
-                    _exp = _prop.get_expression
+                    if _prop.has_import:
+                        _exp = _prop.import_expression
+                    elif _prop.has_swt_import:
+                        empty_string = ''
+                        temp = f'"{imported_data.get(_prop.swt_import.column, empty_string)}"'
+                        _exp = temp
+                    else:
+                        _exp = _prop.get_expression
 
-                if not _exp.startswith('"') and not _exp.endswith('"'):
-                    _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
-                                  lambda p: self.make_obj_prop_full_name(p,
-                                                                         self.properties.keys(),
-                                                                         self.object_id), _exp)
+                    if not _exp.startswith('"') and not _exp.endswith('"'):
+                        _exp = re.sub(EVAL_GLOBALS['re_object_property_name'],
+                                      lambda p: self.make_obj_prop_full_name(p,
+                                                                             self.properties.keys(),
+                                                                             self.object_id), _exp)
 
                 expression = {f'{self.object_id}.{_prop_name}': _exp}
                 result.append(expression)

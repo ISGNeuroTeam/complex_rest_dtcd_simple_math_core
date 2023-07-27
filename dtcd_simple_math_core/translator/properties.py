@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """This module describes logic of working with Property objects.
 """
+import re
+from typing import Dict, List, Union, Any
 
-from typing import Dict, List, Union
+from ..settings import PROPERTY_GLOBALS
 
 
 class SWTImport:
@@ -16,7 +18,7 @@ class SWTImport:
     swt_name: str
     column: str
 
-    def __init__(self, data: Dict):
+    def __init__(self, data: Union[Dict, Any]):
         self.swt_name = data['swt_name']
         self.column = data['column']
 
@@ -74,16 +76,20 @@ class Property:
 
     def initialize(self):
         self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
-        self.imports = [value for value in self.expression.split() if 'inPort' in value] \
+        self.imports = re.findall(PROPERTY_GLOBALS['re_inport'], self.expression) \
             if self.has_import else 0
         self.import_expression = self.expression if self.has_import else ''
         self.has_swt_import = isinstance(self.expression, dict)
         self.swt_import = SWTImport(self.expression) if self.has_swt_import else 'SWTImport'
 
     @property
-    def get_expression(self) -> str:
+    def get_expression(self) -> Union[str, int, float]:
         """Get string representation of the expression"""
-        return str(self.expression) if not isinstance(self.expression, str) else self.expression
+        if isinstance(self.expression, int) or self.expression.isdigit():
+            return int(self.expression)
+        if is_float(str(self.expression)):
+            return float(self.expression)
+        return self.expression
 
     def update(self, value: str, status: str = ...) -> None:
         """Function to save value and status inside Property object"""
@@ -94,6 +100,12 @@ class Property:
         """Function to replace import expression with a different one from source"""
         new_exp = self.import_expression.replace(target, source)
         self.import_expression = new_exp
+
+    @property
+    def is_float_or_int(self):
+        if self.has_swt_import:
+            return False
+        return is_float(self.expression) or isinstance(self.expression, int)
 
     def has_expression(self) -> bool:
         """Checks if property has an expression"""
@@ -110,3 +122,9 @@ class Property:
     def __str__(self):
         """Get string representation of the Property"""
         return ' | '.join(f'{key}={value}' for key, value in self.__dict__.items())
+
+
+def is_float(string: Any) -> bool:
+    pattern = r"^[-+]?[0-9]*\.?[0-9]+$"
+    match = re.match(pattern, str(string))
+    return bool(match)
