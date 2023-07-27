@@ -1,3 +1,15 @@
+## [0.1.3] - 2023-07-27
+
+### Changed
+
+- update of the `ot_simple_connector` version to 0.1.12
+- added `property_globals` section to dtcd_simple_math_core.conf.example. Please update your *.conf file.
+
+### Fixed
+
+- parsing inPort values when not surrounded by whitespaces. Example: `(inPort1 + inPort2 + inPort3) / 100` evaluated to `(inPort1 + 'DataNode_1.value' + inPort3) / 100`.
+- parsing float values as float values, not strings. Example: `eval 'DataNode_1.value' = '0.6'` did not evaluate.
+
 ## [0.1.2] - 2023-07-20
 
 ### Changed

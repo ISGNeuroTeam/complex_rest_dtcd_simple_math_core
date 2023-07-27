@@ -79,7 +79,7 @@ class TestNode(TestCase):
         self.node.fill_default_properties(name='theBest', data={'expression': 'movieStar'})
         sample = '2018'
         prop = self.node.properties['testField']
-        re_group = re.search(EVAL_GLOBALS['re_object_property_name'], prop.get_expression)
+        re_group = re.search(EVAL_GLOBALS['re_object_property_name'], str(prop.get_expression))
         result = self.node.make_obj_prop_full_name(re_group, self.node.properties.keys(),
                                                    self.node.object_id)
         self.assertEqual(sample, result)
