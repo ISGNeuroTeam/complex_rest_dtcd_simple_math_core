@@ -103,6 +103,8 @@ class Property:
 
     @property
     def is_float_or_int(self):
+        if self.has_swt_import:
+            return False
         return is_float(self.expression) or isinstance(self.expression, int)
 
     def has_expression(self) -> bool:
@@ -122,7 +124,7 @@ class Property:
         return ' | '.join(f'{key}={value}' for key, value in self.__dict__.items())
 
 
-def is_float(string):
+def is_float(string: Any) -> bool:
     pattern = r"^[-+]?[0-9]*\.?[0-9]+$"
-    match = re.match(pattern, string)
+    match = re.match(pattern, str(string))
     return bool(match)
