@@ -17,6 +17,9 @@ object_id_column = primitiveID
 re_object_property_name = [\.\w]+
 re_numbers = r"^\d+\.?\d*$"
 
+[property_globals]
+re_inport = \binPort\w+
+
 [graph_globals]
 plugin_name = dtcd_simple_math_core
 object_id_column = primitiveID
