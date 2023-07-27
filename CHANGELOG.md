@@ -3,6 +3,7 @@
 ### Changed
 
 - update of the `ot_simple_connector` version to 0.1.12
+- added `property_globals` section to dtcd_simple_math_core.conf.example. Please update your *.conf file.
 
 ### Fixed
 

@@ -15,7 +15,7 @@ property_type = expression
 plugin_name = dtcd_simple_math_core
 object_id_column = primitiveID
 re_object_property_name = [\.\w]+
-re_numbers = r"^\d+\.?\d*$"
+re_numbers = ^\d+\.?\d*$
 
 [property_globals]
 re_inport = \binPort\w+
