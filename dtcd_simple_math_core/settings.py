@@ -45,6 +45,7 @@ plugin_name = 'dtcd_simple_math_core'  # pylint: disable=invalid-name
 CONNECTOR_CONFIG = ini_config['ot_simple_connector']
 EVAL_GLOBALS = ini_config['eval_globals']
 GRAPH_GLOBALS = ini_config['graph_globals']
+PROPERTY_GLOBALS = ini_config['property_globals']
 SETTINGS_FILE_PATH = Path().resolve()
 
 # set graph key names
