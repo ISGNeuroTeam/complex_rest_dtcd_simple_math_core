@@ -112,7 +112,7 @@ class Node:
             # pylint: disable=line-too-long
             self.properties['_operations_order'].update(self.properties['_operations_order'].expression, "complete")
         except KeyError:
-            self.log.warning('no %s property found, only %s got', prop_name, self.properties.keys())
+            self.log.debug('no %s property found, only %s got', prop_name, self.properties.keys())
 
     @classmethod
     def filter_eval_properties(cls, prop: Tuple[str, Property]) -> bool:

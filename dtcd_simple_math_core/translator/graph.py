@@ -139,7 +139,7 @@ class Graph:
                 self.log.debug('properties object is found')
                 return node['properties']
 
-        self.log.warning('%s node is not found, returning empty dictionary...', object_id)
+        self.log.debug('%s node is not found, returning empty dictionary...', object_id)
         return {}
 
     def update_property_at_graph(self, node_name: str, prop_name: str, value: str) -> None:
@@ -179,7 +179,7 @@ class Graph:
                 self.log.debug('updated property at the self.graph dictionary')
 
             except KeyError:
-                self.log.warning('No %s node found, only %s got', object_id, self.nodes.keys())
+                self.log.debug('No %s node found, only %s got', object_id, self.nodes.keys())
 
         return self.dictionary
 
