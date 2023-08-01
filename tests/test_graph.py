@@ -47,3 +47,14 @@ class TestGraph(TestCase):
         self.graph.update_property_at_graph(node_name=object_id, prop_name=_property, value=sample)
         result = control_property[_property]['value']
         self.assertEqual(sample, result)
+
+    def test_get_eval_expressions(self):
+        sample = [{'UncontrolledRichLabelNode01_2.Sum1': '28'},
+                  {'Data_396.type': '"Примитив с данными"'},
+                  {'Data_396.value': '0.6 + 0.7'},
+                  {'Goal_10.type': '"Цель"'},
+                  {'Goal_10.value': "('Data_395.value' + 'Data_396.value') * 200"},
+                  {'Data_395.type': '"Примитив с данными"'},
+                  {'Data_395.value': '0.5'}]
+        result = self.graph.get_nodes_eval_expressions()
+        self.assertEqual(sample, result)
