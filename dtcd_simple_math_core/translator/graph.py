@@ -189,8 +189,7 @@ class Graph:
         self.log.debug('calculating graph...')
         swt = SourceWideTable(self.name)
         swt.initialize()
-        imported_data = swt.import_data(self.swt_import_tables)
-        nodes_eval_expressions = self.get_nodes_eval_expressions(imported_data=imported_data)
+        nodes_eval_expressions = self.get_nodes_eval_expressions()
         self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
         list_of_sw_rows = swt.calc(nodes_eval_expressions)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
@@ -205,14 +204,14 @@ class Graph:
         swt = SourceWideTable(self.name)
         return swt.calc(self.get_nodes_eval_expressions({}))
 
-    def get_nodes_eval_expressions(self, imported_data: Dict) -> List[Dict]:
+    def get_nodes_eval_expressions(self) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
         """
         self.log.debug('getting nodes eval expressions...')
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
-            eval_expressions.extend(node.get_eval_expressions(imported_data))
+            eval_expressions.extend(node.get_eval_expressions())
         self.log.debug('eval_expressions=%s', eval_expressions)
         return eval_expressions
 

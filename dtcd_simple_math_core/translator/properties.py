@@ -115,10 +115,6 @@ class Property:
         """Get dictionary representation of the Property"""
         return self.__dict__
 
-    # def get_all_object_property_names_out_of_expression(self):
-    #     result = re.findall(EVAL_GLOBALS['re_object_property_name'], self.expression)
-    #     return result
-
     def __str__(self):
         """Get string representation of the Property"""
         return ' | '.join(f'{key}={value}' for key, value in self.__dict__.items())
