@@ -66,11 +66,6 @@ class DataCollector:
 
         return result
 
-    def read_multiple_swts(self, names: List[str], tick: str) -> Dict:
-        expression = Query().get_read_expressions(names, tick)
-        result = self.job_create(expression=expression, cache_ttl=5)
-        return result[0] if len(result) > 0 else {}
-
     def job_create(self, expression: str, cache_ttl: int) -> list:
         """Wrapper for working with ot_simple_connector.job.create and
         parse and handle its exceptions"""
