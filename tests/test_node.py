@@ -37,6 +37,40 @@ class TestNode(TestCase):
                         },
                         "status": "inProgress",
                         "value": ""},
+                    "selectQuotedDigitValue": {
+                        "title": "Значение",
+                        "type": "expression",
+                        "expression": "'1'",
+                        "input": {
+                            "component": "select",
+                            "type": "const",
+                            "values": [
+                                "1",
+                                " 2",
+                                " песня",
+                                " \"Семнадцать руб.\""
+                            ]
+                        },
+                        "status": "inProgress",
+                        "value": ""},
+                    "selectQuotedTextValue": {
+                        "title": "Значение",
+                        "type": "expression",
+                        "expression": "' \"Семнадцать руб.\"'",
+                        "input": {
+                            "component": "select",
+                            "type": "const",
+                            "values": [
+                                "1",
+                                " 2",
+                                " песня",
+                                " \"Семнадцать руб.\""
+                            ]
+                        },
+                        "status": "inProgress",
+                        "value": ""
+                    }
+
                 },
                 "extensionName": "ExtensionRiskPrimitives",
                 "nodeTitle": "$this.primitiveID$",
@@ -94,7 +128,7 @@ class TestNode(TestCase):
         self.assertFalse(result)
 
     def test_get_eval_properties(self):
-        sample = 3
+        sample = 5
         eval_properties = [n[0] for n in self.node.get_eval_properties()]
         result = len(eval_properties)
         self.assertEqual(sample, result)
@@ -126,6 +160,8 @@ class TestNode(TestCase):
         self.node.fill_default_properties(name=name, data=new_data)
         sample = [{'UncontrolledRichLabelNode01_1.testField': '2018'},
                   {'UncontrolledRichLabelNode01_1.emailInValueField': '"почта@домен.рф"'},
-                  {'UncontrolledRichLabelNode01_1.swtValue': "'UncontrolledRichLabelNode01_1.Calc2_114.exportValue'"}]
+                  {'UncontrolledRichLabelNode01_1.swtValue': "'UncontrolledRichLabelNode01_1.Calc2_114.exportValue'"},
+                  {'UncontrolledRichLabelNode01_1.selectQuotedDigitValue': '1'},
+                  {'UncontrolledRichLabelNode01_1.selectQuotedTextValue': ' "Семнадцать руб."'}]
         result = self.node.get_eval_expressions()
         self.assertEqual(sample, result)
