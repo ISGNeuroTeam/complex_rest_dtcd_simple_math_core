@@ -52,7 +52,6 @@ class Graph:
         self.parse_edges()
         self.parse_ports_of_nodes()
 
-
     def parse_nodes(self) -> None:
         """We parse graph from json into Nodes objects
         """
@@ -61,7 +60,7 @@ class Graph:
             self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
             self.nodes[node['primitiveID']].initialize(node)
             self.log.debug("parsed node %s", node['primitiveID'])
-            self.swt_import_tables.extend(self.nodes[node['primitiveID']].swt_imported_tables)
+            # self.swt_import_tables.extend(self.nodes[node['primitiveID']].swt_imported_tables)
         self.log.debug('parsed nodes successfully...')
 
     def parse_edges(self) -> None:
@@ -191,18 +190,12 @@ class Graph:
         swt.initialize()
         nodes_eval_expressions = self.get_nodes_eval_expressions()
         self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
-        list_of_sw_rows = swt.calc(nodes_eval_expressions)
+        list_of_sw_rows = swt.calc(nodes_eval_expressions, self.swt_import_tables)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
 
         result = self.update(list_of_sw_rows[-1])
         return result
 
-    def swt(self) -> List:
-        """Function to get the whole source wide table
-        """
-        self.log.debug('getting swt...')
-        swt = SourceWideTable(self.name)
-        return swt.calc(self.get_nodes_eval_expressions({}))
 
     def get_nodes_eval_expressions(self) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
@@ -211,7 +204,9 @@ class Graph:
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
-            eval_expressions.extend(node.get_eval_expressions())
+            evals, imported_columns = node.get_eval_expressions()
+            self.swt_import_tables.extend(imported_columns)
+            eval_expressions.extend(evals)
         self.log.debug('eval_expressions=%s', eval_expressions)
         return eval_expressions
 

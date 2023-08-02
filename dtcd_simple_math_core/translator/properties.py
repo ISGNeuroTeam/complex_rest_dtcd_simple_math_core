@@ -21,6 +21,7 @@ class SWTImport:
     def __init__(self, data: Union[Dict, Any]):
         self.swt_name = data['swt_name']
         self.column = data['column']
+        self.column_property = self.column.split('.')[-1]
 
     def __str__(self):
         return f'{self.swt_name=} | {self.column=}'

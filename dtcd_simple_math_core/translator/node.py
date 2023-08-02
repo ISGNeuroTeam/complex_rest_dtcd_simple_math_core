@@ -186,7 +186,7 @@ class Node:
 
         return name
 
-    def get_eval_expressions(self) -> List[Dict]:
+    def get_eval_expressions(self) -> Tuple[List[Dict], List[str]]:
         """This function loops through the node and its properties to get the string of
         all possible eval expressions.
 
@@ -203,6 +203,7 @@ class Node:
         self.log.debug('Getting all eval expressions for %s node', self.object_id)
 
         result = []
+        imported_columns = []
         node_properties = self.get_eval_properties()
 
         for _prop_name, _prop in node_properties:
@@ -213,7 +214,8 @@ class Node:
                     if _prop.has_import:
                         _exp = _prop.import_expression
                     elif _prop.has_swt_import:
-                        _exp = f"{self.object_id}.{_prop.swt_import.column}"
+                        _exp = f"{self.object_id}.{_prop.swt_import.column_property}"
+                        imported_columns.append(_exp)
                     else:
                         _exp = _prop.get_expression
 
@@ -227,7 +229,7 @@ class Node:
                 result.append(expression)
         self.log.debug('result=%s', result)
 
-        return result
+        return result, imported_columns
 
     def __str__(self):
         """String representation of the node"""
