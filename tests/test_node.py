@@ -158,10 +158,12 @@ class TestNode(TestCase):
         new_data = {"expression": "2018"}
         name = "testField"
         self.node.fill_default_properties(name=name, data=new_data)
-        sample = [{'UncontrolledRichLabelNode01_1.testField': '2018'},
-                  {'UncontrolledRichLabelNode01_1.emailInValueField': '"почта@домен.рф"'},
-                  {'UncontrolledRichLabelNode01_1.swtValue': "'UncontrolledRichLabelNode01_1.Calc2_114.exportValue'"},
-                  {'UncontrolledRichLabelNode01_1.selectQuotedDigitValue': '1'},
-                  {'UncontrolledRichLabelNode01_1.selectQuotedTextValue': ' "Семнадцать руб."'}]
-        result = self.node.get_eval_expressions()
-        self.assertEqual(sample, result)
+        sample_evals = [{'UncontrolledRichLabelNode01_1.testField': '2018'},
+                        {'UncontrolledRichLabelNode01_1.emailInValueField': '"почта@домен.рф"'},
+                        {'UncontrolledRichLabelNode01_1.swtValue': "'UncontrolledRichLabelNode01_1.exportValue'"},
+                        {'UncontrolledRichLabelNode01_1.selectQuotedDigitValue': '1'},
+                        {'UncontrolledRichLabelNode01_1.selectQuotedTextValue': ' "Семнадцать руб."'}]
+        sample_imported_columns = ['UncontrolledRichLabelNode01_1.exportValue']
+        result_evals, result_imported_columns = self.node.get_eval_expressions()
+        self.assertEqual(sample_evals, result_evals)
+        self.assertEqual(sample_imported_columns, result_imported_columns)

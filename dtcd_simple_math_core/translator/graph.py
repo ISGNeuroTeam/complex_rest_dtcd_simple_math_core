@@ -52,7 +52,6 @@ class Graph:
         self.parse_edges()
         self.parse_ports_of_nodes()
 
-
     def parse_nodes(self) -> None:
         """We parse graph from json into Nodes objects
         """
@@ -61,7 +60,7 @@ class Graph:
             self.nodes[node['primitiveID']] = Node(node.get('primitiveID', ''))
             self.nodes[node['primitiveID']].initialize(node)
             self.log.debug("parsed node %s", node['primitiveID'])
-            self.swt_import_tables.extend(self.nodes[node['primitiveID']].swt_imported_tables)
+            # self.swt_import_tables.extend(self.nodes[node['primitiveID']].swt_imported_tables)
         self.log.debug('parsed nodes successfully...')
 
     def parse_edges(self) -> None:
@@ -97,6 +96,7 @@ class Graph:
     def filtered_columns(self, swr: List) -> List:
         """We get a row of the source wide table which is "Source Wide Row" >>> swr
         and filter out all strings that start with "_" symbol
+
 
         Args:
             swr: list of strings to filter
@@ -142,18 +142,22 @@ class Graph:
         self.log.debug('%s node is not found, returning empty dictionary...', object_id)
         return {}
 
-    def update_property_at_graph(self, node_name: str, prop_name: str, value: str) -> None:
+    def update_property_at_graph(self, node_name: str, prop_name: str, parameter: str, value: str) -> None:
         """Function to update given property with data
 
         Args:
             node_name: name of the node where to look for property
             prop_name: name of the property to update
+            parameter: name of the parameter of the property to update
             value: actual value to set to property
         """
         self.log.debug('updating prop_name=%s of the %s node with value=%s...',
                        prop_name, node_name, value)
         properties = self.get_property_of_the_node_by_id(object_id=node_name)
-        properties[prop_name]['value'] = value
+        if prop_name in properties:
+            properties[prop_name][parameter] = value
+        else:
+            properties[prop_name] = {parameter: value}
         self.log.debug('update successfully done...')
 
     def update(self, swr: List) -> Dict:
@@ -162,6 +166,7 @@ class Graph:
         Args:
             swr: the least row of the source wide table
         """
+        # updating graph with data from otl
         self.log.debug('updating the graph...')
         self.log.debug('input: swr=%s', swr)
         for column in self.filtered_columns(swr=swr):
@@ -175,7 +180,11 @@ class Graph:
                 self.nodes[object_id].update_property(object_property, swr[column])
                 self.log.debug('updated property at the self.nodes dictionary')
                 self.update_property_at_graph(node_name=object_id, prop_name=object_property,
-                                              value=swr[column])
+                                              parameter='value', value=swr[column])
+                self.update_property_at_graph(node_name=object_id, prop_name='_operations_order',
+                                              parameter='expression',
+                                              value=self.nodes[object_id].properties[
+                                                  '_operations_order'].get_expression)
                 self.log.debug('updated property at the self.graph dictionary')
 
             except KeyError:
@@ -191,18 +200,11 @@ class Graph:
         swt.initialize()
         nodes_eval_expressions = self.get_nodes_eval_expressions()
         self.log.debug('nodes_eval_expressions: %s', nodes_eval_expressions)
-        list_of_sw_rows = swt.calc(nodes_eval_expressions)
+        list_of_sw_rows = swt.calc(nodes_eval_expressions, self.swt_import_tables)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
 
         result = self.update(list_of_sw_rows[-1])
         return result
-
-    def swt(self) -> List:
-        """Function to get the whole source wide table
-        """
-        self.log.debug('getting swt...')
-        swt = SourceWideTable(self.name)
-        return swt.calc(self.get_nodes_eval_expressions({}))
 
     def get_nodes_eval_expressions(self) -> List[Dict]:
         """Function to get all the eval expressions for all nodes and properties
@@ -211,7 +213,9 @@ class Graph:
         sorted_nodes = self.get_sorted_nodes()
         eval_expressions = []
         for node in sorted_nodes:
-            eval_expressions.extend(node.get_eval_expressions())
+            evals, imported_columns = node.get_eval_expressions()
+            self.swt_import_tables.extend(imported_columns)
+            eval_expressions.extend(evals)
         self.log.debug('eval_expressions=%s', eval_expressions)
         return eval_expressions
 
