@@ -75,10 +75,13 @@ class Property:
         self.expression = expression
         self.__dict__.update(kwargs)
 
+    def __getitem__(self, property_name: str):
+        return self.__dict__.get(property_name, '')
+
     def initialize(self):
         # checking if expression is sent from select and has opening and closing singular quote symbol
         if isinstance(self.expression, str) and self.expression.endswith("'") and self.expression.startswith("'"):
-            self.expression = self.expression[self.expression.find("'")+1:self.expression.rfind("'")]
+            self.expression = self.expression[self.expression.find("'") + 1:self.expression.rfind("'")]
         self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
         self.imports = re.findall(PROPERTY_GLOBALS['re_inport'], self.expression) \
             if self.has_import else 0
@@ -94,6 +97,10 @@ class Property:
         if is_float(str(self.expression)):
             return float(self.expression)
         return self.expression
+
+    @property
+    def expression_string(self):
+        return f'expression:{self.expression}'
 
     def update(self, value: str, status: str = ...) -> None:
         """Function to save value and status inside Property object"""

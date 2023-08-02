@@ -44,7 +44,7 @@ class TestGraph(TestCase):
         _property = 'Sum1'
         sample = '150'
         control_property = self.graph.get_property_of_the_node_by_id(object_id=object_id)
-        self.graph.update_property_at_graph(node_name=object_id, prop_name=_property, value=sample)
+        self.graph.update_property_at_graph(node_name=object_id, prop_name=_property, parameter='value', value=sample)
         result = control_property[_property]['value']
         self.assertEqual(sample, result)
 
