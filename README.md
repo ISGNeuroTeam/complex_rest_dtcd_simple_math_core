@@ -51,7 +51,8 @@ Serditov Nikita
 ## Features
 - Creates swt table when graph is calculated first time and has no swt table.
 - Supports importing data through inPort/outPort in terms of one graph. As it works with data from swt table, not graph, then sometimes it requires two consequent graph calculations to calc all imported data.
-- Support `SWT` and `SWT Export` data import from a different graph only if source graph has the same `_t` tick value as the latest `-t` tick value of the target swt table.
+- Support `SWT` and `SWT Export` data import from a different graph only if source graph has the same `_t` tick value as the latest `-t` tick value of the target swt table. Works with "Загрузка данных из соседних вкладок" custom action only.
+- Support data import from data lake node. Works with "Загрузка данных из озера данных" custom action only.
 
 ## Setup of the plugin
 Go to dtcd_simple_math_core/dtcd_simple_math_core.conf and edit it:
