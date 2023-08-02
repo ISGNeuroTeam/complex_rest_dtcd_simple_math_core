@@ -1,3 +1,11 @@
+## [0.1.4] - 2023-08-02
+
+### Fixed
+- added support of string enclosed with singular quotes. Example: regular string `"text"`, string from `select` `"'text''"`.
+
+### Changed
+- replaced import of data from external swt tables with simple swt calc
+
 ## [0.1.3] - 2023-07-27
 
 ### Changed

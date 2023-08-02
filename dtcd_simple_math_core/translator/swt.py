@@ -95,10 +95,6 @@ class SourceWideTable:
 
         return result
 
-    def import_data(self, names) -> Dict:
-        result = self.data_collector.read_multiple_swts(names, self.latest_tick_value)
-        return result
-
     def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
         """Function to check if swt table with given name exists or not and why
 

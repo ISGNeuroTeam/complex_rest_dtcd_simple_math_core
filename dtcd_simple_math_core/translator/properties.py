@@ -75,6 +75,9 @@ class Property:
         self.__dict__.update(kwargs)
 
     def initialize(self):
+        # checking if expression is sent from select and has opening and closing singular quote symbol
+        if isinstance(self.expression, str) and self.expression.endswith("'") and self.expression.startswith("'"):
+            self.expression = self.expression[self.expression.find("'")+1:self.expression.rfind("'")]
         self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
         self.imports = re.findall(PROPERTY_GLOBALS['re_inport'], self.expression) \
             if self.has_import else 0
@@ -114,10 +117,6 @@ class Property:
     def get_dictionary(self) -> Dict:
         """Get dictionary representation of the Property"""
         return self.__dict__
-
-    # def get_all_object_property_names_out_of_expression(self):
-    #     result = re.findall(EVAL_GLOBALS['re_object_property_name'], self.expression)
-    #     return result
 
     def __str__(self):
         """Get string representation of the Property"""

@@ -112,7 +112,7 @@ class Node:
             # pylint: disable=line-too-long
             self.properties['_operations_order'].update(self.properties['_operations_order'].expression, "complete")
         except KeyError:
-            self.log.warning('no %s property found, only %s got', prop_name, self.properties.keys())
+            self.log.debug('no %s property found, only %s got', prop_name, self.properties.keys())
 
     @classmethod
     def filter_eval_properties(cls, prop: Tuple[str, Property]) -> bool:
@@ -186,7 +186,7 @@ class Node:
 
         return name
 
-    def get_eval_expressions(self, imported_data: Dict) -> List[Dict]:
+    def get_eval_expressions(self) -> List[Dict]:
         """This function loops through the node and its properties to get the string of
         all possible eval expressions.
 
@@ -201,7 +201,6 @@ class Node:
             {'UncontrolledRichLabelNode01_1.testField': '2018'}
         """
         self.log.debug('Getting all eval expressions for %s node', self.object_id)
-        email_pattern = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
 
         result = []
         node_properties = self.get_eval_properties()
@@ -214,9 +213,7 @@ class Node:
                     if _prop.has_import:
                         _exp = _prop.import_expression
                     elif _prop.has_swt_import:
-                        empty_string = ''
-                        temp = f'"{imported_data.get(_prop.swt_import.column, empty_string)}"'
-                        _exp = temp
+                        _exp = f"{self.object_id}.{_prop.swt_import.column}"
                     else:
                         _exp = _prop.get_expression
 
