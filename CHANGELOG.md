@@ -1,11 +1,10 @@
-## [0.1.4] - 2023-08-02
+## [0.1.4] - 2023-08-03
 
 ### Fixed
-- added support of string enclosed with singular quotes. Example: regular string `"text"`, string from `select` `"'text''"`.
+- added support of string enclosed with singular quotes used in `select` values. Example: regular string `"text"`, string from `select` entry: `"'text''"`. Never use singular quotes to give `string` values, always double. Singular quotes used in OTL to define columns only.
 
 ### Changed
 - replaced import of data from external swt tables with simple swt calc
-- added update of the `-operations_order` property or create it if not present at the node.
 
 ## [0.1.3] - 2023-07-27
 
