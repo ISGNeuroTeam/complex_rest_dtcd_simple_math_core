@@ -33,6 +33,7 @@ class GraphView(APIView):
         :return:
         """
         filename = request.data['swt_name']
+        graph_id = request.data['swt_id']
         graph_dict = request.data['graph']
 
         try:
@@ -43,7 +44,7 @@ class GraphView(APIView):
             self.log.error('Got an error: %s', exception)
             return ErrorResponse(error_message=str(exception))
 
-        return SuccessResponse({'swt_name': filename, 'graph': graph.dictionary})
+        return SuccessResponse({'swt_id': graph_id, 'swt_name': filename, 'graph': graph.dictionary})
 
     def get(self, request):
         """

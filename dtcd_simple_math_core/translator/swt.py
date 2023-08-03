@@ -67,8 +67,6 @@ class SourceWideTable:
                     raise
                 counter += 1
 
-
-
     @staticmethod
     def get_datalakenodes(dln_data: List) -> List:
         if len(dln_data) == 0:
@@ -93,10 +91,6 @@ class SourceWideTable:
         result = data_collector.read_swt(last_row=last_row)
         self.log.debug('result=%s', result)
 
-        return result
-
-    def import_data(self, names) -> Dict:
-        result = self.data_collector.read_multiple_swts(names, self.latest_tick_value)
         return result
 
     def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
@@ -158,7 +152,7 @@ class SourceWideTable:
             except Exception as exception:
                 raise Exception(f'unregistered exception: {exception.args[0]}') from exception
 
-    def calc(self, graph_eval_names: List[Dict]) -> list:
+    def calc(self, graph_eval_names: List[Dict], imported_columns: List[str]) -> list:
         """Here we create a data collector and make it calc swt table
 
         Args:
@@ -173,12 +167,13 @@ class SourceWideTable:
 
         result = []
         counter = 0
+        saved_columns = self.datalakenode_columns + imported_columns
 
         while True:
             try:
                 self.log.debug('swt-calc | trying..')
                 result = data_collector.calc_swt(eval_names=graph_eval_names,
-                                                 saved_columns_names=self.datalakenode_columns)
+                                                 saved_columns_names=saved_columns)
                 break
 
             except (OTLJobWithStatusNewHasNoCacheID, OTLJobWithStatusFailedHasNoCacheID):

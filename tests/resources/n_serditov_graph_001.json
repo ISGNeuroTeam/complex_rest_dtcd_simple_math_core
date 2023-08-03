@@ -1,1 +1,523 @@
-{"graph":{"nodes":[{"primitiveID":"UncontrolledRichLabelNode01_1","primitiveName":"UncontrolledRichLabelNode01","properties":{"testField":{"expression":"","type":"expression","status":"complete","value":""}},"extensionName":"ExtensionRiskPrimitives","nodeTitle":"$this.primitiveID$","initPorts":[{"primitiveName":"outPort1","type":["OUT"],"properties":{"status":{"expression":"","type":"expression","status":"complete","value":""}},"primitiveID":"UncontrolledRichLabelNode01_1_outPort1","location":{"x":298.75,"y":136.29}}],"layout":{"x":151.75,"y":139.25,"height":148,"width":294}},{"primitiveID":"UncontrolledRichLabelNode01_2","primitiveName":"UncontrolledRichLabelNode01","properties":{"testField":{"expression":"","type":"expression","status":"complete","value":""},"Sum1":{"type":"expression","expression":"28","status":"complete","value":28,"input":{"component":"textarea"}},"_operations_order":{"value":100,"status":"complete","type":"expression","expression":100,"input":{"component":"textarea"}}},"extensionName":"ExtensionRiskPrimitives","nodeTitle":"$this.primitiveID$","initPorts":[{"primitiveName":"outPort1","type":["OUT"],"properties":{"status":{"type":"expression","expression":"this.Sum1","input":{"component":"textarea"}}},"primitiveID":"UncontrolledRichLabelNode01_2_outPort1","location":{"x":645.75,"y":136.29}}],"layout":{"x":498.75,"y":139.25,"height":148,"width":294}},{"primitiveID":"TargetRichLabelNode2_5","primitiveName":"TargetRichLabelNode2","properties":{"testField":{"expression":"","type":"expression","status":"complete","value":""}},"extensionName":"ExtensionRiskPrimitives","nodeTitle":"$this.primitiveID$","initPorts":[{"primitiveName":"inPort1","type":["IN"],"properties":{"status":{"expression":"let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}","type":"expression","status":"complete","value":""}},"primitiveID":"TargetRichLabelNode2_5_inPort1","location":{"x":383.8,"y":2.960000000000008}},{"primitiveName":"inPort2","type":["IN"],"properties":{"status":{"expression":"let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}","type":"expression","status":"complete","value":""}},"primitiveID":"TargetRichLabelNode2_5_inPort2","location":{"x":560.2,"y":2.960000000000008}}],"layout":{"x":325,"y":-148,"height":148,"width":294}},{"primitiveID":"DataLakeNode_22","primitiveName":"DataLakeNode","properties":{"query":{"expression":"","type":"expression","status":"complete","value":""},"_operations_order":{"expression":1,"type":"expression","value":"","status":"complete"}},"extensionName":"ExtensionDataLakePrimitives","nodeTitle":"$this.primitiveID$","initPorts":[],"layout":{"x":75.75,"y":25,"height":60,"width":130}}],"edges":[{"bends":[],"sourceNode":"UncontrolledRichLabelNode01_1","sourcePort":"UncontrolledRichLabelNode01_1_outPort1","targetNode":"TargetRichLabelNode2_5","targetPort":"TargetRichLabelNode2_5_inPort1","extensionName":"ExtensionCommonPrimitives","primitiveName":"SimpleEdge"},{"bends":[[560.2,2.960000000000008]],"sourceNode":"UncontrolledRichLabelNode01_2","sourcePort":"UncontrolledRichLabelNode01_2_outPort1","targetNode":"TargetRichLabelNode2_5","targetPort":"TargetRichLabelNode2_5_inPort2","extensionName":"ExtensionCommonPrimitives","primitiveName":"SimpleEdge"}],"groups":[]}}
+{
+  "graph": {
+    "nodes": [
+      {
+        "primitiveID": "UncontrolledRichLabelNode01_1",
+        "primitiveName": "UncontrolledRichLabelNode01",
+        "properties": {
+          "testField": {
+            "expression": "",
+            "type": "expression",
+            "status": "complete",
+            "value": ""
+          }
+        },
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.primitiveID$",
+        "initPorts": [
+          {
+            "primitiveName": "outPort1",
+            "type": [
+              "OUT"
+            ],
+            "properties": {
+              "status": {
+                "expression": "",
+                "type": "expression",
+                "status": "complete",
+                "value": ""
+              }
+            },
+            "primitiveID": "UncontrolledRichLabelNode01_1_outPort1",
+            "location": {
+              "x": 298.75,
+              "y": 136.29
+            }
+          }
+        ],
+        "layout": {
+          "x": 151.75,
+          "y": 139.25,
+          "height": 148,
+          "width": 294
+        }
+      },
+      {
+        "primitiveID": "UncontrolledRichLabelNode01_2",
+        "primitiveName": "UncontrolledRichLabelNode01",
+        "properties": {
+          "testField": {
+            "expression": "",
+            "type": "expression",
+            "status": "complete",
+            "value": ""
+          },
+          "Sum1": {
+            "type": "expression",
+            "expression": "28",
+            "status": "complete",
+            "value": 28,
+            "input": {
+              "component": "textarea"
+            }
+          },
+          "_operations_order": {
+            "value": 100,
+            "status": "complete",
+            "type": "expression",
+            "expression": 100,
+            "input": {
+              "component": "textarea"
+            }
+          }
+        },
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.primitiveID$",
+        "initPorts": [
+          {
+            "primitiveName": "outPort1",
+            "type": [
+              "OUT"
+            ],
+            "properties": {
+              "status": {
+                "type": "expression",
+                "expression": "this.Sum1",
+                "input": {
+                  "component": "textarea"
+                }
+              }
+            },
+            "primitiveID": "UncontrolledRichLabelNode01_2_outPort1",
+            "location": {
+              "x": 645.75,
+              "y": 136.29
+            }
+          }
+        ],
+        "layout": {
+          "x": 498.75,
+          "y": 139.25,
+          "height": 148,
+          "width": 294
+        }
+      },
+      {
+        "primitiveID": "TargetRichLabelNode2_5",
+        "primitiveName": "TargetRichLabelNode2",
+        "properties": {
+          "testField": {
+            "expression": "",
+            "type": "expression",
+            "status": "complete",
+            "value": ""
+          }
+        },
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.primitiveID$",
+        "initPorts": [
+          {
+            "primitiveName": "inPort1",
+            "type": [
+              "IN"
+            ],
+            "properties": {
+              "status": {
+                "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+                "type": "expression",
+                "status": "complete",
+                "value": ""
+              }
+            },
+            "primitiveID": "TargetRichLabelNode2_5_inPort1",
+            "location": {
+              "x": 383.8,
+              "y": 2.960000000000008
+            }
+          },
+          {
+            "primitiveName": "inPort2",
+            "type": [
+              "IN"
+            ],
+            "properties": {
+              "status": {
+                "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+                "type": "expression",
+                "status": "complete",
+                "value": ""
+              }
+            },
+            "primitiveID": "TargetRichLabelNode2_5_inPort2",
+            "location": {
+              "x": 560.2,
+              "y": 2.960000000000008
+            }
+          }
+        ],
+        "layout": {
+          "x": 325,
+          "y": -148,
+          "height": 148,
+          "width": 294
+        }
+      },
+      {
+        "primitiveID": "DataLakeNode_22",
+        "primitiveName": "DataLakeNode",
+        "properties": {
+          "query": {
+            "expression": "",
+            "type": "expression",
+            "status": "complete",
+            "value": ""
+          },
+          "_operations_order": {
+            "expression": 1,
+            "type": "expression",
+            "value": "",
+            "status": "complete"
+          }
+        },
+        "extensionName": "ExtensionDataLakePrimitives",
+        "nodeTitle": "$this.primitiveID$",
+        "initPorts": [],
+        "layout": {
+          "x": 75.75,
+          "y": 25,
+          "height": 60,
+          "width": 130
+        }
+      },
+      {
+        "primitiveID": "Data_396",
+        "primitiveName": "Data",
+        "properties": {
+          "type": {
+            "title": "Тип примитива",
+            "type": "expression",
+            "expression": "\"Примитив с данными\"",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "name": {
+            "title": "Наименование",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "description": {
+            "title": "Описание",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "value": {
+            "title": "Значение",
+            "type": "expression",
+            "expression": "0.6 + 0.7",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          }
+        },
+        "primitiveTitle": "Примитив с данными",
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+        "initPorts": [
+          {
+            "primitiveName": "outPort1",
+            "type": [
+              "OUT"
+            ],
+            "properties": {
+              "status": {
+                "title": "",
+                "type": "expression",
+                "expression": "value",
+                "input": {
+                  "component": "textarea"
+                },
+                "status": "inProgress",
+                "value": ""
+              }
+            },
+            "primitiveID": "Data_396_outPort1",
+            "location": {
+              "x": 401.75,
+              "y": 783
+            }
+          }
+        ],
+        "layout": {
+          "x": 254.75,
+          "y": 783,
+          "height": 148,
+          "width": 294
+        }
+      },
+      {
+        "primitiveID": "Goal_10",
+        "primitiveName": "Goal",
+        "properties": {
+          "type": {
+            "title": "Тип примитива",
+            "type": "expression",
+            "expression": "\"Цель\"",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "name": {
+            "title": "Наименование цели",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "select",
+              "type": "const",
+              "values": [
+                "\"Чистая прибыль млн руб.\"",
+                "\"Грузооборот\"",
+                "\"Доходность на общий парк руб./ваг./сут.\"",
+                "\"EBITDA\"",
+                "\"Чистый долг/EBITDA\"",
+                "\"ROIC\"",
+                "\"Проект «Скоростные перевозки контейнеров»\"",
+                "\"Проект «Контрейлерные перевозки»\"",
+                "\"Проект «Стратегия цифровой трансформации»\""
+              ]
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "description": {
+            "title": "Описание",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "value": {
+            "title": "Значение",
+            "type": "expression",
+            "expression": "(inPort1 + inPort2) * 200",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          }
+        },
+        "portCounters": {
+          "inPorts": 2,
+          "outPorts": 0
+        },
+        "primitiveTitle": "Цель",
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+        "initPorts": [
+          {
+            "primitiveName": "inPort2",
+            "isAddedManually": true,
+            "portLocation": "bottom",
+            "type": [
+              "IN"
+            ],
+            "properties": {
+              "status": {
+                "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\n          let inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray();\n          if (inEdges.length < 1) ''\n          else eval(inEdges[0].sourcePort.tag.primitiveID).status;",
+                "type": "expression",
+                "status": "inProgress"
+              }
+            },
+            "initPosition": {
+              "x": 0.6666666666666666,
+              "y": 1
+            },
+            "primitiveID": "Goal_10_inPort2",
+            "location": {
+              "x": 284,
+              "y": 654.25
+            }
+          },
+          {
+            "primitiveName": "inPort1",
+            "type": [
+              "IN"
+            ],
+            "properties": {
+              "status": {
+                "title": "",
+                "type": "expression",
+                "expression": "",
+                "input": {
+                  "component": "textarea"
+                },
+                "status": "inProgress",
+                "value": ""
+              }
+            },
+            "portLocation": "bottom",
+            "initPosition": {
+              "x": 0.3333333333333333,
+              "y": 1
+            },
+            "primitiveID": "Goal_10_inPort1",
+            "location": {
+              "x": 186,
+              "y": 654.25
+            }
+          }
+        ],
+        "layout": {
+          "x": 88,
+          "y": 506.25,
+          "height": 148,
+          "width": 294
+        }
+      },
+      {
+        "primitiveID": "Data_395",
+        "primitiveName": "Data",
+        "properties": {
+          "type": {
+            "title": "Тип примитива",
+            "type": "expression",
+            "expression": "\"Примитив с данными\"",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "name": {
+            "title": "Наименование",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "description": {
+            "title": "Описание",
+            "type": "expression",
+            "expression": "",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          },
+          "value": {
+            "title": "Значение",
+            "type": "expression",
+            "expression": "0.5",
+            "input": {
+              "component": "textarea"
+            },
+            "status": "inProgress",
+            "value": ""
+          }
+        },
+        "primitiveTitle": "Примитив с данными",
+        "extensionName": "ExtensionRiskPrimitives",
+        "nodeTitle": "$this.props.name$ <br>$this.props.value$",
+        "initPorts": [
+          {
+            "primitiveName": "outPort1",
+            "type": [
+              "OUT"
+            ],
+            "properties": {
+              "status": {
+                "title": "",
+                "type": "expression",
+                "expression": "value",
+                "input": {
+                  "component": "textarea"
+                },
+                "status": "inProgress",
+                "value": ""
+              }
+            },
+            "primitiveID": "Data_395_outPort1",
+            "location": {
+              "x": 77.75,
+              "y": 783
+            }
+          }
+        ],
+        "layout": {
+          "x": -69.25,
+          "y": 783,
+          "height": 148,
+          "width": 294
+        }
+      }
+    ],
+    "edges": [
+      {
+        "bends": [],
+        "sourceNode": "UncontrolledRichLabelNode01_1",
+        "sourcePort": "UncontrolledRichLabelNode01_1_outPort1",
+        "targetNode": "TargetRichLabelNode2_5",
+        "targetPort": "TargetRichLabelNode2_5_inPort1",
+        "extensionName": "ExtensionCommonPrimitives",
+        "primitiveName": "SimpleEdge"
+      },
+      {
+        "bends": [
+          [
+            560.2,
+            2.960000000000008
+          ]
+        ],
+        "sourceNode": "UncontrolledRichLabelNode01_2",
+        "sourcePort": "UncontrolledRichLabelNode01_2_outPort1",
+        "targetNode": "TargetRichLabelNode2_5",
+        "targetPort": "TargetRichLabelNode2_5_inPort2",
+        "extensionName": "ExtensionCommonPrimitives",
+        "primitiveName": "SimpleEdge"
+      },
+      {
+        "bends": [],
+        "sourceNode": "Data_396",
+        "sourcePort": "Data_396_outPort1",
+        "targetNode": "Goal_10",
+        "targetPort": "Goal_10_inPort2",
+        "extensionName": "ExtensionCommonPrimitives",
+        "primitiveName": "SimpleEdge"
+      },
+      {
+        "bends": [],
+        "sourceNode": "Data_395",
+        "sourcePort": "Data_395_outPort1",
+        "targetNode": "Goal_10",
+        "targetPort": "Goal_10_inPort1",
+        "extensionName": "ExtensionCommonPrimitives",
+        "primitiveName": "SimpleEdge"
+      }
+    ],
+    "groups": []
+  }
+}

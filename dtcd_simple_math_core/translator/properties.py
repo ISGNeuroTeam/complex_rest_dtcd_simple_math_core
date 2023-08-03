@@ -21,6 +21,7 @@ class SWTImport:
     def __init__(self, data: Union[Dict, Any]):
         self.swt_name = data['swt_name']
         self.column = data['column']
+        self.column_property = self.column.split('.')[-1]
 
     def __str__(self):
         return f'{self.swt_name=} | {self.column=}'
@@ -74,7 +75,13 @@ class Property:
         self.expression = expression
         self.__dict__.update(kwargs)
 
+    def __getitem__(self, property_name: str):
+        return self.__dict__.get(property_name, '')
+
     def initialize(self):
+        # checking if expression is sent from select and has opening and closing singular quote symbol
+        if isinstance(self.expression, str) and self.expression.endswith("'") and self.expression.startswith("'"):
+            self.expression = self.expression[self.expression.find("'") + 1:self.expression.rfind("'")]
         self.has_import = isinstance(self.expression, str) and 'inPort' in self.expression
         self.imports = re.findall(PROPERTY_GLOBALS['re_inport'], self.expression) \
             if self.has_import else 0
@@ -90,6 +97,10 @@ class Property:
         if is_float(str(self.expression)):
             return float(self.expression)
         return self.expression
+
+    @property
+    def expression_string(self):
+        return f'expression:{self.expression}'
 
     def update(self, value: str, status: str = ...) -> None:
         """Function to save value and status inside Property object"""
@@ -115,9 +126,13 @@ class Property:
         """Get dictionary representation of the Property"""
         return self.__dict__
 
-    # def get_all_object_property_names_out_of_expression(self):
-    #     result = re.findall(EVAL_GLOBALS['re_object_property_name'], self.expression)
-    #     return result
+    @property
+    def default_dict(self) -> Dict:
+        return {"expression": self.get_expression,
+                "type": self.get_dictionary().get("type", ""),
+                "value": self.get_dictionary().get("value", ""),
+                "title": self.get_dictionary().get("title", ""),
+                "status": self.get_dictionary().get("status", "")}
 
     def __str__(self):
         """Get string representation of the Property"""
