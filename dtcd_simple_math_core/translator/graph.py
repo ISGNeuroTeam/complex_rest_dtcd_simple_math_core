@@ -181,14 +181,14 @@ class Graph:
                 self.log.debug('updated property at the self.nodes dictionary')
                 self.update_property_at_graph(node_name=object_id, prop_name=object_property,
                                               parameter='value', value=swr[column])
-                self.update_property_at_graph(node_name=object_id, prop_name='_operations_order',
-                                              parameter='expression',
-                                              value=self.nodes[object_id].properties[
-                                                  '_operations_order'].get_expression)
+                #
                 self.log.debug('updated property at the self.graph dictionary')
 
             except KeyError:
-                self.log.debug('No %s node found, only %s got', object_id, self.nodes.keys())
+                self.log.debug('No %s node found, only %s got', object_id, self.nodes.keysself.update_property_at_graph(node_name=object_id, prop_name='_operations_order',
+                #                               parameter='expression',
+                #                               value=self.nodes[object_id].properties[
+                #                                   '_operations_order'].get_expression)())
 
         return self.dictionary
 
