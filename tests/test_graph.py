@@ -58,3 +58,9 @@ class TestGraph(TestCase):
                   {'Data_395.value': '0.5'}]
         result = self.graph.get_nodes_eval_expressions()
         self.assertEqual(sample, result)
+
+    def test_graph_has_this(self):
+        true_result = self.graph.graph_has_this('Data_396.type')
+        false_result = self.graph.graph_has_this('Data_396.exportedProperty')
+        self.assertTrue(true_result)
+        self.assertFalse(false_result)

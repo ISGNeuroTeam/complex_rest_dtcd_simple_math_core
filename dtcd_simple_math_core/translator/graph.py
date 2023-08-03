@@ -97,7 +97,6 @@ class Graph:
         """We get a row of the source wide table which is "Source Wide Row" >>> swr
         and filter out all strings that start with "_" symbol
 
-
         Args:
             swr: list of strings to filter
 
@@ -142,7 +141,7 @@ class Graph:
         self.log.debug('%s node is not found, returning empty dictionary...', object_id)
         return {}
 
-    def update_property_at_graph(self, node_name: str, prop_name: str, parameter: str, value: str) -> None:
+    def update_property_at_graph(self, node_name: str, prop_name: str, parameter: str, value: Union[str, dict]) -> None:
         """Function to update given property with data
 
         Args:
@@ -155,7 +154,10 @@ class Graph:
                        prop_name, node_name, value)
         properties = self.get_property_of_the_node_by_id(object_id=node_name)
         if prop_name in properties:
-            properties[prop_name][parameter] = value
+            if parameter in properties[prop_name].keys():
+                properties[prop_name][parameter] = value
+            else:
+                properties[prop_name].update({parameter: value})
         else:
             properties[prop_name] = {parameter: value}
         self.log.debug('update successfully done...')
@@ -170,6 +172,9 @@ class Graph:
         self.log.debug('updating the graph...')
         self.log.debug('input: swr=%s', swr)
         for column in self.filtered_columns(swr=swr):
+            # here we need to check if columns returned from calculations are present in graph
+            if not self.graph_has_this(column):
+                continue
             reg_exp = GRAPH_GLOBALS['re_object_id_and_property']
             object_id, object_property = re.match(reg_exp, column).groups()
 
@@ -181,16 +186,56 @@ class Graph:
                 self.log.debug('updated property at the self.nodes dictionary')
                 self.update_property_at_graph(node_name=object_id, prop_name=object_property,
                                               parameter='value', value=swr[column])
-                # self.update_property_at_graph(node_name=object_id, prop_name='_operations_order',
-                #                               parameter='expression',
-                #                               value=self.nodes[object_id].properties[
-                #                                   '_operations_order'].get_expression)
                 self.log.debug('updated property at the self.graph dictionary')
 
             except KeyError:
                 self.log.debug('No %s node found, only %s got', object_id, self.nodes.keys())
 
+        # updating graph with data from self.nodes, especially _operations_order property
+        for node in self.nodes:
+            if '_operations_order' in self.get_properties_of_the_node_from_dictionary_by_id(node_name=node):
+                continue
+            self.update_property_at_graph(node_name=node, prop_name='_operations_order',
+                                          parameter='expression',
+                                          value=self.nodes[node].properties[
+                                              '_operations_order'].get_expression)
+            self.update_property_at_graph(node_name=node, prop_name='_operations_order',
+                                          parameter='type',
+                                          value=self.nodes[node].properties['_operations_order'].type)
+            self.update_property_at_graph(node_name=node, prop_name='_operations_order',
+                                          parameter='value',
+                                          value=self.nodes[node].properties['_operations_order'].value)
+            self.update_property_at_graph(node_name=node, prop_name='_operations_order',
+                                          parameter='title',
+                                          value=self.nodes[node].properties['_operations_order'].__dict__.get(
+                                              "title", ""))
+            self.update_property_at_graph(node_name=node, prop_name='_operations_order',
+                                          parameter='status',
+                                          value=self.nodes[node].properties['_operations_order'].status)
+
         return self.dictionary
+
+    def get_properties_of_the_node_from_dictionary_by_id(self, node_name: str) -> Dict:
+        node_list = self.dictionary['graph']['nodes']
+        for node in node_list:
+            if node['primitiveID'] == node_name:
+                return node['properties']
+
+    def graph_has_this(self, column: str) -> bool:
+        """function to check if column is in graph, because some swt imported data is saved
+        from external swt tables and are not present at current graph, and must not.
+
+        Args:
+            ::column: name of the column to check, for example: "SWTNode_44.exportedProperty"
+
+        Result:
+            True if column is at the graph, False otherwise
+        """
+        if '.' not in column:
+            return False
+
+        node_name, prop_name = tuple(column.split('.'))
+        return node_name in self.nodes and prop_name in self.nodes[node_name].properties
 
     def calc(self) -> Dict:
         """Main calculation function of Graph

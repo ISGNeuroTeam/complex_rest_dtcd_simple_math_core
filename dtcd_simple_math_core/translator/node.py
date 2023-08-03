@@ -36,7 +36,12 @@ class Node:
         for prop_name, data in node['properties'].items():
             self.fill_default_properties(prop_name, data=data)
         if '_operations_order' not in self.properties:
-            self.fill_default_properties('_operations_order', {'expression': 100})
+            self.fill_default_properties('_operations_order',
+                                         {"expression": 100,
+                                          "type": "expression",
+                                          "value": "",
+                                          "title": "Последовательность расчетов",
+                                          "status": "complete"})
 
         # init ports
         for data in node['initPorts']:
