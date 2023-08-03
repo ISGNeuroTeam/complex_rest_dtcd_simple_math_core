@@ -1,11 +1,7 @@
-## [0.1.4] - 2023-08-02
-
-### Fixed
-- added support of string enclosed with singular quotes. Example: regular string `"text"`, string from `select` `"'text''"`.
+## [0.1.4] - 2023-08-03
 
 ### Changed
 - replaced import of data from external swt tables with simple swt calc
-- - added update of the `-operations_order` property or create it if not present at the node.
 
 ## [0.1.3] - 2023-07-27
 
