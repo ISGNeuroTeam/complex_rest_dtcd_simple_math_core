@@ -126,6 +126,14 @@ class Property:
         """Get dictionary representation of the Property"""
         return self.__dict__
 
+    @property
+    def default_dict(self) -> Dict:
+        return {"expression": self.get_expression,
+                "type": self.get_dictionary().get("type", ""),
+                "value": self.get_dictionary().get("value", ""),
+                "title": self.get_dictionary().get("title", ""),
+                "status": self.get_dictionary().get("status", "")}
+
     def __str__(self):
         """Get string representation of the Property"""
         return ' | '.join(f'{key}={value}' for key, value in self.__dict__.items())
