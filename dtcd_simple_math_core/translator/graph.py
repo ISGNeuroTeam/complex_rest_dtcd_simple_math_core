@@ -234,7 +234,10 @@ class Graph:
         if '.' not in column:
             return False
 
-        node_name, prop_name = tuple(column.split('.'))
+        columns = column.split('.')
+        if len(columns) != 2:
+            return False
+        node_name, prop_name = tuple(columns)
         return node_name in self.nodes and prop_name in self.nodes[node_name].properties
 
     def calc(self) -> Dict:
