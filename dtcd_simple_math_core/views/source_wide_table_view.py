@@ -31,7 +31,9 @@ class SourceWideTableView(APIView):
         :param request: Consists of a "swt_name" (a graph fragment name)
         :return:
         """
-        swt_name = request.GET.get("swt_name", None)
+        swt_name: str = request.GET.get("swt_name", None)
+        tick: int = int(request.GET.get("tick", None))
+
         if swt_name is None:
             return ErrorResponse(
                 {
@@ -41,7 +43,7 @@ class SourceWideTableView(APIView):
 
         swt = SourceWideTable(swt_name)
         try:
-            table = swt.read()
+            table = swt.get_by_tick(tick=tick)
         except Exception as exception:
             return ErrorResponse(error_message=str(exception))
 
