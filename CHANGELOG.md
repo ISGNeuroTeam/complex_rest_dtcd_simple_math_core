@@ -1,14 +1,9 @@
-## [0.1.6] - 2023-08-10
+## [0.1.6] - 2023-08-09
 
 ### Fixed
 
-- GET swt request now returns an array of on exact line of the swt table with index of `tick`, given in request.
-- if swt table happen to be sparse, smc now increases the density of it according to its schema.
-
-### Changed
-
-- if `tick` sent not as `digit`, plugin returns an error message.
-- if `tick` is not sent at all, default value of `-1` is used.
+- GET swt request now returns exact line of the swt table with index of `tick`, given in request
+- if swt table happen to be sparse, smc now increases the density of it according to its schema
 
 ## [0.1.5] - 2023-08-04
 
