@@ -10,6 +10,8 @@ from rest.response import SuccessResponse, ErrorResponse
 
 from ..translator.swt import SourceWideTable
 
+DEFAULT_TICK = -1
+
 
 class SourceWideTableView(APIView):
     """
@@ -32,14 +34,13 @@ class SourceWideTableView(APIView):
         :return:
         """
         swt_name: str = request.GET.get("swt_name", None)
-        tick: int = int(request.GET.get("tick", None))
-
         if swt_name is None:
-            return ErrorResponse(
-                {
-                    'message': 'A source wide table name is required'
-                }
-            )
+            return ErrorResponse(error_message='A source wide table name is required')
+
+        try:
+            tick: int = int(request.GET.get("tick", DEFAULT_TICK))
+        except ValueError:
+            return ErrorResponse(error_message=f"tick must be a digit, not '{request.GET.get('tick', DEFAULT_TICK)}'")
 
         swt = SourceWideTable(swt_name)
         try:

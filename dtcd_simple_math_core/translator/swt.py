@@ -101,7 +101,7 @@ class SourceWideTable:
         try:
             return [data[tick]]
         except IndexError:
-            raise IndexError(f'tick value is out of range[{len(data)}]')
+            raise IndexError(f'tick value is out of range of {len(data)-1} element{"" if len(data) == 1 else "s"}.')
 
     def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
         """Function to check if swt table with given name exists or not and why
