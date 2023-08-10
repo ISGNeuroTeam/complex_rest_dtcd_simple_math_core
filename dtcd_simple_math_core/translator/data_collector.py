@@ -71,7 +71,10 @@ class DataCollector:
         parse and handle its exceptions"""
         try:
             self.log.debug("data_collector-job_create | trying to create job...")
-            result = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset.load()
+            dataset = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset
+            result = dataset.load()
+            schema = dataset.schema
+            print(f'we have a schema: {schema}')
         except ConnectionError as exception:
             message: str = 'OTL service at {%s}:{%s} seem to be unavailable, ' \
                            'check ot_simple_connector ports in a config' % (
@@ -106,7 +109,23 @@ class DataCollector:
                 self.log.exception(message)
                 raise OTLServiceUnavailable(message) from e
             raise Exception(f"unregistered exception: {e.args[0]}") from e
+
+        # we need to recharge the table if it is sparse.
+        # sometimes it may happen that come columns does not have values in some lines
+        # we must check it and add that cells with empty value
+        result = self.densify_table(result, schema)
         self.log.debug('result=%s', result)
+        return result
+
+    @staticmethod
+    def densify_table(source_table: List[Dict], columns: str) -> List:
+        columns = [x.split(' ')[0].strip('`') for x in columns.split(',')]
+        result = source_table
+        for row in result:
+            for column in columns:
+                if column not in row.keys():
+                    row[column] = ""
+
         return result
 
     def create_fresh_swt(self, query_text: str) -> list:
