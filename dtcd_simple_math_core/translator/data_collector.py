@@ -74,7 +74,6 @@ class DataCollector:
             dataset = self.connector.jobs.create(expression, cache_ttl=cache_ttl).dataset
             result = dataset.load()
             schema = dataset.schema
-            print(f'we have a schema: {schema}')
         except ConnectionError as exception:
             message: str = 'OTL service at {%s}:{%s} seem to be unavailable, ' \
                            'check ot_simple_connector ports in a config' % (

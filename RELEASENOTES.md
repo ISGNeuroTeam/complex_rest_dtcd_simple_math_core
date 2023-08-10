@@ -1,3 +1,14 @@
+## [0.1.7] - 2023-08-10
+
+### Fixed
+
+- GET swt request now returns **an array** of an exact line of the swt table with index of `tick`, given in request.
+
+### Changed
+
+- if `tick` sent not as `digit`, plugin returns an error message.
+- if `tick` is not sent at all, default value of `-1` is used.
+
 ## [0.1.6] - 2023-08-09
 
 ### Fixed
