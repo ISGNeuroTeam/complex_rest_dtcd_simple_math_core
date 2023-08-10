@@ -93,14 +93,15 @@ class SourceWideTable:
 
         return result
 
-    def get_by_tick(self, tick: int) -> str:
+    def get_by_tick(self, tick: int) -> List[Dict]:
+        """Here we take a swt table and return a list of one dict,
+        which is the line of swt table with index 'tick'.
+        Why do we have to return a list of one element? - for not breaking the frontend."""
         data = self.read()
         try:
-            return data[tick]
+            return [data[tick]]
         except IndexError:
             raise IndexError(f'tick value is out of range[{len(data)}]')
-
-    # Index is out of range
 
     def check_swt_exists(self, data_collector: DataCollector) -> Tuple[bool, str]:
         """Function to check if swt table with given name exists or not and why
