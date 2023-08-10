@@ -2,7 +2,7 @@
 
 ### Fixed
 
-- GET swt request now returns **an array** of on exact line of the swt table with index of `tick`, given in request.
+- GET swt request now returns **an array** of an exact line of the swt table with index of `tick`, given in request.
 
 ### Changed
 
