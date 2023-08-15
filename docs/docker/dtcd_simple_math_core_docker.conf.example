@@ -28,6 +28,7 @@ use_re_datalakenode = True
 re_object_id_and_property = (\w+)\.(\w+)
 path_to_graph = ../dtcd_simple_math_core/graphs/{0}.json
 otl_create_fresh_swt = | makeresults count=1 | eval _sn=1 | eval _t=_time | writeFile format=json path=SWT/
+swt_line_index = PREVIOUS_MONTH
 
 [graph_key_names]
 ops_order = _operations_order

@@ -5,6 +5,7 @@
 import json
 import logging
 import re
+import time
 from typing import Dict, Union, List
 
 from ..settings import GRAPH_GLOBALS, plugin_name, EVAL_GLOBALS
@@ -251,7 +252,8 @@ class Graph:
         list_of_sw_rows = swt.calc(nodes_eval_expressions, self.swt_import_tables)
         self.log.debug('list_of_sw_rows[-1]=%s', list_of_sw_rows[-1])
 
-        result = self.update(list_of_sw_rows[-1])
+        row_of_swt = get_row_of_swt(list_of_sw_rows, GRAPH_GLOBALS['swt_line_index'])
+        result = self.update(row_of_swt)
         return result
 
     def get_nodes_eval_expressions(self) -> List[Dict]:
@@ -320,3 +322,19 @@ class Graph:
         cls.log.debug('reading a graph %s at %s', filename, path)
         with open(path, encoding='utf-8') as file:
             return Graph(filename, file.read())
+
+
+def get_row_of_swt(list_of_rows: List[Dict], swt_line_index: str) -> Dict:
+    if swt_line_index == 'PREVIOUS_MONTH':
+        current_time = int(time.time())
+
+        # Create a list comprehension that filters out dictionaries with `_t` value
+        # larger than or equal to the current time
+        filtered_list = [d for d in list_of_rows if int(d['_t']) < current_time]
+
+        # Find the dictionary with the highest `_t` value in the filtered list
+        result = max(filtered_list, key=lambda d: d['_t'])
+    else:  # if swt_line_index is 'LAST' or anything else we return latest row
+        result = list_of_rows[-1]
+
+    return result
