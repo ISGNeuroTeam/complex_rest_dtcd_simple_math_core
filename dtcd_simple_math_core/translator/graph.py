@@ -330,7 +330,7 @@ def get_row_of_swt(list_of_rows: List[Dict], swt_line_index: str) -> Dict:
 
         # Create a list comprehension that filters out dictionaries with `_t` value
         # larger than or equal to the current time
-        filtered_list = [d for d in list_of_rows if d['_t'] < current_time]
+        filtered_list = [d for d in list_of_rows if int(d['_t']) < current_time]
 
         # Find the dictionary with the highest `_t` value in the filtered list
         result = max(filtered_list, key=lambda d: d['_t'])
