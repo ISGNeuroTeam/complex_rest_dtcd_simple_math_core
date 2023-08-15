@@ -334,7 +334,7 @@ def get_row_of_swt(list_of_rows: List[Dict], swt_line_index: str) -> Dict:
 
         # Find the dictionary with the highest `_t` value in the filtered list
         result = max(filtered_list, key=lambda d: d['_t'])
-    else:  # if swt_line_index is 'LATEST' or anything else we return latest row
+    else:  # if swt_line_index is 'LAST' or anything else we return latest row
         result = list_of_rows[-1]
 
     return result
