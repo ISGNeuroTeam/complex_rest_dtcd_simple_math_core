@@ -56,5 +56,6 @@ Serditov Nikita
 
 ## Setup of the plugin
 Go to dtcd_simple_math_core/dtcd_simple_math_core.conf and edit it:
-- set logging `level` at the [logging] section
-- set parameters of [ot_simple_connector], usually `host` is `localhost`, all the rest parameters get from your administrator
+- set logging `level` at the [logging] section.
+- set parameters of [ot_simple_connector], usually `host` is `localhost`, all the rest parameters get from your administrator.
+- set `swt_line_index` parameter to `PREVIOUS_MONTH` if you need to fill graph with fact swt table values, or `LATEST` if you need to fill graph with random latest row of swt table.
