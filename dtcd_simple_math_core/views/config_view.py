@@ -2,8 +2,6 @@
 """Module to return configuration of the plugin view"""
 # pylint: disable=import-error, too-few-public-methods
 import logging
-import re
-from typing import Union
 
 from rest.views import APIView
 from rest.permissions import AllowAny
