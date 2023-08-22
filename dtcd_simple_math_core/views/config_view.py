@@ -6,7 +6,7 @@ import logging
 from rest.views import APIView
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
-from ..settings import SETTINGS_FILE_PATH
+from ..settings import SETTINGS_FILE_PATH, PLUGIN_VERSION
 
 
 class ConfigView(APIView):
@@ -31,7 +31,8 @@ class ConfigView(APIView):
                 'level': str(self.log.level),
                 'handlers': str(self.log.handlers)
             },
-            'settings_file_path': str(SETTINGS_FILE_PATH)
+            'settings_file_path': str(SETTINGS_FILE_PATH),
+            'plugin_version': PLUGIN_VERSION
         }
 
         return SuccessResponse(result)
