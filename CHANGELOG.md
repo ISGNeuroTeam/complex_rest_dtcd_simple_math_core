@@ -1,10 +1,18 @@
+## [0.1.9] - 2023-08-22
+
+### Added 
+- `time_offset` parameter to establish the difference between timezone where `_t` column values of the `wide` swt table were generated and `utc` timezone.
+
+### Changed
+- now `PREVIOUS_MONTH` leads to fill the graph with values of the row of swt table which `_t` value is previous to current time **considering timezone**. So if today is 2nd of August 2023, then values from row with `1688158800` (30th of June 2023 21:00:00) at `_t` column will be used.
+
 ## [0.1.8] - 2023-08-15
 
 ### Changed
 
 - graph is filled with values of the different row of the swt table now, depending on `swt_line_index` config parameter.
-  - `PREVIOUS_MONTH` leads to fill the graph with values of the row of swt table which `_t` value is previous to current time. So if today is 2nd of August 2023, then values from row with `1564606800` (31st of July 2023) at `_t` column will be used 
-  - `LAST` leads to fill graph with values of the last row of current swt table. Which may be **not the latest**.
+  - `PREVIOUS_MONTH` leads to fill the graph with values of the row of swt table which `_t` value is previous to current time. So if today is 2nd of August 2023, then values from row with `1690837200` (31st of July 2023) at `_t` column will be used 
+  - `LAST` leads to fill graph with values of the last row of current swt table. Which may be **not the latest**.     
 
 ## [0.1.7] - 2023-08-10
 

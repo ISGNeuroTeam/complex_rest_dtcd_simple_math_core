@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """This module describes logic of analyzing and merging graph data
 """
-
+from _datetime import datetime, timezone, timedelta
 import json
 import logging
 import re
-import time
 from typing import Dict, Union, List
 
-from ..settings import GRAPH_GLOBALS, plugin_name, EVAL_GLOBALS
+from ..settings import GRAPH_GLOBALS, plugin_name, EVAL_GLOBALS, UTC_OFFSET
 from .swt import SourceWideTable
 
 from .node import Node
@@ -326,11 +325,10 @@ class Graph:
 
 def get_row_of_swt(list_of_rows: List[Dict], swt_line_index: str) -> Dict:
     if swt_line_index == 'PREVIOUS_MONTH':
-        current_time = int(time.time())
-
+        threshold_time = get_threshold_time(offset=UTC_OFFSET)
         # Create a list comprehension that filters out dictionaries with `_t` value
         # larger than or equal to the current time
-        filtered_list = [d for d in list_of_rows if int(d['_t']) < current_time]
+        filtered_list = [d for d in list_of_rows if int(d['_t']) < threshold_time]
 
         # Find the dictionary with the highest `_t` value in the filtered list
         result = max(filtered_list, key=lambda d: d['_t'])
@@ -338,3 +336,31 @@ def get_row_of_swt(list_of_rows: List[Dict], swt_line_index: str) -> Dict:
         result = list_of_rows[-1]
 
     return result
+
+
+def get_threshold_time(offset: int) -> int:
+    """ the problem with offset is that currently wide table is created with utc+03 timezone,
+        so if it was required to have 01.08.2023 00:00:00, instead it stores 31.07.2023 21:00:00
+        and all cells in wide swt table store datetime of 21:00:00 of the latest day of the month
+        and threshold should be like this:
+
+             required date        `threshold date`               today
+        [30.06.2023 21:00:00] | [31.07.2023 21:00:00] | [22.08.2023 21:00:00] | [31.08.2023 21:00:00]
+
+        if today is 22.08.2023 09:45:00.
+        previous time cell  for current date is 31.07.2023 21:00:00
+        next time cell      for current date is 31.08.2023 21:00:00
+        then required data is from row with cell of 30.06.2023 21:00:00     <<< `threshold date`
+
+        task of this function is to get threshold date out of today datetime using 'offset' parameter
+
+        Args:
+            ::offset: amount of hours offset used in wide swt table considering utc timezone
+
+        Returns:
+            integer value timestamp fof the `threshold date`
+    """
+    tz = timezone(timedelta(hours=offset))
+    ct = datetime.now(tz=tz)
+    threshold_time = datetime(year=ct.year, month=ct.month, day=1) - timedelta(hours=offset)
+    return int(round(threshold_time.timestamp()))
