@@ -1,3 +1,5 @@
+freezegun==1.1.0
+
 ot-simple-connector==0.1.12
 --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple
 --trusted-host s.dev.isgneuro.com
