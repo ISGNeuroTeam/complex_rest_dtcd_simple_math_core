@@ -1,10 +1,11 @@
+from freezegun import freeze_time
 from unittest import TestCase, mock
 
 import json
 
 import os
 
-from dtcd_simple_math_core.translator.graph import Graph, get_row_of_swt
+from dtcd_simple_math_core.translator.graph import Graph, get_row_of_swt, get_threshold_time
 from .resources.wide_swt_dates import dates
 
 
@@ -66,19 +67,24 @@ class TestGraph(TestCase):
         self.assertTrue(true_result)
         self.assertFalse(false_result)
 
-    # @mock.patch('time.time', mock.MagicMock(return_value=1692118295)) # 1562014800
-    @mock.patch('time.time', mock.MagicMock(return_value=1562014800))
     def test_get_row_of_swt_previous_month(self):
-        # 1562014800 (2023.07.01)>> {'_t': '1561928400'} (2023.06.30)
-        list_of_rows = dates
-        swt_line_index = 'PREVIOUS_MONTH'
-        sample = {'_t': '1561928400'}
-        result = get_row_of_swt(list_of_rows=list_of_rows, swt_line_index=swt_line_index)
-        self.assertEqual(sample, result)
+        with mock.patch('dtcd_simple_math_core.translator.graph.get_threshold_time') as mocked_get_threshold_time:
+            mocked_get_threshold_time.return_value = 1690837200  # 31.07.2023 21:00:00
+            list_of_rows = dates
+            swt_line_index = 'PREVIOUS_MONTH'
+            sample = {'_t': '1688158800'}  # 30.06.2023
+            result = get_row_of_swt(list_of_rows=list_of_rows, swt_line_index=swt_line_index)
+            self.assertEqual(sample, result)
 
     def test_get_row_of_swt_latest_index(self):
         list_of_rows = dates
         swt_line_index = 'LATEST'
         sample = {'_t': '1661979600'}
         result = get_row_of_swt(list_of_rows=list_of_rows, swt_line_index=swt_line_index)
+        self.assertEqual(sample, result)
+
+    @freeze_time("2023-08-22 09:45:00")
+    def test_get_threshold_time(self):
+        sample: int = 1690837200  # 2023-07-31 21:00:00
+        result: int = get_threshold_time(3)
         self.assertEqual(sample, result)

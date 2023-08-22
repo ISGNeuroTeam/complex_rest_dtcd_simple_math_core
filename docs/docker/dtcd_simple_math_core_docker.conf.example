@@ -3,6 +3,8 @@ level = INFO
 
 [general]
 logs_path = .
+time_offset = 3
+version = "0.1.9"
 
 [ot_simple_connector]
 host = s-dev-2.dev.isgneuro.com
