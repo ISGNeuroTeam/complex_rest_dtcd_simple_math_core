@@ -22,6 +22,7 @@ WORKDIR /complex_rest
 
 RUN pip install --no-cache-dir  -r requirements.txt
 RUN pip install --no-cache-dir --extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple --trusted-host s.dev.isgneuro.com ot-simple-connector
+RUN pip install freezegun==1.1.0
 
 ENTRYPOINT ["/complex_rest/docs/docker_dev/complex_rest/entrypoint.sh"]
 CMD ["python /complex_rest/complex_rest/manage.py runserver [::]:8080"]
