@@ -48,6 +48,10 @@ GRAPH_GLOBALS = ini_config['graph_globals']
 PROPERTY_GLOBALS = ini_config['property_globals']
 SETTINGS_FILE_PATH = Path().resolve()
 
+# general settings
+PLUGIN_VERSION = ini_config['general'].get('version', 'No version found')
+UTC_OFFSET = int(ini_config['general'].get('time_offset', '3'))
+
 # set graph key names
 GRAPH_KEY_NAMES = ini_config['graph_key_names']
 
