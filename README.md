@@ -59,3 +59,4 @@ Go to dtcd_simple_math_core/dtcd_simple_math_core.conf and edit it:
 - set logging `level` at the [logging] section.
 - set parameters of [ot_simple_connector], usually `host` is `localhost`, all the rest parameters get from your administrator.
 - set `swt_line_index` parameter to `PREVIOUS_MONTH` if you need to fill graph with fact swt table values, or `LATEST` if you need to fill graph with random latest row of swt table.
+- set `time_offset` parameter to show the difference between timezone used to set wide swt table `_t` column values and utc timezone. For example if `_t` values were generated in `utc+3` timezone, the `time_offset` must be set to `3`.
